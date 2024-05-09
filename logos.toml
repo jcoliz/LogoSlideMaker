@@ -13,11 +13,23 @@ path = "blender_icon_128x128.png"
 title = "Wine O'Clock"
 path = "wine-svgrepo-com.svg"
 
+[logos.one]
+title = "1x1 Square"
+path = "1x1.svg"
+
+[logos.two]
+title = "3x2 Mid-Wide"
+path = "3x2.svg"
+
+[logos.three]
+title = "3x1 Super Wide"
+path = "3x1.svg"
+
 [[rows]]
 xposition = 1.2
 yposition = 1.12
 width = 4.85
-logos = [ "wine", "blender", "blender", "blender", "blender", "blender", "blender" ]
+logos = [ "wine", "one", "two", "three", "blender", "blender", "blender" ]
 
 [[rows]]
 xposition = 1.2

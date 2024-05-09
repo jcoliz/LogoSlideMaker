@@ -63,6 +63,10 @@ public class Placement(Config config, Row row, Logo logo)
         //image.Save(stream, image.RawFormat);
         //stream.Position = 0;
 
+        // By default, icons are square
+        var icon_width = config.IconSize;
+        var icon_height = config.IconSize;
+
         if (Path.GetExtension(logo.Path).ToLowerInvariant() == ".svg")
         {
             var svg = Svg.SvgDocument.Open(logo.Path);
@@ -77,6 +81,15 @@ public class Placement(Config config, Row row, Logo logo)
             bitmap.Save(stream, ImageFormat.Png);
             stream.Seek(0,SeekOrigin.Begin);
             shapes.AddPicture(stream);
+
+            // Adjust size of icon depending on size of source image. The idea is all
+            // icons occupy the same number of pixel area
+
+            var width_factor = Math.Sqrt(aspect);
+            var height_factor = 1.0 / width_factor;
+
+            icon_width *= width_factor;
+            icon_height *= height_factor;
         }
         else
         {
@@ -88,10 +101,10 @@ public class Placement(Config config, Row row, Logo logo)
         //shapes.AddPicture(stream);
 
         IShape shape = shapes.Last();
-        shape.X = (int)((row.XPosition + Index * row.Spacing - config.IconSize / 2)*config.Dpi);
-        shape.Y = (int)((row.YPosition - config.IconSize / 2)*config.Dpi);
-        shape.Width = (int)(config.IconSize * config.Dpi);
-        shape.Height = (int)(config.IconSize * config.Dpi);
+        shape.X = (int)((row.XPosition + Index * row.Spacing - icon_width / 2)*config.Dpi);
+        shape.Y = (int)((row.YPosition - icon_height / 2)*config.Dpi);
+        shape.Width = (int)(icon_width * config.Dpi);
+        shape.Height = (int)(icon_height * config.Dpi);
 
         shapes.AddRectangle(
             x:(int)((row.XPosition + Index * row.Spacing - config.TextWidth / 2) * config.Dpi), 
