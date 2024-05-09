@@ -68,9 +68,9 @@ public class Placement(Config config, Row row, Logo logo)
             var svg = Svg.SvgDocument.Open(logo.Path);
             var aspect = svg.Width.Value / svg.Height.Value;
 
-            // Arbitrarily render the bitmap at 96px (1 inch) high
-            svg.Width = new Svg.SvgUnit(Svg.SvgUnitType.Pixel, 96f * aspect);
-            svg.Height = new Svg.SvgUnit(Svg.SvgUnitType.Pixel, 96f);
+            // Arbitrarily render the bitmap at 96px (2 inch) high
+            svg.Width = new Svg.SvgUnit(Svg.SvgUnitType.Pixel, 2*96f * aspect);
+            svg.Height = new Svg.SvgUnit(Svg.SvgUnitType.Pixel, 2*96f);
             var bitmap = svg.Draw();
 
             using var stream = new MemoryStream();
