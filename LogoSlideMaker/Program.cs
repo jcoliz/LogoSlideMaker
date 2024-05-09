@@ -13,6 +13,11 @@ var config = new Config()
     TextWidth = 0.67 
 };
 
+var logos = new Dictionary<string,Logo>()
+{
+    { "blender", new Logo() { Title = "Hello, Blender", Path = "blender_icon_128x128.png" } }
+};
+
 Row[] rows =
 [
     new Row() 
@@ -21,12 +26,13 @@ Row[] rows =
         XPosition = 1.2, 
         YPosition = 1.12,
         Logos = [ 
-            "blender_icon_128x128.png",
-            "blender_icon_128x128.png",
-            "blender_icon_128x128.png",
-            "blender_icon_128x128.png",
-            "blender_icon_128x128.png",
-            "blender_icon_128x128.png",
+            "blender",
+            "blender",
+            "blender",
+            "blender",
+            "blender",
+            "blender",
+            "blender",
         ]
     },
     new Row() 
@@ -35,21 +41,20 @@ Row[] rows =
         XPosition = 1.2, 
         YPosition = 1.12 + 0.6,
         Logos = [ 
-            "blender_icon_128x128.png",
-            "blender_icon_128x128.png",
-            "blender_icon_128x128.png",
-            "blender_icon_128x128.png",
-            "blender_icon_128x128.png",
-            "blender_icon_128x128.png",
-            "blender_icon_128x128.png",
-            "blender_icon_128x128.png",
-            "blender_icon_128x128.png",
-            "blender_icon_128x128.png",
+            "blender",
+            "blender",
+            "blender",
+            "blender",
+            "blender",
+            "blender",
+            "blender",
+            "blender",
+            "blender",
         ]
     }
 ];
 
-var renderer = new Renderer(config,shapes);
+var renderer = new Renderer(config, logos, shapes);
 foreach(var row in rows)
 {
     renderer.Render(row);
