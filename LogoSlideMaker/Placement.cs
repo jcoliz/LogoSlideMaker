@@ -2,36 +2,43 @@ using ShapeCrawler;
 using System.Drawing;
 using System.Drawing.Imaging;
 
-public record Logo
+public class Definition
 {
-    public string Title { get; init; } = string.Empty;
-    public string Path { get; init; } = string.Empty;
+    public Config Config { get; set; } = new();
+    public Dictionary<string,Logo> Logos { get; set; } = [];
+    public List<Row> Rows { get; set; } = new List<Row>();
 }
 
-public record Config
+public class Logo
+{
+    public string Title { get; set; } = string.Empty;
+    public string Path { get; set; } = string.Empty;
+}
+
+public class Config
 {
     /// <summary>
     /// Vertical distance from middle of icon to top of text, in inches
     /// </summary>
-    public double TextDistace { get; init; }
+    public double TextDistace { get; set; }
 
-    public double TextWidth { get; init; }
-    public double TextHeight { get; init; }
+    public double TextWidth { get; set; }
+    public double TextHeight { get; set; }
 
     /// <summary>
     /// Width & height of icon, in inches
     /// </summary>
-    public double IconSize { get; init; }
+    public double IconSize { get; set; }
 
-    public double Dpi { get; init; }
+    public double Dpi { get; set; }
 }
 
-public record Row
+public class Row
 {
-    public double XPosition { get; init; }
-    public double YPosition { get; init; }
-    public double Width { get; init; }
-    public List<string> Logos { get; init; } = new();
+    public double XPosition { get; set; }
+    public double YPosition { get; set; }
+    public double Width { get; set; }
+    public List<string> Logos { get; set; } = new List<string>();
     public int NumItems => Logos.Count;
     public double Spacing => Width / ((double)NumItems - 1);
 }
