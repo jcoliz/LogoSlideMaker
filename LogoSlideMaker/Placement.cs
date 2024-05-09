@@ -63,13 +63,29 @@ public class Placement(Config config, Row row, Logo logo)
         //image.Save(stream, image.RawFormat);
         //stream.Position = 0;
 
-        using var stream = new FileStream(logo.Path,FileMode.Open);
-        shapes.AddPicture(stream);
+        if (Path.GetExtension(logo.Path).ToLowerInvariant() == ".svg")
+        {
+            var svg = Svg.SvgDocument.Open(logo.Path);
+            //var aspect = svg.AspectRatio;
+            //svg.Width = 100;
+            //svg.Height = 100;
+            var bitmap = svg.Draw();
+
+            using var stream = new MemoryStream();
+            bitmap.Save(stream, ImageFormat.Png);
+            stream.Seek(0,SeekOrigin.Begin);
+            shapes.AddPicture(stream);
+        }
+        else
+        {
+            using var stream = new FileStream(logo.Path,FileMode.Open);
+            shapes.AddPicture(stream);
+        }
         
         //using var stream = File.OpenRead("wine-svgrepo-com.svg");
         //shapes.AddPicture(stream);
 
-        var shape = shapes.Last();
+        IShape shape = shapes.Last();
         shape.X = (int)((row.XPosition + Index * row.Spacing - config.IconSize / 2)*config.Dpi);
         shape.Y = (int)((row.YPosition - config.IconSize / 2)*config.Dpi);
         shape.Width = (int)(config.IconSize * config.Dpi);

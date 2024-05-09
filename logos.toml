@@ -9,11 +9,15 @@ dpi = 96.0
 title = "Hello, Blender"
 path = "blender_icon_128x128.png"
 
+[logos.wine]
+title = "Wine O'Clock"
+path = "wine-svgrepo-com.svg"
+
 [[rows]]
 xposition = 1.2
 yposition = 1.12
 width = 4.85
-logos = [ "blender", "blender", "blender", "blender", "blender", "blender", "blender" ]
+logos = [ "wine", "blender", "blender", "blender", "blender", "blender", "blender" ]
 
 [[rows]]
 xposition = 1.2
