@@ -37,6 +37,10 @@ path = "7x1.svg"
 title = "9x1 Insane Wide"
 path = "9x1.svg"
 
+#
+#
+#
+
 [[rows]]
 xposition = 1.31
 yposition = 1.21
@@ -45,6 +49,119 @@ logos = [ "three", "wine", "one", "two", "one", "one", "five" ]
 
 [[rows]]
 xposition = 1.31
-yposition = 1.83
+yposition = 1.84
 width = 4.85
 logos = ["one", "seven", "nine", "one", "five", "nine", "nine" ]
+
+#
+#
+#
+
+[[rows]]
+xposition = 1.31
+yposition = 2.71
+width = 4.85
+logos = [ "three", "one" ]
+
+[[rows]]
+xposition = 1.31
+yposition = 3.34
+width = 4.85
+logos = [ "one" ]
+
+[[rows]]
+xposition = 1.31
+yposition = 3.97
+width = 4.85
+logos = [ "one" ]
+
+#
+#
+#
+
+[[rows]]
+xposition = 1.31
+yposition = 4.88
+width = 4.85
+logos = [ "one" ]
+
+[[rows]]
+xposition = 1.31
+yposition = 5.50
+width = 4.85
+logos = [ "two", "one" ]
+
+#
+#
+#
+
+[[rows]]
+xposition = 1.31
+yposition = 6.58
+width = 4.85
+logos = [ "two", "one" ]
+
+#
+# ----------------------------------
+#
+
+
+[[rows]]
+xposition = 7.66
+yposition = 1.21
+width = 4.85
+logos = [ "five", "one" ]
+
+[[rows]]
+xposition = 7.66
+yposition = 1.84
+width = 4.85
+logos = [ "five", "one" ]
+
+#
+#
+#
+
+[[rows]]
+xposition = 7.66
+yposition = 2.71
+width = 4.85
+logos = [ "five", "one" ]
+
+[[rows]]
+xposition = 7.66
+yposition = 3.34
+width = 4.85
+logos = [ "five", "one" ]
+
+[[rows]]
+xposition = 7.66
+yposition = 3.97
+width = 4.85
+logos = [ "five", "one" ]
+
+#
+#
+#
+
+[[rows]]
+xposition = 7.66
+yposition = 4.88
+width = 4.85
+logos = [ "five", "one" ]
+
+[[rows]]
+xposition = 7.66
+yposition = 5.50
+width = 4.85
+logos = [ "five", "one" ]
+
+#
+#
+#
+
+[[rows]]
+xposition = 7.66
+yposition = 6.58
+width = 4.85
+logos = [ "five", "one" ]

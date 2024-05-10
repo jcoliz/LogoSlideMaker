@@ -41,7 +41,7 @@ public class Row
     public double Width { get; set; }
     public List<string> Logos { get; set; } = new List<string>();
     public int NumItems => Logos.Count;
-    public double Spacing => Width / ((double)NumItems - 1);
+    public double Spacing => (NumItems > 1) ? Width / ((double)NumItems - 1) : 0;
 }
 
 public class Placement(Config config, Row row, Logo logo)
@@ -50,31 +50,13 @@ public class Placement(Config config, Row row, Logo logo)
 
     public void RenderTo(ISlideShapes shapes)
     {
-        /*
-        shapes.AddRectangle(
-            x:(int)((row.XPosition + Index * row.Spacing - config.IconSize / 2)*config.Dpi), 
-            y:(int)((row.YPosition - config.IconSize / 2)*config.Dpi), 
-            width:(int)(config.IconSize * config.Dpi), 
-            height:(int)(config.IconSize * config.Dpi)
-        );
-        */
-
-        //Image image = Image.FromFile("wine-svgrepo-com.svg");
-        //var stream = new MemoryStream();
-        //image.Save(stream, image.RawFormat);
-        //stream.Position = 0;
-
-        // By default, icons are square
-        var icon_width = config.IconSize;
-        var icon_height = config.IconSize;
-
         if (Path.GetExtension(logo.Path).ToLowerInvariant() == ".svg")
         {
             var svg = Svg.SvgDocument.Open(logo.Path);
-            var aspect = svg.Width.Value / svg.Height.Value;
+            var svg_aspect = svg.Width.Value / svg.Height.Value;
 
             // Arbitrarily render the bitmap at 96px (2 inch) high
-            svg.Width = new Svg.SvgUnit(Svg.SvgUnitType.Pixel, 2*96f * aspect);
+            svg.Width = new Svg.SvgUnit(Svg.SvgUnitType.Pixel, 2*96f * svg_aspect);
             svg.Height = new Svg.SvgUnit(Svg.SvgUnitType.Pixel, 2*96f);
             var bitmap = svg.Draw();
 
@@ -83,14 +65,6 @@ public class Placement(Config config, Row row, Logo logo)
             stream.Seek(0,SeekOrigin.Begin);
             shapes.AddPicture(stream);
 
-            // Adjust size of icon depending on size of source image. The idea is all
-            // icons occupy the same number of pixel area
-
-            var width_factor = Math.Sqrt(aspect);
-            var height_factor = 1.0 / width_factor;
-
-            icon_width *= width_factor;
-            icon_height *= height_factor;
         }
         else
         {
@@ -98,12 +72,17 @@ public class Placement(Config config, Row row, Logo logo)
             shapes.AddPicture(stream);
         }
         
-        //using var stream = File.OpenRead("wine-svgrepo-com.svg");
-        //shapes.AddPicture(stream);
+        var pic = shapes.OfType<IPicture>().Last();
 
-        var pic = shapes.OfType<IPicture>().First();
+        // Adjust size of icon depending on size of source image. The idea is all
+        // icons occupy the same number of pixel area
 
-        //var pic = shapes.Last() as IPicture;
+        var aspect = (double)pic.Width / (double)pic.Height;
+        var width_factor = Math.Sqrt(aspect);
+        var height_factor = 1.0 / width_factor;
+        var icon_width = config.IconSize * width_factor;
+        var icon_height = config.IconSize * height_factor;
+
         pic.X = (int)((row.XPosition + Index * row.Spacing - icon_width / 2)*config.Dpi);
         pic.Y = (int)((row.YPosition - icon_height / 2)*config.Dpi);
         pic.Width = (int)(icon_width * config.Dpi);
@@ -119,6 +98,8 @@ public class Placement(Config config, Row row, Logo logo)
         var tf = shape.TextFrame;
         tf.Text = logo.Title;
         var font = tf.Paragraphs.First().Portions.First().Font;
+
+        // TODO: All of these should be supplied on config
         font.Size = 7;
         font.LatinName = "Segoe UI";
         font.Color.Update("595959");
