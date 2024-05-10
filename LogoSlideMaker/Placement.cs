@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml.Spreadsheet;
 using ShapeCrawler;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -100,11 +101,13 @@ public class Placement(Config config, Row row, Logo logo)
         //using var stream = File.OpenRead("wine-svgrepo-com.svg");
         //shapes.AddPicture(stream);
 
-        IShape shape = shapes.Last();
-        shape.X = (int)((row.XPosition + Index * row.Spacing - icon_width / 2)*config.Dpi);
-        shape.Y = (int)((row.YPosition - icon_height / 2)*config.Dpi);
-        shape.Width = (int)(icon_width * config.Dpi);
-        shape.Height = (int)(icon_height * config.Dpi);
+        var pic = shapes.OfType<IPicture>().First();
+
+        //var pic = shapes.Last() as IPicture;
+        pic.X = (int)((row.XPosition + Index * row.Spacing - icon_width / 2)*config.Dpi);
+        pic.Y = (int)((row.YPosition - icon_height / 2)*config.Dpi);
+        pic.Width = (int)(icon_width * config.Dpi);
+        pic.Height = (int)(icon_height * config.Dpi);
 
         shapes.AddRectangle(
             x:(int)((row.XPosition + Index * row.Spacing - config.TextWidth / 2) * config.Dpi), 
@@ -112,7 +115,7 @@ public class Placement(Config config, Row row, Logo logo)
             width:(int)(config.TextWidth * config.Dpi), height:(int)(config.TextHeight * config.Dpi)
         );
 
-        shape = shapes.Last();
+        var shape = shapes.Last();
         var tf = shape.TextFrame;
         tf.Text = logo.Title;
         var font = tf.Paragraphs.First().Portions.First().Font;

@@ -25,14 +25,26 @@ path = "3x2.svg"
 title = "3x1 Super Wide"
 path = "3x1.svg"
 
-[[rows]]
-xposition = 1.2
-yposition = 1.12
-width = 4.85
-logos = [ "wine", "one", "two", "three", "blender", "blender", "blender" ]
+[logos.five]
+title = "5x1 Very Wide"
+path = "5x1.svg"
+
+[logos.seven]
+title = "7x1 Epic Wide"
+path = "7x1.svg"
+
+[logos.nine]
+title = "9x1 Insane Wide"
+path = "9x1.svg"
 
 [[rows]]
-xposition = 1.2
-yposition = 1.72
+xposition = 1.31
+yposition = 1.21
 width = 4.85
-logos = ["blender", "blender", "blender", "blender", "blender", "blender", "blender", "blender", "blender"]
+logos = [ "three", "wine", "one", "two", "one", "one", "five" ]
+
+[[rows]]
+xposition = 1.31
+yposition = 1.83
+width = 4.85
+logos = ["one", "seven", "nine", "one", "five", "nine", "nine" ]
