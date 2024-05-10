@@ -14,6 +14,9 @@ public class Logo
 {
     public string Title { get; set; } = string.Empty;
     public string Path { get; set; } = string.Empty;
+    public double? TextWidth { get; set; }
+
+    public double Scale { get; set; } = 1.0;
 }
 
 public class Config
@@ -80,18 +83,20 @@ public class Placement(Config config, Row row, Logo logo)
         var aspect = (double)pic.Width / (double)pic.Height;
         var width_factor = Math.Sqrt(aspect);
         var height_factor = 1.0 / width_factor;
-        var icon_width = config.IconSize * width_factor;
-        var icon_height = config.IconSize * height_factor;
+        var icon_width = config.IconSize * width_factor * logo.Scale;
+        var icon_height = config.IconSize * height_factor * logo.Scale;
 
         pic.X = (int)((row.XPosition + Index * row.Spacing - icon_width / 2)*config.Dpi);
         pic.Y = (int)((row.YPosition - icon_height / 2)*config.Dpi);
         pic.Width = (int)(icon_width * config.Dpi);
         pic.Height = (int)(icon_height * config.Dpi);
 
+        var text_width = logo.TextWidth ?? config.TextWidth;
+
         shapes.AddRectangle(
-            x:(int)((row.XPosition + Index * row.Spacing - config.TextWidth / 2) * config.Dpi), 
+            x:(int)((row.XPosition + Index * row.Spacing - text_width / 2) * config.Dpi), 
             y:(int)((row.YPosition - config.TextHeight / 2 + config.TextDistace) * config.Dpi), 
-            width:(int)(config.TextWidth * config.Dpi), height:(int)(config.TextHeight * config.Dpi)
+            width:(int)(text_width * config.Dpi), height:(int)(config.TextHeight * config.Dpi)
         );
 
         var shape = shapes.Last();
