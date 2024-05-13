@@ -102,6 +102,8 @@ public class Placement(Config config, Row row, Logo logo)
         var shape = shapes.Last();
         var tf = shape.TextFrame;
         tf.Text = logo.Title;
+        tf.LeftMargin = 0;
+        tf.RightMargin = 0;
         var font = tf.Paragraphs.First().Portions.First().Font;
 
         // TODO: All of these should be supplied on config
