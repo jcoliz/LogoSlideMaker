@@ -70,6 +70,81 @@ public record Row
     public double Spacing => (NumItems > 1) ? Width / ((double)NumItems - 1) : 0;
 }
 
+public enum Commands { Invalid = 0, End = 1 }
+
+/// <summary>
+/// Decompose a single logo entry within a row into component parts
+/// </summary>
+/// <remarks>
+/// The `logos=` line in a row can encode a lot of information. This breaks
+/// it apart into well-defined symbols.
+/// </remarks>
+public record Entry
+{
+    /// <summary>
+    /// Default constructor
+    /// </summary>
+    /// <remarks>
+    /// OK to just construct directly, although not commonly used this way
+    /// </remarks>
+    public Entry() {}
+
+    /// <summary>
+    /// Construct from a row logo entry
+    /// </summary>
+    /// <param name=""></param>
+    public Entry(string value)
+    {
+        var split = value.Split(':');
+        var logoId = split[0];
+
+        if (logoId.StartsWith('@'))
+        {
+            Command = Enum.Parse<Commands>(logoId[1..], ignoreCase:true);
+        }
+        else
+        {
+            Id = logoId;
+        }
+
+        var tags = split.Skip(1).GroupBy(x=>!x.StartsWith('!')).ToDictionary(x=>x.Key,x=>x);
+        Tags = tags.GetValueOrDefault(true)?.ToArray() ?? [];
+        NotTags = tags.GetValueOrDefault(false)?.Select(x=>x[1..]).ToArray() ?? [];
+    }
+
+    /// <summary>
+    /// Logo ID, or null if is not a logo
+    /// </summary>
+    /// <remarks>
+    /// Used to lookup into Definition.Logos
+    /// </remarks>
+    public string? Id { get; set; }
+
+    /// <summary>
+    /// Processing command
+    /// </summary>
+    /// <remarks>
+    /// Set by "@{command}" in row logos
+    /// </remarks>
+    public Commands? Command { get; set; }
+
+    /// <summary>
+    /// Entry-specific tags, will include this entry if match variant
+    /// </summary>
+    /// <remarks>
+    /// Set with "app:tag" in row logos
+    /// </remarks>
+    public string[] Tags { get; set; } = [];
+
+    /// <summary>
+    /// Entry-specific disincluding tags, will include this entry if does NOT match variant
+    /// </summary>
+    /// <remarks>
+    /// Set with "app:!tag" in row logos
+    /// </remarks>
+    public string[] NotTags { get; set; } = [];
+}
+
 public class Placement(Config config, Row row, Logo logo)
 {
     public int Index { get; init; }
@@ -109,7 +184,7 @@ public class Placement(Config config, Row row, Logo logo)
         var icon_height = config.IconSize * height_factor * logo.Scale;
 
         pic.X = (int)((row.XPosition + Index * row.Spacing - icon_width / 2)*config.Dpi);
-        pic.Y = (int)((row.YPosition - icon_height / 2)*config.Dpi);
+        pic.Y = (int)((row.YPosition - icon_height / 2.0)*config.Dpi);
         pic.Width = (int)(icon_width * config.Dpi);
         pic.Height = (int)(icon_height * config.Dpi);
 
@@ -143,24 +218,26 @@ public class Renderer(Config config, Dictionary<string,Logo> logos, Variant vari
     public void Render(Row _row)
     {
         // Skip any logos that aren't included.
-        var row = RowVariant(_row);
+        var entries = RowVariant(_row);
+        var row = _row with { Logos = entries.Select(x=>x.Id ?? string.Empty).ToList()};
 
-        for(int i = 0; i < row.NumItems; ++i )
+        int i = 0;
+        foreach(var entry in entries)
         {
-            var logoId = row.Logos[i];
-
-            if (logoId == "@end")
+            if (entry.Command == Commands.End)
             {
                 break;
             }
 
-            var logo = logos[logoId];
+            var logo = logos[entry.Id!];
 
             if (LogoShownInVariant(logo))
             {
                 var item = new Placement(config, row, logo) { Index = i };
                 item.RenderTo(shapes);
             }
+
+            ++i;
         }
     }
 
@@ -177,22 +254,31 @@ public class Renderer(Config config, Dictionary<string,Logo> logos, Variant vari
         return false;
     }
 
-    private bool LogoIncludedInVariant(string value)
+    private bool EntryIncludedInVariant(Entry entry)
     {
-        var split = value.Split(':');
-        var logoId = split[0];
+        // Split out "not" tags, where the logo is included if the tag
+        // is NOT in the variant
 
-        // Commands are included
-        if (logoId.StartsWith('@'))
-            return true;
+        var tags = entry.Tags.ToList();
+
+        // Lookup tags from logo if there is a logo
+        if (entry.Id != null)
+        {
+            var logo = logos[entry.Id!];
+
+            // Also include placement-only tags which are included in the
+            // id with an at-sign,
+            // e.g. "app@tag"
+            tags.AddRange( logo.Tags );
+        }
+
+        // Logos with 'not' tags are excluded if variant includes the tag
+        if (entry.NotTags.Any())
+        {
+            if (entry.NotTags.Intersect(variant.Include).Any())
+                return false;
+        } 
         
-        var logo = logos[logoId];
-
-        // Also include placement-only tags which are included in the
-        // id with an at-sign,
-        // e.g. "app@tag"
-        var tags = logo.Tags.Union(split.Skip(1)).ToList();
-
         // Logos with no tags are always included
         if (tags.Count == 0)
             return true;
@@ -209,10 +295,13 @@ public class Renderer(Config config, Dictionary<string,Logo> logos, Variant vari
         return false;
     }
 
-    private Row RowVariant(Row row)
+    /// <summary>
+    /// Transform to entries, and filter out non-included entries
+    /// </summary>
+    /// <param name="row"></param>
+    /// <returns></returns>
+    private ICollection<Entry> RowVariant(Row row)
     {
-        var included = row.Logos.Where(x => LogoIncludedInVariant(x)).Select(x=>x.Split(':')[0]).ToList();
-
-        return row with { Logos = included };
+        return row.Logos.Select(x=>new Entry(x)).Where(x => EntryIncludedInVariant(x)).ToArray();
     }
 }

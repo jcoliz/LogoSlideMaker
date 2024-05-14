@@ -1,7 +1,7 @@
 ﻿using ShapeCrawler;
 using Tomlyn;
 
-var pres = new Presentation();
+var pres = new Presentation("template.pptx");
 
 var sr = new StreamReader("logos.toml");
 var toml = sr.ReadToEnd();
