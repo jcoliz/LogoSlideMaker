@@ -65,8 +65,9 @@ public record Row
     public double XPosition { get; set; }
     public double YPosition { get; set; }
     public double Width { get; set; }
+    public int MinColumns { get; set; }
     public List<string> Logos { get; set; } = new List<string>();
-    public int NumItems => Logos.Count;
+    public int NumItems => Math.Max( Logos.Count, MinColumns );
     public double Spacing => (NumItems > 1) ? Width / ((double)NumItems - 1) : 0;
 }
 
