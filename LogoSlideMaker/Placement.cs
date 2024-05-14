@@ -1,14 +1,39 @@
 using ShapeCrawler;
 using System.Drawing.Imaging;
 
+/// <summary>
+/// The overall run definition as loaded in as the top-level toml file
+/// </summary>
 public record Definition
 {
     public Config Config { get; set; } = new();
+
+    /// <summary>
+    /// Variations of the logos which each get their own slide
+    /// </summary>
     public List<Variant> Variants { get; set; } = new();
+
+    /// <summary>
+    /// The actual logos to be displayed, indexed by id
+    /// </summary>
     public Dictionary<string,Logo> Logos { get; set; } = [];
-    public List<Row> Rows { get; set; } = new();    
+
+    /// <summary>
+    /// Rows of logo positions describing how the logos are laid out
+    /// </summary>
+    /// <remarks>
+    /// DEPRECATED, use Boxes
+    /// </remarks>
+    public List<Row> Rows { get; set; } = new();
+
+    /// <summary>
+    /// Multi-line boxes of logo positions describing how the logos are laid out
+    /// </summary>
     public List<Box> Boxes { get; set; } = new();
 
+    /// <summary>
+    /// All the boxes decomposed into rows
+    /// </summary>
     public IEnumerable<Row> AllRows => Rows.Concat(Boxes.SelectMany(x=>x.GetRows(Config.LineSpacing, Config.DefaultWidth)));
 }
 
@@ -17,8 +42,20 @@ public record Definition
 /// </summary>
 public record Variant
 {
+    /// <summary>
+    /// Human-readable name
+    /// </summary>
+    /// <remarks>
+    /// Ideally, would be added to slide notes
+    /// </remarks>
     public string Name { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Human-readable description
+    /// </summary>
+    /// <remarks>
+    /// Ideally, would be added to slide notes
+    /// </remarks>
     public string Description { get; set; } = string.Empty;
 
     /// <summary>
@@ -36,12 +73,35 @@ public record Variant
     public List<string> Include { get; set; } = new();
 }
 
+/// <summary>
+/// Details about a particular logo glyph
+/// </summary>
 public record Logo
 {
+    /// <summary>
+    /// Human-readble title to show under the logo
+    /// </summary>
     public string Title { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Where to find the image data
+    /// </summary>
     public string Path { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Tags which describe the logo, used by variants to pick which logos
+    /// go in which variant
+    /// </summary>
     public List<string> Tags { get; set; } = new();
+
+    /// <summary>
+    /// Override default text width for this logo
+    /// </summary>
     public double? TextWidth { get; set; }
+
+    /// <summary>
+    /// Override default scale for this logo
+    /// </summary>
     public double Scale { get; set; } = 1.0;
 }
 
@@ -52,24 +112,37 @@ public record Config
     /// </summary>
     public double TextDistace { get; set; }
 
+    /// <summary>
+    /// Default width of text under logos, in inches
+    /// </summary>
+
     public double TextWidth { get; set; }
+
+    /// <summary>
+    /// Height of text box under logos, in inches
+    /// </summary>
     public double TextHeight { get; set; }
 
     /// <summary>
-    /// Width & height of icon, in inches
+    /// Width & height of square icons, in inches
     /// </summary>
     public double IconSize { get; set; }
 
     /// <summary>
-    /// Default vertical space between successive lines
+    /// Default vertical space between successive lines, in inches
     /// </summary>
     public double LineSpacing { get; set; }
 
+    /// <summary>
+    /// Default width of row, in inches
+    /// </summary>
     public double? DefaultWidth { get; set; }
 
+    /// <summary>
+    /// Dots (pixels) per inch
+    /// </summary>
     public double Dpi { get; set; }
 }
-
 
 /// <summary>
 /// A method to specify multiple rows in one declaration
