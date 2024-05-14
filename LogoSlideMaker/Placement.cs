@@ -6,7 +6,10 @@ public record Definition
     public Config Config { get; set; } = new();
     public List<Variant> Variants { get; set; } = new();
     public Dictionary<string,Logo> Logos { get; set; } = [];
-    public List<Row> Rows { get; set; } = new();
+    public List<Row> Rows { get; set; } = new();    
+    public List<Box> Boxes { get; set; } = new();
+
+    public IEnumerable<Row> AllRows => Rows.Concat(Boxes.SelectMany(x=>x.GetRows(Config.LineSpacing)));
 }
 
 /// <summary>
@@ -57,7 +60,38 @@ public record Config
     /// </summary>
     public double IconSize { get; set; }
 
-    public double Dpi { get; set; }
+    /// <summary>
+    /// Default vertical space between successive lines
+    /// </summary>
+    public double LineSpacing { get; set; }
+   public double Dpi { get; set; }
+}
+
+
+/// <summary>
+/// A method to specify multiple rows in one declaration
+/// </summary>
+public record Box
+{
+    public double XPosition { get; set; }
+    public double YPosition { get; set; }
+    public double Width { get; set; }
+    public int MinColumns { get; set; }
+    public Dictionary<int,List<string>> Logos { get; set; } = new Dictionary<int,List<string>>();
+
+    public IEnumerable<Row> GetRows(double spacing)
+    {
+        return Logos
+            .OrderBy(x=>x.Key)
+            .Select((x,i) => new Row() 
+            {
+                XPosition = XPosition,
+                YPosition = YPosition + i * spacing,
+                Width = Width,
+                MinColumns = MinColumns,
+                Logos = x.Value
+            });
+    }
 }
 
 public record Row

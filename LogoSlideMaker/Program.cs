@@ -16,7 +16,7 @@ foreach(var variant in definitions.Variants)
     var shapes = slide.Shapes;
     var renderer = new Renderer(definitions.Config, definitions.Logos, variant, shapes);
 
-    foreach(var row in definitions.Rows)
+    foreach(var row in definitions.AllRows)
     {
         renderer.Render(row);
     }
