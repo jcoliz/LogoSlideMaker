@@ -177,25 +177,32 @@ public class Renderer(Config config, Dictionary<string,Logo> logos, Variant vari
         return false;
     }
 
-    private bool LogoIncludedInVariant(string logoId)
+    private bool LogoIncludedInVariant(string value)
     {
+        var split = value.Split(':');
+        var logoId = split[0];
 
         // Commands are included
-        if (logoId.StartsWith("@"))
+        if (logoId.StartsWith('@'))
             return true;
         
         var logo = logos[logoId];
 
+        // Also include placement-only tags which are included in the
+        // id with an at-sign,
+        // e.g. "app@tag"
+        var tags = logo.Tags.Union(split.Skip(1)).ToList();
+
         // Logos with no tags are always included
-        if (logo.Tags.Count == 0)
+        if (tags.Count == 0)
             return true;
 
         // Blanked logos are included at this stage
-        if (logo.Tags.Intersect(variant.Blank).Any())
+        if (tags.Intersect(variant.Blank).Any())
             return true;
 
         // Explicitly included logos are always included
-        if (logo.Tags.Intersect(variant.Include).Any())
+        if (tags.Intersect(variant.Include).Any())
             return true;
 
         // Otherwise, logos with tags are excluded by default
@@ -204,7 +211,7 @@ public class Renderer(Config config, Dictionary<string,Logo> logos, Variant vari
 
     private Row RowVariant(Row row)
     {
-        var included = row.Logos.Where(x => LogoIncludedInVariant(x)).ToList();
+        var included = row.Logos.Where(x => LogoIncludedInVariant(x)).Select(x=>x.Split(':')[0]).ToList();
 
         return row with { Logos = included };
     }
