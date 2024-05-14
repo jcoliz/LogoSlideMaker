@@ -212,7 +212,7 @@ public record Entry
     /// <summary>
     /// Construct from a row logo entry
     /// </summary>
-    /// <param name=""></param>
+    /// <param name="value">Logo as specified in the original box line</param>
     public Entry(string value)
     {
         var split = value.Split(':');
@@ -265,11 +265,35 @@ public record Entry
     public string[] NotTags { get; set; } = [];
 }
 
-public class Placement(Config config, Row row, Logo logo)
-{
-    public int Index { get; init; }
 
-    public void RenderTo(ISlideShapes shapes)
+public class Renderer(Config config, Dictionary<string,Logo> logos, Variant variant, ISlideShapes shapes)
+{
+    public void Render(Row _row)
+    {
+        // Skip any logos that aren't included.
+        var entries = RowVariant(_row);
+        var row = _row with { Logos = entries.Select(x=>x.Id ?? string.Empty).ToList()};
+
+        int column = 0;
+        foreach(var entry in entries)
+        {
+            if (entry.Command == Commands.End)
+            {
+                break;
+            }
+
+            var logo = logos[entry.Id!];
+
+            if (LogoShownInVariant(logo))
+            {
+                RenderOne(row, logo, column);
+            }
+
+            ++column;
+        }
+    }
+
+    private void RenderOne(Row row, Logo logo, int Column)
     {
         if (Path.GetExtension(logo.Path).ToLowerInvariant() == ".svg")
         {
@@ -303,7 +327,7 @@ public class Placement(Config config, Row row, Logo logo)
         var icon_width = config.IconSize * width_factor * logo.Scale;
         var icon_height = config.IconSize * height_factor * logo.Scale;
 
-        pic.X = (int)((row.XPosition + Index * row.Spacing - icon_width / 2)*config.Dpi);
+        pic.X = (int)((row.XPosition + Column * row.Spacing - icon_width / 2)*config.Dpi);
         pic.Y = (int)((row.YPosition - icon_height / 2.0)*config.Dpi);
         pic.Width = (int)(icon_width * config.Dpi);
         pic.Height = (int)(icon_height * config.Dpi);
@@ -311,7 +335,7 @@ public class Placement(Config config, Row row, Logo logo)
         var text_width = logo.TextWidth ?? config.TextWidth;
 
         shapes.AddRectangle(
-            x:(int)((row.XPosition + Index * row.Spacing - text_width / 2) * config.Dpi), 
+            x:(int)((row.XPosition + Column * row.Spacing - text_width / 2) * config.Dpi), 
             y:(int)((row.YPosition - config.TextHeight / 2 + config.TextDistace) * config.Dpi), 
             width:(int)(text_width * config.Dpi), height:(int)(config.TextHeight * config.Dpi)
         );
@@ -329,35 +353,6 @@ public class Placement(Config config, Row row, Logo logo)
         shape.Fill.SetColor(config.BackgroundColor);
         shape.Outline.HexColor = config.BackgroundColor;
     }
-}
-
-public class Renderer(Config config, Dictionary<string,Logo> logos, Variant variant, ISlideShapes shapes)
-{
-    public void Render(Row _row)
-    {
-        // Skip any logos that aren't included.
-        var entries = RowVariant(_row);
-        var row = _row with { Logos = entries.Select(x=>x.Id ?? string.Empty).ToList()};
-
-        int i = 0;
-        foreach(var entry in entries)
-        {
-            if (entry.Command == Commands.End)
-            {
-                break;
-            }
-
-            var logo = logos[entry.Id!];
-
-            if (LogoShownInVariant(logo))
-            {
-                var item = new Placement(config, row, logo) { Index = i };
-                item.RenderTo(shapes);
-            }
-
-            ++i;
-        }
-    }
 
     private bool LogoShownInVariant(Logo logo)
     {
@@ -374,42 +369,38 @@ public class Renderer(Config config, Dictionary<string,Logo> logos, Variant vari
 
     private bool EntryIncludedInVariant(Entry entry)
     {
-        // Split out "not" tags, where the logo is included if the tag
-        // is NOT in the variant
-
+        // Start with the tags explicitly specified on this entry
         var tags = entry.Tags.ToList();
 
-        // Lookup tags from logo if there is a logo
+        // Add tags from logo if there is a logo
         if (entry.Id != null)
         {
-            var logo = logos[entry.Id!];
+            var logo = logos[entry.Id];
 
             // Also include placement-only tags which are included in the
             // id with an at-sign,
             // e.g. "app@tag"
             tags.AddRange( logo.Tags );
+
+            // TODO: Note that a logo definition cannot declare a "not"
+            // tag. That is only used in entry placements. We COULD add
+            // that in the future. It would go here.
         }
 
-        // Logos with 'not' tags are excluded if variant includes the tag
-        if (entry.NotTags.Any())
-        {
-            if (entry.NotTags.Intersect(variant.Include).Any())
-                return false;
-        } 
+        // Entries with 'not' tags are excluded if variant includes the tag
+        if (entry.NotTags.Intersect(variant.Include).Any())
+            return false;
         
-        // Logos with no tags are always included
+        // Entries with no tags are always included
         if (tags.Count == 0)
             return true;
 
-        // Blanked logos are included at this stage
-        if (tags.Intersect(variant.Blank).Any())
+        // Blanked Entries are included at this stage
+        // Explicitly included Entries are always included
+        if (tags.Intersect(variant.Include.Union(variant.Blank)).Any())
             return true;
 
-        // Explicitly included logos are always included
-        if (tags.Intersect(variant.Include).Any())
-            return true;
-
-        // Otherwise, logos with tags are excluded by default
+        // Otherwise, Entries with tags are excluded by default
         return false;
     }
 
