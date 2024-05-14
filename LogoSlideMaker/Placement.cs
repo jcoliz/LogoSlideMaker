@@ -9,7 +9,7 @@ public record Definition
     public List<Row> Rows { get; set; } = new();    
     public List<Box> Boxes { get; set; } = new();
 
-    public IEnumerable<Row> AllRows => Rows.Concat(Boxes.SelectMany(x=>x.GetRows(Config.LineSpacing)));
+    public IEnumerable<Row> AllRows => Rows.Concat(Boxes.SelectMany(x=>x.GetRows(Config.LineSpacing, Config.DefaultWidth)));
 }
 
 /// <summary>
@@ -64,7 +64,10 @@ public record Config
     /// Default vertical space between successive lines
     /// </summary>
     public double LineSpacing { get; set; }
-   public double Dpi { get; set; }
+
+    public double? DefaultWidth { get; set; }
+
+    public double Dpi { get; set; }
 }
 
 
@@ -75,11 +78,11 @@ public record Box
 {
     public double XPosition { get; set; }
     public double YPosition { get; set; }
-    public double Width { get; set; }
+    public double? Width { get; set; }
     public int MinColumns { get; set; }
     public Dictionary<int,List<string>> Logos { get; set; } = new Dictionary<int,List<string>>();
 
-    public IEnumerable<Row> GetRows(double spacing)
+    public IEnumerable<Row> GetRows(double spacing, double? default_width )
     {
         return Logos
             .OrderBy(x=>x.Key)
@@ -87,7 +90,7 @@ public record Box
             {
                 XPosition = XPosition,
                 YPosition = YPosition + i * spacing,
-                Width = Width,
+                Width = Width ?? default_width ?? throw new ApplicationException("Must specify default with or box width"),
                 MinColumns = MinColumns,
                 Logos = x.Value
             });
