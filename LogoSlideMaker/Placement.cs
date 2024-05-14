@@ -142,6 +142,15 @@ public record Config
     /// Dots (pixels) per inch
     /// </summary>
     public double Dpi { get; set; }
+
+    public int FontSize { get; set; } = 24;
+
+    public string FontName { get; set; } = "sans";
+
+    public string FontColor { get; set; } = "000000";
+
+    public string BackgroundColor { get; set; } = "000000";
+
 }
 
 /// <summary>
@@ -314,14 +323,12 @@ public class Placement(Config config, Row row, Logo logo)
         tf.RightMargin = 0;
         var font = tf.Paragraphs.First().Portions.First().Font;
 
-        // TODO: All of these should be supplied on config
-        font.Size = 7;
-        font.LatinName = "Segoe UI";
-        font.Color.Update("595959");
-        shape.Fill.SetColor("FFFFFF");
-        shape.Outline.HexColor = "FFFFFF";
+        font.Size = config.FontSize;
+        font.LatinName = config.FontName;
+        font.Color.Update(config.FontColor);
+        shape.Fill.SetColor(config.BackgroundColor);
+        shape.Outline.HexColor = config.BackgroundColor;
     }
-
 }
 
 public class Renderer(Config config, Dictionary<string,Logo> logos, Variant variant, ISlideShapes shapes)
