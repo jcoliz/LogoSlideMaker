@@ -1,25 +1,48 @@
-using DocumentFormat.OpenXml.Spreadsheet;
 using ShapeCrawler;
-using System.Drawing;
 using System.Drawing.Imaging;
 
-public class Definition
+public record Definition
 {
     public Config Config { get; set; } = new();
+    public List<Variant> Variants { get; set; } = new();
     public Dictionary<string,Logo> Logos { get; set; } = [];
-    public List<Row> Rows { get; set; } = new List<Row>();
+    public List<Row> Rows { get; set; } = new();
 }
 
-public class Logo
+/// <summary>
+/// Describes a variation of logos. One variant will be rendered on each slide.
+/// </summary>
+public record Variant
+{
+    public string Name { get; set; } = string.Empty;
+
+    public string Description { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Which tags identify logos which should hold a blank space instead of
+    /// showing the logo
+    /// </summary>
+    public List<string> Blank { get; set; } = new();
+
+    /// <summary>
+    /// Which tags identify logos which should should be included
+    /// </summary>
+    /// <remarks>
+    /// By default, any logos with tags are excluded from each variant
+    /// </remarks>
+    public List<string> Include { get; set; } = new();
+}
+
+public record Logo
 {
     public string Title { get; set; } = string.Empty;
     public string Path { get; set; } = string.Empty;
+    public List<string> Tags { get; set; } = new();
     public double? TextWidth { get; set; }
-
     public double Scale { get; set; } = 1.0;
 }
 
-public class Config
+public record Config
 {
     /// <summary>
     /// Vertical distance from middle of icon to top of text, in inches
@@ -37,7 +60,7 @@ public class Config
     public double Dpi { get; set; }
 }
 
-public class Row
+public record Row
 {
     public double XPosition { get; set; }
     public double YPosition { get; set; }
@@ -67,7 +90,6 @@ public class Placement(Config config, Row row, Logo logo)
             bitmap.Save(stream, ImageFormat.Png);
             stream.Seek(0,SeekOrigin.Begin);
             shapes.AddPicture(stream);
-
         }
         else
         {
@@ -116,14 +138,74 @@ public class Placement(Config config, Row row, Logo logo)
 
 }
 
-public class Renderer(Config config, Dictionary<string,Logo> logos, ISlideShapes shapes)
+public class Renderer(Config config, Dictionary<string,Logo> logos, Variant variant, ISlideShapes shapes)
 {
-    public void Render(Row row)
+    public void Render(Row _row)
     {
+        // Skip any logos that aren't included.
+        var row = RowVariant(_row);
+
         for(int i = 0; i < row.NumItems; ++i )
         {
-            var item = new Placement(config, row, logos[row.Logos[i]]) { Index = i };
-            item.RenderTo(shapes);
+            var logoId = row.Logos[i];
+
+            if (logoId == "@end")
+            {
+                break;
+            }
+
+            var logo = logos[logoId];
+
+            if (LogoShownInVariant(logo))
+            {
+                var item = new Placement(config, row, logo) { Index = i };
+                item.RenderTo(shapes);
+            }
         }
+    }
+
+    private bool LogoShownInVariant(Logo logo)
+    {
+        // Logos with no tags are always shown
+        if (logo.Tags.Count == 0)
+            return true;
+
+        // Explicitly included logos are always included
+        if (logo.Tags.Intersect(variant.Include).Any())
+            return true;
+
+        return false;
+    }
+
+    private bool LogoIncludedInVariant(string logoId)
+    {
+
+        // Commands are included
+        if (logoId.StartsWith("@"))
+            return true;
+        
+        var logo = logos[logoId];
+
+        // Logos with no tags are always included
+        if (logo.Tags.Count == 0)
+            return true;
+
+        // Blanked logos are included at this stage
+        if (logo.Tags.Intersect(variant.Blank).Any())
+            return true;
+
+        // Explicitly included logos are always included
+        if (logo.Tags.Intersect(variant.Include).Any())
+            return true;
+
+        // Otherwise, logos with tags are excluded by default
+        return false;
+    }
+
+    private Row RowVariant(Row row)
+    {
+        var included = row.Logos.Where(x => LogoIncludedInVariant(x)).ToList();
+
+        return row with { Logos = included };
     }
 }
