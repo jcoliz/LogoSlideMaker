@@ -7,12 +7,12 @@ var sr = new StreamReader("logos.toml");
 var toml = sr.ReadToEnd();
 var definitions = Toml.ToModel<Definition>(toml);
 
-
+int i = 0;
 foreach(var variant in definitions.Variants)
 {
-    var copyingSlide = pres.Slides[0];
-    pres.Slides.Add(copyingSlide);
-    var slide = pres.Slides.Last();
+    var copyingSlide = pres.Slides.Last();
+    pres.Slides.Insert(i + 1, copyingSlide);
+    var slide = pres.Slides[i];
     var shapes = slide.Shapes;
     var renderer = new Renderer(definitions.Config, definitions.Logos, variant, shapes);
 
@@ -20,6 +20,8 @@ foreach(var variant in definitions.Variants)
     {
         renderer.Render(row);
     }
+
+    ++i;
 }
 
 
