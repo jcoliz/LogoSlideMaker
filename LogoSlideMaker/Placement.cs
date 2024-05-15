@@ -295,6 +295,7 @@ public class Renderer(Config config, Dictionary<string,Logo> logos, Variant vari
 
     private void RenderOne(Row row, Logo logo, int Column)
     {
+#if false        
         if (Path.GetExtension(logo.Path).ToLowerInvariant() == ".svg")
         {
             var svg = Svg.SvgDocument.Open(logo.Path);
@@ -311,6 +312,7 @@ public class Renderer(Config config, Dictionary<string,Logo> logos, Variant vari
             shapes.AddPicture(stream);
         }
         else
+#endif
         {
             using var stream = new FileStream(logo.Path,FileMode.Open);
             shapes.AddPicture(stream);
@@ -350,7 +352,8 @@ public class Renderer(Config config, Dictionary<string,Logo> logos, Variant vari
         font.Size = config.FontSize;
         font.LatinName = config.FontName;
         font.Color.Update(config.FontColor);
-        shape.Fill.SetColor(config.BackgroundColor);
+        shape.Fill.SetNoFill(); //SetColor(config.BackgroundColor);
+        shape.Outline.Weight = 0;
         shape.Outline.HexColor = config.BackgroundColor;
     }
 
