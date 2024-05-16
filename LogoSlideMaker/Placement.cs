@@ -329,20 +329,26 @@ public class Renderer(Config config, Dictionary<string,Logo> logos, Variant vari
         var icon_width = config.IconSize * width_factor * logo.Scale;
         var icon_height = config.IconSize * height_factor * logo.Scale;
 
-        pic.X = (int)((row.XPosition + Column * row.Spacing - icon_width / 2)*config.Dpi);
-        pic.Y = (int)((row.YPosition - icon_height / 2.0)*config.Dpi);
-        pic.Width = (int)(icon_width * config.Dpi);
-        pic.Height = (int)(icon_height * config.Dpi);
+        pic.DecimalX = (decimal)((row.XPosition + Column * row.Spacing - icon_width / 2)*config.Dpi);
+        pic.DecimalY = (decimal)((row.YPosition - icon_height / 2.0)*config.Dpi);
+        pic.DecimalWidth = (decimal)(icon_width * config.Dpi);
+        pic.DecimalHeight = (decimal)(icon_height * config.Dpi);
 
-        var text_width = logo.TextWidth ?? config.TextWidth;
+        var text_width_inches = logo.TextWidth ?? config.TextWidth;
 
-        shapes.AddRectangle(
-            x:(int)((row.XPosition + Column * row.Spacing - text_width / 2) * config.Dpi), 
-            y:(int)((row.YPosition - config.TextHeight / 2 + config.TextDistace) * config.Dpi), 
-            width:(int)(text_width * config.Dpi), height:(int)(config.TextHeight * config.Dpi)
-        );
+        decimal text_x = (decimal)((row.XPosition + Column * row.Spacing - text_width_inches / 2) * config.Dpi);
+        decimal text_y = (decimal)((row.YPosition - config.TextHeight / 2 + config.TextDistace) * config.Dpi);
+        decimal text_width = (decimal)(text_width_inches * config.Dpi);
+        decimal text_height = (decimal)(config.TextHeight * config.Dpi);
 
+        shapes.AddRectangle(100,100,100,100);
         var shape = shapes.Last();
+
+        shape.DecimalX = text_x;
+        shape.DecimalY = text_y;
+        shape.DecimalWidth = text_width;
+        shape.DecimalHeight = text_height;
+
         var tf = shape.TextFrame;
         tf.Text = logo.Title;
         tf.LeftMargin = 0;
@@ -362,6 +368,10 @@ public class Renderer(Config config, Dictionary<string,Logo> logos, Variant vari
         // Logos with no tags are always shown
         if (logo.Tags.Count == 0)
             return true;
+
+        // Tags on the "blank" list are not shown
+        if (logo.Tags.Intersect(variant.Blank).Any())
+            return false;
 
         // Explicitly included logos are always included
         if (logo.Tags.Intersect(variant.Include).Any())
