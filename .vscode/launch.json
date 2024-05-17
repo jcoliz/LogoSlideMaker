@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/LogoSlideMaker/bin/Debug/net8.0/LogoSlideMaker.dll",
-            "args": [],
+            "args": [ "--input=logos.toml", "--template=template.pptx", "--output=out/2.pptx" ],
             "cwd": "${workspaceFolder}/../AppEcoSlide",
             "stopAtEntry": false,
             "console": "internalConsole"

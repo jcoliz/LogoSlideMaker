@@ -1,9 +1,17 @@
 ﻿using ShapeCrawler;
 using Tomlyn;
 
-var pres = new Presentation("template.pptx");
+var options = new AppOptions();
+options.Parse(args);
 
-var sr = new StreamReader("logos.toml");
+if (options.Exit)
+{
+    return -1;
+}
+
+var pres = !string.IsNullOrWhiteSpace(options.Template) ? new Presentation(options.Template) : new Presentation();
+
+var sr = new StreamReader(options.Input!);
 var toml = sr.ReadToEnd();
 var definitions = Toml.ToModel<Definition>(toml);
 
@@ -24,5 +32,6 @@ foreach(var variant in definitions.Variants)
     ++i;
 }
 
+pres.SaveAs(options.Output!);
 
-pres.SaveAs("out/1.pptx");
+return 0;
