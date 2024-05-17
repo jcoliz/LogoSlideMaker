@@ -329,10 +329,10 @@ public class Renderer(Config config, Dictionary<string,Logo> logos, Variant vari
         var icon_width = config.IconSize * width_factor * logo.Scale;
         var icon_height = config.IconSize * height_factor * logo.Scale;
 
-        pic.DecimalX = (decimal)((row.XPosition + Column * row.Spacing - icon_width / 2)*config.Dpi);
-        pic.DecimalY = (decimal)((row.YPosition - icon_height / 2.0)*config.Dpi);
-        pic.DecimalWidth = (decimal)(icon_width * config.Dpi);
-        pic.DecimalHeight = (decimal)(icon_height * config.Dpi);
+        pic.X = (decimal)((row.XPosition + Column * row.Spacing - icon_width / 2)*config.Dpi);
+        pic.Y = (decimal)((row.YPosition - icon_height / 2.0)*config.Dpi);
+        pic.Width = (decimal)(icon_width * config.Dpi);
+        pic.Height = (decimal)(icon_height * config.Dpi);
 
         var text_width_inches = logo.TextWidth ?? config.TextWidth;
 
@@ -344,10 +344,10 @@ public class Renderer(Config config, Dictionary<string,Logo> logos, Variant vari
         shapes.AddRectangle(100,100,100,100);
         var shape = shapes.Last();
 
-        shape.DecimalX = text_x;
-        shape.DecimalY = text_y;
-        shape.DecimalWidth = text_width;
-        shape.DecimalHeight = text_height;
+        shape.X = text_x;
+        shape.Y = text_y;
+        shape.Width = text_width;
+        shape.Height = text_height;
 
         var tf = shape.TextFrame;
         tf.Text = logo.Title;
