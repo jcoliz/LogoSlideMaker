@@ -89,6 +89,11 @@ public record Logo
     public string Path { get; set; } = string.Empty;
 
     /// <summary>
+    /// Where to find the image data when displaying on a dark background
+    /// </summary>
+    public string? PathDark { get; set; }
+
+    /// <summary>
     /// Tags which describe the logo, used by variants to pick which logos
     /// go in which variant
     /// </summary>
@@ -158,8 +163,23 @@ public record Config
 
     public string FontColor { get; set; } = "000000";
 
-    public string BackgroundColor { get; set; } = "000000";
+    public string BackgroundColor { get; set; } = "FFFFFF";
 
+    public string FontColorDark { get; set; } = "FFFFFF";
+
+    public string BackgroundColorDark { get; set; } = "000000";
+
+    public string PaddingColorDark { get; set; } = "FFFFFF";
+
+    /// <summary>
+    /// In dark mode, how much padding to add around all sides
+    /// </summary>
+    public double PaddingDark { get; set; }
+
+    /// <summary>
+    /// Whether to render in dark mode, else is in light mode
+    /// </summary>
+    public bool Dark { get; set; }
 }
 
 /// <summary>
@@ -304,6 +324,11 @@ public class Renderer(Config config, Dictionary<string,Logo> logos, Variant vari
 
     private void RenderOne(Row row, Logo logo, int Column)
     {
+        // First add padding rectangle if we're in dark mode with a light-only icon
+        // Oh, crap, we can't do this, becasue we don't know the size until we've
+        // added the picture, but if we add after the picture, it will be on top!!
+
+
 #if false        
         if (Path.GetExtension(logo.Path).ToLowerInvariant() == ".svg")
         {
