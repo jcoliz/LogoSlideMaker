@@ -103,6 +103,15 @@ public record Logo
     /// Override default scale for this logo
     /// </summary>
     public double Scale { get; set; } = 1.0;
+
+    /// <summary>
+    /// True if this logo only looks good against a light background
+    /// </summary>
+    /// <remarks>
+    /// Ideally it would be replaces, or at least filled with white when
+    /// presented on a dark background.
+    /// </remarks>
+    public bool Light { get; set; } = false;
 }
 
 public record Config
