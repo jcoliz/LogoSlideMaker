@@ -9,23 +9,61 @@ if (options.Exit)
     return -1;
 }
 
+
 var pres = !string.IsNullOrWhiteSpace(options.Template) ? new Presentation(options.Template) : new Presentation();
 
 var sr = new StreamReader(options.Input!);
 var toml = sr.ReadToEnd();
 var definitions = Toml.ToModel<Definition>(toml);
 
+if (options.Listing)
+{
+    definitions.Config.Listing = true;
+}
+
+if (definitions.Config.Listing)
+{
+    Console.WriteLine($"# {definitions.Config.Title}");
+}
+
 int i = 0;
 foreach(var variant in definitions.Variants)
 {
+    if (definitions.Config.Listing)
+    {   
+        Console.WriteLine();
+        Console.WriteLine($"## {variant.Name}");
+        Console.WriteLine();
+        Console.WriteLine(variant.Description);
+    }
+
     var copyingSlide = pres.Slides.Last();
     pres.Slides.Insert(i + 1, copyingSlide);
     var slide = pres.Slides[i];
     var shapes = slide.Shapes;
     var renderer = new Renderer(definitions.Config, definitions.Logos, variant, shapes);
 
-    foreach(var row in definitions.AllRows)
+    foreach(var box in definitions.Boxes)
     {
+        if (definitions.Config.Listing)
+        {   
+            Console.WriteLine();
+            Console.WriteLine($"### {box.Title}");
+            Console.WriteLine();
+        }
+
+        foreach (var row in box.GetRows(spacing:definitions.Config.LineSpacing, default_width:definitions.Config.DefaultWidth))
+        {
+            renderer.Render(row);
+        }
+    }
+
+    foreach(var row in definitions.Rows)
+    {
+        if (definitions.Config.Listing)
+        {   
+            Console.WriteLine();
+        }
         renderer.Render(row);
     }
 

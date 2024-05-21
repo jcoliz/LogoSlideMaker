@@ -6,6 +6,9 @@ using System.Drawing.Imaging;
 /// </summary>
 public record Definition
 {
+    /// <summary>
+    /// Global setup configuration
+    /// </summary>
     public Config Config { get; set; } = new();
 
     /// <summary>
@@ -130,6 +133,11 @@ public record Logo
 public record Config
 {
     /// <summary>
+    /// Title of the overall document
+    /// </summary>
+    public string? Title { get; set; }
+
+    /// <summary>
     /// Vertical distance from middle of icon to top of text, in inches
     /// </summary>
     public double TextDistace { get; set; }
@@ -137,7 +145,6 @@ public record Config
     /// <summary>
     /// Default width of text under logos, in inches
     /// </summary>
-
     public double TextWidth { get; set; }
 
     /// <summary>
@@ -188,6 +195,14 @@ public record Config
     /// Whether to render in dark mode, else is in light mode
     /// </summary>
     public bool Dark { get; set; }
+
+    /// <summary>
+    /// Whether to also display a text list of apps to the console
+    /// </summary>
+    /// <remarks>
+    /// This can also be overriden on command line with "--list"
+    /// </remarks>
+    public bool Listing { get; set; }
 }
 
 /// <summary>
@@ -337,6 +352,11 @@ public class Renderer(Config config, Dictionary<string,Logo> logos, Variant vari
         // Oh, crap, we can't do this, becasue we don't know the size until we've
         // added the picture, but if we add after the picture, it will be on top!!
 
+        if (config.Listing)
+        {
+            string alt_text = string.IsNullOrWhiteSpace(logo.AltText) ? string.Empty : $"{logo.AltText} ";
+            Console.WriteLine($"* {alt_text}{logo.Title}");
+        }
 
 #if false        
         if (Path.GetExtension(logo.Path).ToLowerInvariant() == ".svg")

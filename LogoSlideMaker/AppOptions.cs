@@ -8,6 +8,7 @@ public class AppOptions: OptionSet
     public string? Output { get; private set; }
     public string? Template { get; private set; }
     public bool Exit { get; private set; }
+    public bool Listing { get; private set; }
 
     public AppOptions()
     {
@@ -15,6 +16,7 @@ public class AppOptions: OptionSet
         Add("i|input=", "the {toml} containing slide definitions", v => Input = v);
         Add("o|output=", "the {pptx} where the slides will be written", v => Output = v);
         Add("t|template=", "the {template} to base the news slides on (optional)", v => Template = v);
+        Add("l|list", "also print a listing of logos", v => Listing = v != null);
     }
 
     public new List<string> Parse(IEnumerable<string> args)
