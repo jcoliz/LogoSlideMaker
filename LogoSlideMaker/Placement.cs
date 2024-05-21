@@ -117,6 +117,14 @@ public record Logo
     /// presented on a dark background.
     /// </remarks>
     public bool Light { get; set; } = false;
+
+    /// <summary>
+    /// Alt-text to use for the logo
+    /// </summary>
+    /// <remarks>
+    /// Only used if text in the logo is required for understanding
+    /// </remarks>
+    public string? AltText { get; set; }
 }
 
 public record Config
@@ -191,6 +199,7 @@ public record Box
     public double YPosition { get; set; }
     public double? Width { get; set; }
     public int MinColumns { get; set; }
+    public string Title { get; set; } = string.Empty;
     public Dictionary<int,List<string>> Logos { get; set; } = new Dictionary<int,List<string>>();
 
     public IEnumerable<Row> GetRows(double spacing, double? default_width )
