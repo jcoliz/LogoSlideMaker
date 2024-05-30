@@ -93,9 +93,14 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>
             }
 
             foreach(var logolayout in boxlayout.Logos)
-            {
+            {                
                 var logo = logolayout.Logo;
-                
+
+                if (logo is null)
+                {
+                    continue;
+                }
+
                 if (config.Listing)
                 {
                     string alt_text = string.IsNullOrWhiteSpace(logo.AltText) ? string.Empty : $"{logo.AltText} ";
@@ -176,10 +181,16 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>
             if (LogoShownInVariant(logo))
             {
                 // TODO: Return this
-                result.Add(new LogoLayout() { Logo = logo, X = (decimal)(row.XPosition + column * row.Spacing) , Y = (decimal)row.YPosition });
+                result.Add(new LogoLayout() { Logo = logo, X = row.XPosition + column * row.Spacing , Y = row.YPosition });
             }
 
             ++column;
+        }
+
+        if (result.Count == 0)
+        {
+            // Ensure there is at least one logolayout, even if empty, to hold space for this row.
+            result.Add( new LogoLayout() { Y = row.YPosition } );
         }
 
         return result;
@@ -256,7 +267,7 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>
 /// </summary>
 public record LogoLayout
 {
-    public Logo Logo { get; init; } = new();
+    public Logo? Logo { get; init; }
     public decimal X { get; init; }
     public decimal Y { get; init; }
 }
