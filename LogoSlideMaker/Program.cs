@@ -41,6 +41,23 @@ foreach(var variant in definitions.Variants)
     pres.Slides.Insert(i + 1, copyingSlide);
     var slide = pres.Slides[i];
     var shapes = slide.Shapes;
+
+    // Fill in description field
+    if (!string.IsNullOrWhiteSpace(variant.Description))
+    {
+        var description_box = shapes.TryGetByName<IShape>("Description");
+        if (description_box is not null)
+        {
+            var lines = variant.Description.Split(',');
+            var tf = description_box.TextFrame;
+            var maxlines = Math.Min(lines.Length,tf.Paragraphs.Count);
+            for (int l = 0; l < maxlines; l++)
+            {
+                tf.Paragraphs[l].Text = lines[l];
+            }
+        }
+    }
+
     var renderer = new Renderer(definitions.Config, definitions.Logos, variant, shapes);
 
     foreach(var box in definitions.Boxes)
