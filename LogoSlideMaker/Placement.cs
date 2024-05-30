@@ -261,14 +261,6 @@ public enum Commands { Invalid = 0, End = 1 }
 public record Entry
 {
     /// <summary>
-    /// Default constructor
-    /// </summary>
-    /// <remarks>
-    /// OK to just construct directly, although not commonly used this way
-    /// </remarks>
-    public Entry() {}
-
-    /// <summary>
     /// Construct from a row logo entry
     /// </summary>
     /// <param name="value">Logo as specified in the original box line</param>
@@ -297,7 +289,7 @@ public record Entry
     /// <remarks>
     /// Used to lookup into Definition.Logos
     /// </remarks>
-    public string? Id { get; set; }
+    public string? Id { get; }
 
     /// <summary>
     /// Processing command
@@ -305,7 +297,7 @@ public record Entry
     /// <remarks>
     /// Set by "@{command}" in row logos
     /// </remarks>
-    public Commands? Command { get; set; }
+    public Commands? Command { get; }
 
     /// <summary>
     /// Entry-specific tags, will include this entry if match variant
@@ -313,7 +305,7 @@ public record Entry
     /// <remarks>
     /// Set with "app:tag" in row logos
     /// </remarks>
-    public string[] Tags { get; set; } = [];
+    public string[] Tags { get; }
 
     /// <summary>
     /// Entry-specific disincluding tags, will include this entry if does NOT match variant
@@ -321,6 +313,6 @@ public record Entry
     /// <remarks>
     /// Set with "app:!tag" in row logos
     /// </remarks>
-    public string[] NotTags { get; set; } = [];
+    public string[] NotTags { get; }
 }
 
