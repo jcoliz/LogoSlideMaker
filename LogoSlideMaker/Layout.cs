@@ -73,26 +73,17 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>, IL
         var entries = FilteredRowEntries(_row);
         var row = _row with { Logos = entries.Select(x=>x.Id ?? string.Empty).ToList()};
 
-        int column = 0;
-        foreach(var entry in entries)
+        var layout = entries
+            .TakeWhile(x=>x.Command != Commands.End)
+            .Select((x,i)=>(logo:definition.Logos[x.Id!],column:i))
+            .Where(x=> LogoShownInVariant(x.logo))
+            .Select(x=>new LogoLayout() { Logo = x.logo, X = row.XPosition + x.column * row.Spacing , Y = row.YPosition });
+
+        if (layout.Any())
         {
-            if (entry.Command == Commands.End)
-            {
-                break;
-            }
-
-            var logo = definition.Logos[entry.Id!];
-
-            if (LogoShownInVariant(logo))
-            {
-                // TODO: Return this
-                result.Add(new LogoLayout() { Logo = logo, X = row.XPosition + column * row.Spacing , Y = row.YPosition });
-            }
-
-            ++column;
+            result.AddRange(layout);
         }
-
-        if (result.Count == 0)
+        else
         {
             // Ensure there is at least one logolayout, even if empty, to hold space for this row.
             result.Add( new LogoLayout() { Y = row.YPosition } );
