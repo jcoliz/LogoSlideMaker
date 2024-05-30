@@ -23,18 +23,30 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>
 
     private List<BoxLayout> LayoutAggregateBox(List<BoxLayout> layouts, Box box)
     {
-        layouts.Add( LayoutBox(box) );
+        // Fill in missing box.YPosition if it has none
+        decimal YPosition = 0m;
+        if (box.YPosition is null)
+        {
+            var last = layouts.LastOrDefault();
+            if (last is null)
+            {
+                throw new ApplicationException("Must set explicit YPosition on first box");
+            }
+            YPosition = last.Logos.Max(x=>x.Y) + definition.Config.LineSpacing + definition.Config.BoxSpacing;
+        }
+
+        layouts.Add( LayoutBox(box, YPosition) );
         return layouts;
     }
 
-    private BoxLayout LayoutBox(Box box)
+    private BoxLayout LayoutBox(Box box, decimal YPosition)
     {
         var logos = box.Logos
             .OrderBy(x=>x.Key)
             .Select((x,i) => new Row() 
             {
                 XPosition = box.XPosition,
-                YPosition = box.YPosition + i * definition.Config.LineSpacing,
+                YPosition = (box.YPosition ?? YPosition) + i * definition.Config.LineSpacing,
                 Width = box.Width ?? definition.Config.DefaultWidth ?? throw new ApplicationException("Must specify default with or box width"),
                 MinColumns = box.MinColumns,
                 Logos = x.Value

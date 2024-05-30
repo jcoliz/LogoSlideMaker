@@ -222,7 +222,7 @@ public record Config
 public record Box
 {
     public decimal XPosition { get; set; }
-    public decimal YPosition { get; set; }
+    public decimal? YPosition { get; set; } // Calculate based on BoxSpacing if missing
     public decimal? Width { get; set; }
     public int MinColumns { get; set; }
     public string Title { get; set; } = string.Empty;
