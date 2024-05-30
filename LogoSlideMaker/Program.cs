@@ -1,5 +1,8 @@
 ﻿using ShapeCrawler;
 using Tomlyn;
+using LogoSlideMaker.Configure;
+using LogoSlideMaker.Layout;
+using LogoSlideMaker.Render;
 
 var options = new AppOptions();
 options.Parse(args);

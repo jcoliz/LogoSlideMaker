@@ -1,3 +1,5 @@
+namespace LogoSlideMaker.Layout;
+
 public interface ILayout: IEnumerable<BoxLayout>
 {
     string Name { get; }

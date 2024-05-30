@@ -1,4 +1,8 @@
 using ShapeCrawler;
+using LogoSlideMaker.Configure;
+using LogoSlideMaker.Layout;
+
+namespace LogoSlideMaker.Render;
 
 /// <summary>
 /// Render a logo layout to presentation slide shapes

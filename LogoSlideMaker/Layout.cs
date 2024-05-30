@@ -1,3 +1,7 @@
+using LogoSlideMaker.Configure;
+
+namespace LogoSlideMaker.Layout;
+
 /// <summary>
 /// A collection of icons which have already been chosen and placed
 /// </summary>
