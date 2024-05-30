@@ -25,6 +25,8 @@ if (definitions.Render.Listing)
     Console.WriteLine($"# {definitions.Layout.Title}");
 }
 
+var renderer = new Renderer(definitions.Render);
+
 int i = 0;
 foreach(var variant in definitions.Variants)
 {
@@ -33,8 +35,8 @@ foreach(var variant in definitions.Variants)
     var slide = pres.Slides.Last();
 
     var layout = new Layout(definitions, variant);
-    layout.PopulateFrom();
-    layout.RenderTo(slide.Shapes);
+    layout.Populate();
+    renderer.Render(layout, slide.Shapes);
 
     ++i;
 }

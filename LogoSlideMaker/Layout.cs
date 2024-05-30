@@ -5,11 +5,12 @@ using ShapeCrawler;
 /// <summary>
 /// A collection of icons which have already been chosen and placed
 /// </summary>
-public class Layout(Definition definition, Variant variant): List<BoxLayout>
+public class Layout(Definition definition, Variant variant): List<BoxLayout>, ILayout
 {
-    private readonly string Name = variant.Name;
-    private readonly IEnumerable<string> Description = variant.Description;
-    public void PopulateFrom()
+    public string Name { get; } = variant.Name;
+    public IEnumerable<string> Description { get; } = variant.Description;
+
+    public void Populate()
     {
         // Add well-defined boxes
         base.AddRange
@@ -24,6 +25,9 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>
         );
     }
 
+    /// <summary>
+    /// Layout a single box, considering the state of already-laid-out boxes
+    /// </summary>
     private List<BoxLayout> LayoutAggregateBox(List<BoxLayout> layouts, Box box)
     {
         // Fill in missing box.YPosition if it has none
@@ -42,6 +46,12 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>
         return layouts;
     }
 
+    /// <summary>
+    /// Layout a single box
+    /// </summary>
+    /// <param name="YPosition">
+    /// Default yposition to use if box has no intrinsic position defined
+    /// </param>
     private BoxLayout LayoutBox(Box box, decimal YPosition)
     {
         var logos = box.Logos
@@ -59,119 +69,12 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>
         return new BoxLayout() { Heading = box.Title, Logos = logos.ToArray() };
     }
 
-    public void RenderTo(ISlideShapes shapes)
-    {
-        var config = definition.Render;
-
-        if (config.Listing)
-        {   
-            Console.WriteLine();
-            Console.WriteLine($"## {Name}");
-            Console.WriteLine();
-            foreach(var line in Description)
-            {
-                Console.WriteLine(line);        
-            }
-        }
-
-        // Fill in description field
-        if (variant.Description.Count > 0)
-        {
-            var description_box = shapes.TryGetByName<IShape>("Description");
-            if (description_box is not null)
-            {
-                var tf = description_box.TextFrame;
-                var maxlines = Math.Min(Description.Count(),tf.Paragraphs.Count);
-                for (int l = 0; l < maxlines; l++)
-                {
-                    tf.Paragraphs[l].Text = Description.Skip(l).First();
-                }
-            }
-        }
-
-        foreach(var boxlayout in this)
-        {
-            if (config.Listing)
-            {   
-                Console.WriteLine();
-                Console.WriteLine($"### {boxlayout.Heading}");
-                Console.WriteLine();
-            }
-
-            foreach(var logolayout in boxlayout.Logos)
-            {                
-                var logo = logolayout.Logo;
-
-                if (logo is null)
-                {
-                    continue;
-                }
-
-                if (config.Listing)
-                {
-                    string alt_text = string.IsNullOrWhiteSpace(logo.AltText) ? string.Empty : $"{logo.AltText} ";
-                    Console.WriteLine($"* {alt_text}{logo.Title}");
-                }
-
-                {
-                    using var stream = new FileStream(logo.Path,FileMode.Open);
-                    shapes.AddPicture(stream);
-                }
-                
-                var pic = shapes.OfType<IPicture>().Last();
-
-                // Adjust size of icon depending on size of source image. The idea is all
-                // icons occupy the same number of pixel area
-
-                var aspect = pic.Width / pic.Height;
-                var width_factor = (decimal)Math.Sqrt((double)aspect);
-                var height_factor = 1.0m / width_factor;
-                var icon_width = config.IconSize * width_factor * logo.Scale;
-                var icon_height = config.IconSize * height_factor * logo.Scale;
-
-                pic.X = ( logolayout.X - icon_width / 2.0m ) * config.Dpi;
-                pic.Y = ( logolayout.Y - icon_height / 2.0m ) * config.Dpi;
-                pic.Width = icon_width * config.Dpi;
-                pic.Height = icon_height * config.Dpi;
-
-                var text_width_inches = logo.TextWidth ?? config.TextWidth;
-
-                decimal text_x = ( logolayout.X - text_width_inches / 2.0m ) * config.Dpi;
-                decimal text_y = ( logolayout.Y - config.TextHeight / 2.0m + config.TextDistace) * config.Dpi;
-                decimal text_width = text_width_inches * config.Dpi;
-                decimal text_height = config.TextHeight * config.Dpi;
-
-                shapes.AddRectangle(100,100,100,100);
-                var shape = shapes.Last();
-
-                shape.X = text_x;
-                shape.Y = text_y;
-                shape.Width = text_width;
-                shape.Height = text_height;
-
-                var tf = shape.TextFrame;
-                tf.Text = logo.Title;
-                tf.LeftMargin = 0;
-                tf.RightMargin = 0;
-                var font = tf.Paragraphs.First().Portions.First().Font;
-
-                font.Size = config.FontSize;
-                font.LatinName = config.FontName;
-                font.Color.Update(config.FontColor);
-                shape.Fill.SetNoFill(); //SetColor(config.BackgroundColor);
-                shape.Outline.Weight = 0;
-                shape.Outline.HexColor = config.BackgroundColor;            
-            }
-        }
-
-    }
-
     private IEnumerable<LogoLayout> LayoutRow(Row _row)
     {
         var result = new List<LogoLayout>();
 
         // Skip any logos that aren't included.
-        var entries = RowVariant(_row);
+        var entries = FilteredRowEntries(_row);
         var row = _row with { Logos = entries.Select(x=>x.Id ?? string.Empty).ToList()};
 
         int column = 0;
@@ -207,7 +110,7 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>
     /// </summary>
     /// <param name="row"></param>
     /// <returns></returns>
-    private ICollection<Entry> RowVariant(Row row)
+    private ICollection<Entry> FilteredRowEntries(Row row)
     {
         return row.Logos.Select(x=>new Entry(x)).Where(x => EntryIncludedInVariant(x)).ToArray();
     }
