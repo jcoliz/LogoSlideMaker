@@ -1,6 +1,3 @@
-
-
-using DocumentFormat.OpenXml.Office.CoverPageProps;
 using ShapeCrawler;
 
 /// <summary>
@@ -10,22 +7,24 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>
 {
     public void PopulateFrom()
     {
+        // Add well-defined boxes
         foreach(var box in definition.Boxes)
         {
-            // TODO: Combine using selectmany
-            var logos = new List<LogoLayout>();
-
-            foreach (var row in box.GetRows(row_spacing:definition.Config.LineSpacing, default_width:definition.Config.DefaultWidth))
-            {
-                logos.AddRange(LayoutRow(row));
-            }
+            var logos = box
+                .GetRows(
+                    row_spacing:definition.Config.LineSpacing, 
+                    default_width:definition.Config.DefaultWidth
+                )
+                .SelectMany(x => LayoutRow(x));
 
             base.Add( new BoxLayout() { Heading = box.Title, Logos = logos.ToArray() });
         }
-        foreach(var row in definition.Rows)
-        {
-            base.Add( new BoxLayout() { Logos = LayoutRow(row).ToArray() });
-        }
+
+        // Add loose rows
+        base.AddRange
+        (
+            definition.Rows.Select(x => new BoxLayout() { Logos = LayoutRow(x).ToArray() })
+        );
     }
 
     public void RenderTo(ISlideShapes shapes)
