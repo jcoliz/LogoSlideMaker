@@ -59,7 +59,7 @@ public record Variant
     /// <remarks>
     /// Ideally, would be added to slide notes
     /// </remarks>
-    public string Description { get; set; } = string.Empty;
+    public List<string> Description { get; set; } = new();
 
     /// <summary>
     /// Which tags identify logos which should hold a blank space instead of
