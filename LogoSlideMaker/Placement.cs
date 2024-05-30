@@ -33,11 +33,6 @@ public record Definition
     /// Multi-line boxes of logo positions describing how the logos are laid out
     /// </summary>
     public List<Box> Boxes { get; set; } = new();
-
-    /// <summary>
-    /// All the boxes decomposed into rows
-    /// </summary>
-    public IEnumerable<Row> AllRows => Rows.Concat(Boxes.SelectMany(x=>x.GetRows(Config.LineSpacing, Config.DefaultWidth)));
 }
 
 /// <summary>
@@ -232,20 +227,6 @@ public record Box
     public int MinColumns { get; set; }
     public string Title { get; set; } = string.Empty;
     public Dictionary<int,List<string>> Logos { get; set; } = new Dictionary<int,List<string>>();
-
-    public IEnumerable<Row> GetRows(decimal row_spacing, decimal? default_width )
-    {
-        return Logos
-            .OrderBy(x=>x.Key)
-            .Select((x,i) => new Row() 
-            {
-                XPosition = XPosition,
-                YPosition = YPosition + i * row_spacing,
-                Width = Width ?? default_width ?? throw new ApplicationException("Must specify default with or box width"),
-                MinColumns = MinColumns,
-                Logos = x.Value
-            });
-    }
 }
 
 public record Row

@@ -8,23 +8,33 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>
     public void PopulateFrom()
     {
         // Add well-defined boxes
-        foreach(var box in definition.Boxes)
-        {
-            var logos = box
-                .GetRows(
-                    row_spacing:definition.Config.LineSpacing, 
-                    default_width:definition.Config.DefaultWidth
-                )
-                .SelectMany(x => LayoutRow(x));
-
-            base.Add( new BoxLayout() { Heading = box.Title, Logos = logos.ToArray() });
-        }
+        base.AddRange
+        (
+            definition.Boxes.Select(x=>LayoutBox(x))
+        );
 
         // Add loose rows
         base.AddRange
         (
             definition.Rows.Select(x => new BoxLayout() { Logos = LayoutRow(x).ToArray() })
         );
+    }
+
+    private BoxLayout LayoutBox(Box box)
+    {
+        var logos = box.Logos
+            .OrderBy(x=>x.Key)
+            .Select((x,i) => new Row() 
+            {
+                XPosition = box.XPosition,
+                YPosition = box.YPosition + i * definition.Config.LineSpacing,
+                Width = box.Width ?? definition.Config.DefaultWidth ?? throw new ApplicationException("Must specify default with or box width"),
+                MinColumns = box.MinColumns,
+                Logos = x.Value
+            })
+            .SelectMany(x => LayoutRow(x));
+
+        return new BoxLayout() { Heading = box.Title, Logos = logos.ToArray() };
     }
 
     public void RenderTo(ISlideShapes shapes)
