@@ -1,7 +1,3 @@
-using System.Collections.Immutable;
-using DocumentFormat.OpenXml.Wordprocessing;
-using ShapeCrawler;
-
 /// <summary>
 /// A collection of icons which have already been chosen and placed
 /// </summary>

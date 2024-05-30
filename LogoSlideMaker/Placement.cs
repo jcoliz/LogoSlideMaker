@@ -1,6 +1,3 @@
-using ShapeCrawler;
-using System.Drawing.Imaging;
-
 /// <summary>
 /// The overall run definition as loaded in as the top-level toml file
 /// </summary>
