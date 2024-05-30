@@ -67,10 +67,8 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>, IL
 
     private IEnumerable<LogoLayout> LayoutRow(Row _row)
     {
-        var result = new List<LogoLayout>();
-
-        // Skip any logos that aren't included.
-        var entries = FilteredRowEntries(_row);
+        // Filter down to only included logos.
+        var entries = IncludedRowEntries(_row);
         var row = _row with { Logos = entries.Select(x=>x.Id ?? string.Empty).ToList()};
 
         var layout = entries
@@ -79,17 +77,8 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>, IL
             .Where(x=> LogoShownInVariant(x.logo))
             .Select(x=>new LogoLayout() { Logo = x.logo, X = row.XPosition + x.column * row.Spacing , Y = row.YPosition });
 
-        if (layout.Any())
-        {
-            result.AddRange(layout);
-        }
-        else
-        {
-            // Ensure there is at least one logolayout, even if empty, to hold space for this row.
-            result.Add( new LogoLayout() { Y = row.YPosition } );
-        }
-
-        return result;
+        // If row ends up being empty, we still need to placehold vertical space for it
+        return layout.Any() ? layout : [ new() { Y = row.YPosition } ];
     }
 
     /// <summary>
@@ -97,11 +86,17 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>, IL
     /// </summary>
     /// <param name="row"></param>
     /// <returns></returns>
-    private ICollection<Entry> FilteredRowEntries(Row row)
+    private ICollection<Entry> IncludedRowEntries(Row row)
     {
         return row.Logos.Select(x=>new Entry(x)).Where(x => EntryIncludedInVariant(x)).ToArray();
     }
 
+    /// <summary>
+    /// True to show the logo OR hold space for it
+    /// </summary>
+    /// <remarks>
+    /// "Blank" logos are 'included' but not 'shown'
+    /// </remarks>
     private bool EntryIncludedInVariant(Entry entry)
     {
         // Start with the tags explicitly specified on this entry
@@ -139,6 +134,9 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>, IL
         return false;
     }
 
+    /// <summary>
+    /// True if we should actually display the logo
+    /// </summary>
     private bool LogoShownInVariant(Logo logo)
     {
         // Logos with no tags are always shown
