@@ -9,6 +9,7 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>, IL
 {
     public string Name { get; } = variant.Name;
     public IEnumerable<string> Description { get; } = variant.Description;
+    public int Source { get; } = variant.Source;
 
     public void Populate()
     {
