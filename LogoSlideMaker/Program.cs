@@ -9,7 +9,6 @@ if (options.Exit)
     return -1;
 }
 
-
 var pres = !string.IsNullOrWhiteSpace(options.Template) ? new Presentation(options.Template) : new Presentation();
 
 var sr = new StreamReader(options.Input!);
@@ -18,12 +17,12 @@ var definitions = Toml.ToModel<Definition>(toml);
 
 if (options.Listing)
 {
-    definitions.Config.Listing = true;
+    definitions.Render.Listing = true;
 }
 
-if (definitions.Config.Listing)
+if (definitions.Render.Listing)
 {
-    Console.WriteLine($"# {definitions.Config.Title}");
+    Console.WriteLine($"# {definitions.Layout.Title}");
 }
 
 int i = 0;

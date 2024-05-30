@@ -35,7 +35,7 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>
             {
                 throw new ApplicationException("Must set explicit YPosition on first box");
             }
-            YPosition = last.Logos.Max(x=>x.Y) + definition.Config.LineSpacing + definition.Config.BoxSpacing;
+            YPosition = last.Logos.Max(x=>x.Y) + definition.Layout.LineSpacing + definition.Layout.BoxSpacing;
         }
 
         layouts.Add( LayoutBox(box, YPosition) );
@@ -49,8 +49,8 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>
             .Select((x,i) => new Row() 
             {
                 XPosition = box.XPosition,
-                YPosition = (box.YPosition ?? YPosition) + i * definition.Config.LineSpacing,
-                Width = box.Width ?? definition.Config.DefaultWidth ?? throw new ApplicationException("Must specify default with or box width"),
+                YPosition = (box.YPosition ?? YPosition) + i * definition.Layout.LineSpacing,
+                Width = box.Width ?? definition.Layout.DefaultWidth ?? throw new ApplicationException("Must specify default with or box width"),
                 MinColumns = box.MinColumns,
                 Logos = x.Value
             })
@@ -61,7 +61,7 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>
 
     public void RenderTo(ISlideShapes shapes)
     {
-        var config = definition.Config;
+        var config = definition.Render;
 
         if (config.Listing)
         {   

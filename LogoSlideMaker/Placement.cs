@@ -9,7 +9,9 @@ public record Definition
     /// <summary>
     /// Global setup configuration
     /// </summary>
-    public Config Config { get; set; } = new();
+    public Config Layout { get; set; } = new();
+
+    public RenderConfig Render { get; set; } = new();
 
     /// <summary>
     /// Variations of the logos which each get their own slide
@@ -138,26 +140,6 @@ public record Config
     public string? Title { get; set; }
 
     /// <summary>
-    /// Vertical distance from middle of icon to top of text, in inches
-    /// </summary>
-    public decimal TextDistace { get; set; }
-
-    /// <summary>
-    /// Default width of text under logos, in inches
-    /// </summary>
-    public decimal TextWidth { get; set; }
-
-    /// <summary>
-    /// Height of text box under logos, in inches
-    /// </summary>
-    public decimal TextHeight { get; set; }
-
-    /// <summary>
-    /// Width & height of square icons, in inches
-    /// </summary>
-    public decimal IconSize { get; set; }
-
-    /// <summary>
     /// Default vertical space between successive lines, in inches
     /// </summary>
     /// <remarks>
@@ -178,7 +160,34 @@ public record Config
     /// </summary>
     public decimal? DefaultWidth { get; set; }
 
+}
+
+/// <summary>
+/// Configuration which affects rendering
+/// </summary>
+public record RenderConfig
+{
     /// <summary>
+    /// Vertical distance from middle of icon to top of text, in inches
+    /// </summary>
+    public decimal TextDistace { get; set; }
+
+    /// <summary>
+    /// Default width of text under logos, in inches
+    /// </summary>
+    public decimal TextWidth { get; set; }
+
+    /// <summary>
+    /// Height of text box under logos, in inches
+    /// </summary>
+    public decimal TextHeight { get; set; }
+
+    /// <summary>
+    /// Width & height of square icons, in inches
+    /// </summary>
+
+    public decimal IconSize { get; set; }
+        /// <summary>
     /// Dots (pixels) per inch
     /// </summary>
     public decimal Dpi { get; set; }
