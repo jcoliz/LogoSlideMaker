@@ -11,7 +11,7 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>
         // Add well-defined boxes
         base.AddRange
         (
-            definition.Boxes.Aggregate<Box,BoxLayout[]>(new BoxLayout[] {}, LayoutAggregateBox)
+            definition.Boxes.Aggregate<Box,List<BoxLayout>>(new(), LayoutAggregateBox)
         );
 
         // Add loose rows
@@ -21,9 +21,10 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>
         );
     }
 
-    private BoxLayout[] LayoutAggregateBox(BoxLayout[] layouts, Box box)
+    private List<BoxLayout> LayoutAggregateBox(List<BoxLayout> layouts, Box box)
     {
-        return layouts.Concat([ LayoutBox(box) ]).ToArray();
+        layouts.Add( LayoutBox(box) );
+        return layouts;
     }
 
     private BoxLayout LayoutBox(Box box)
