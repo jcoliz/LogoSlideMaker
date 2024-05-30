@@ -74,6 +74,11 @@ public record Variant
     /// By default, any logos with tags are excluded from each variant
     /// </remarks>
     public List<string> Include { get; set; } = new();
+
+    /// <summary>
+    /// Which slide # to use as the basis, starting from 0
+    /// </summary>
+    public int Source { get; set; }
 }
 
 /// <summary>

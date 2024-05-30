@@ -37,9 +37,9 @@ foreach(var variant in definitions.Variants)
         Console.WriteLine(variant.Description);
     }
 
-    var copyingSlide = pres.Slides.Last();
-    pres.Slides.Insert(i + 1, copyingSlide);
-    var slide = pres.Slides[i];
+    var copyingSlide = pres.Slides[variant.Source];
+    pres.Slides.Add(copyingSlide);
+    var slide = pres.Slides.Last();
     var shapes = slide.Shapes;
 
     // Fill in description field
