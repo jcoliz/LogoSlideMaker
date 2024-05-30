@@ -110,12 +110,12 @@ public record Logo
     /// <summary>
     /// Override default text width for this logo
     /// </summary>
-    public double? TextWidth { get; set; }
+    public decimal? TextWidth { get; set; }
 
     /// <summary>
     /// Override default scale for this logo
     /// </summary>
-    public double Scale { get; set; } = 1.0;
+    public decimal Scale { get; set; } = 1.0m;
 
     /// <summary>
     /// True if this logo only looks good against a light background
@@ -145,37 +145,48 @@ public record Config
     /// <summary>
     /// Vertical distance from middle of icon to top of text, in inches
     /// </summary>
-    public double TextDistace { get; set; }
+    public decimal TextDistace { get; set; }
 
     /// <summary>
     /// Default width of text under logos, in inches
     /// </summary>
-    public double TextWidth { get; set; }
+    public decimal TextWidth { get; set; }
 
     /// <summary>
     /// Height of text box under logos, in inches
     /// </summary>
-    public double TextHeight { get; set; }
+    public decimal TextHeight { get; set; }
 
     /// <summary>
     /// Width & height of square icons, in inches
     /// </summary>
-    public double IconSize { get; set; }
+    public decimal IconSize { get; set; }
 
     /// <summary>
     /// Default vertical space between successive lines, in inches
     /// </summary>
-    public double LineSpacing { get; set; }
+    /// <remarks>
+    /// Only used when lines are being automatically spaced
+    /// </remarks>
+    public decimal LineSpacing { get; set; }
+
+    /// <summary>
+    /// Default vertical space between successive boxes, in inches
+    /// </summary>
+    /// <remarks>
+    /// Only used when boxes are being automatically spaced
+    /// </remarks>
+    public decimal BoxSpacing { get; set; }
 
     /// <summary>
     /// Default width of row, in inches
     /// </summary>
-    public double? DefaultWidth { get; set; }
+    public decimal? DefaultWidth { get; set; }
 
     /// <summary>
     /// Dots (pixels) per inch
     /// </summary>
-    public double Dpi { get; set; }
+    public decimal Dpi { get; set; }
 
     public int FontSize { get; set; } = 24;
 
@@ -215,21 +226,21 @@ public record Config
 /// </summary>
 public record Box
 {
-    public double XPosition { get; set; }
-    public double YPosition { get; set; }
-    public double? Width { get; set; }
+    public decimal XPosition { get; set; }
+    public decimal YPosition { get; set; }
+    public decimal? Width { get; set; }
     public int MinColumns { get; set; }
     public string Title { get; set; } = string.Empty;
     public Dictionary<int,List<string>> Logos { get; set; } = new Dictionary<int,List<string>>();
 
-    public IEnumerable<Row> GetRows(double spacing, double? default_width )
+    public IEnumerable<Row> GetRows(decimal row_spacing, decimal? default_width )
     {
         return Logos
             .OrderBy(x=>x.Key)
             .Select((x,i) => new Row() 
             {
                 XPosition = XPosition,
-                YPosition = YPosition + i * spacing,
+                YPosition = YPosition + i * row_spacing,
                 Width = Width ?? default_width ?? throw new ApplicationException("Must specify default with or box width"),
                 MinColumns = MinColumns,
                 Logos = x.Value
@@ -239,13 +250,13 @@ public record Box
 
 public record Row
 {
-    public double XPosition { get; set; }
-    public double YPosition { get; set; }
-    public double Width { get; set; }
+    public decimal XPosition { get; set; }
+    public decimal YPosition { get; set; }
+    public decimal Width { get; set; }
     public int MinColumns { get; set; }
     public List<string> Logos { get; set; } = new List<string>();
     public int NumItems => Math.Max( Logos.Count, MinColumns );
-    public double Spacing => (NumItems > 1) ? Width / ((double)NumItems - 1) : 0;
+    public decimal Spacing => (NumItems > 1) ? Width / (NumItems - 1) : 0;
 }
 
 public enum Commands { Invalid = 0, End = 1 }
@@ -323,175 +334,3 @@ public record Entry
     public string[] NotTags { get; set; } = [];
 }
 
-
-public class Renderer(Config config, Dictionary<string,Logo> logos, Variant variant, ISlideShapes shapes)
-{
-    public void Render(Row _row)
-    {
-        // Skip any logos that aren't included.
-        var entries = RowVariant(_row);
-        var row = _row with { Logos = entries.Select(x=>x.Id ?? string.Empty).ToList()};
-
-        int column = 0;
-        foreach(var entry in entries)
-        {
-            if (entry.Command == Commands.End)
-            {
-                break;
-            }
-
-            var logo = logos[entry.Id!];
-
-            if (LogoShownInVariant(logo))
-            {
-                RenderOne(row, logo, column);
-            }
-
-            ++column;
-        }
-    }
-
-    private void RenderOne(Row row, Logo logo, int Column)
-    {
-        // First add padding rectangle if we're in dark mode with a light-only icon
-        // Oh, crap, we can't do this, becasue we don't know the size until we've
-        // added the picture, but if we add after the picture, it will be on top!!
-
-        if (config.Listing)
-        {
-            string alt_text = string.IsNullOrWhiteSpace(logo.AltText) ? string.Empty : $"{logo.AltText} ";
-            Console.WriteLine($"* {alt_text}{logo.Title}");
-        }
-
-#if false        
-        if (Path.GetExtension(logo.Path).ToLowerInvariant() == ".svg")
-        {
-            var svg = Svg.SvgDocument.Open(logo.Path);
-            var svg_aspect = svg.Width.Value / svg.Height.Value;
-
-            // Arbitrarily render the bitmap at 96px (2 inch) high
-            svg.Width = new Svg.SvgUnit(Svg.SvgUnitType.Pixel, 2*96f * svg_aspect);
-            svg.Height = new Svg.SvgUnit(Svg.SvgUnitType.Pixel, 2*96f);
-            var bitmap = svg.Draw();
-
-            using var stream = new MemoryStream();
-            bitmap.Save(stream, ImageFormat.Png);
-            stream.Seek(0,SeekOrigin.Begin);
-            shapes.AddPicture(stream);
-        }
-        else
-#endif
-        {
-            using var stream = new FileStream(logo.Path,FileMode.Open);
-            shapes.AddPicture(stream);
-        }
-        
-        var pic = shapes.OfType<IPicture>().Last();
-
-        // Adjust size of icon depending on size of source image. The idea is all
-        // icons occupy the same number of pixel area
-
-        var aspect = (double)pic.Width / (double)pic.Height;
-        var width_factor = Math.Sqrt(aspect);
-        var height_factor = 1.0 / width_factor;
-        var icon_width = config.IconSize * width_factor * logo.Scale;
-        var icon_height = config.IconSize * height_factor * logo.Scale;
-
-        pic.X = (decimal)((row.XPosition + Column * row.Spacing - icon_width / 2)*config.Dpi);
-        pic.Y = (decimal)((row.YPosition - icon_height / 2.0)*config.Dpi);
-        pic.Width = (decimal)(icon_width * config.Dpi);
-        pic.Height = (decimal)(icon_height * config.Dpi);
-
-        var text_width_inches = logo.TextWidth ?? config.TextWidth;
-
-        decimal text_x = (decimal)((row.XPosition + Column * row.Spacing - text_width_inches / 2) * config.Dpi);
-        decimal text_y = (decimal)((row.YPosition - config.TextHeight / 2 + config.TextDistace) * config.Dpi);
-        decimal text_width = (decimal)(text_width_inches * config.Dpi);
-        decimal text_height = (decimal)(config.TextHeight * config.Dpi);
-
-        shapes.AddRectangle(100,100,100,100);
-        var shape = shapes.Last();
-
-        shape.X = text_x;
-        shape.Y = text_y;
-        shape.Width = text_width;
-        shape.Height = text_height;
-
-        var tf = shape.TextFrame;
-        tf.Text = logo.Title;
-        tf.LeftMargin = 0;
-        tf.RightMargin = 0;
-        var font = tf.Paragraphs.First().Portions.First().Font;
-
-        font.Size = config.FontSize;
-        font.LatinName = config.FontName;
-        font.Color.Update(config.FontColor);
-        shape.Fill.SetNoFill(); //SetColor(config.BackgroundColor);
-        shape.Outline.Weight = 0;
-        shape.Outline.HexColor = config.BackgroundColor;
-    }
-
-    private bool LogoShownInVariant(Logo logo)
-    {
-        // Logos with no tags are always shown
-        if (logo.Tags.Count == 0)
-            return true;
-
-        // Tags on the "blank" list are not shown
-        if (logo.Tags.Intersect(variant.Blank).Any())
-            return false;
-
-        // Explicitly included logos are always included
-        if (logo.Tags.Intersect(variant.Include).Any())
-            return true;
-
-        return false;
-    }
-
-    private bool EntryIncludedInVariant(Entry entry)
-    {
-        // Start with the tags explicitly specified on this entry
-        var tags = entry.Tags.ToList();
-
-        // Add tags from logo if there is a logo
-        if (entry.Id != null)
-        {
-            var logo = logos[entry.Id];
-
-            // Also include placement-only tags which are included in the
-            // id with an at-sign,
-            // e.g. "app@tag"
-            tags.AddRange( logo.Tags );
-
-            // TODO: Note that a logo definition cannot declare a "not"
-            // tag. That is only used in entry placements. We COULD add
-            // that in the future. It would go here.
-        }
-
-        // Entries with 'not' tags are excluded if variant includes the tag
-        if (entry.NotTags.Intersect(variant.Include).Any())
-            return false;
-        
-        // Entries with no tags are always included
-        if (tags.Count == 0)
-            return true;
-
-        // Blanked Entries are included at this stage
-        // Explicitly included Entries are always included
-        if (tags.Intersect(variant.Include.Union(variant.Blank)).Any())
-            return true;
-
-        // Otherwise, Entries with tags are excluded by default
-        return false;
-    }
-
-    /// <summary>
-    /// Transform to entries, and filter out non-included entries
-    /// </summary>
-    /// <param name="row"></param>
-    /// <returns></returns>
-    private ICollection<Entry> RowVariant(Row row)
-    {
-        return row.Logos.Select(x=>new Entry(x)).Where(x => EntryIncludedInVariant(x)).ToArray();
-    }
-}
