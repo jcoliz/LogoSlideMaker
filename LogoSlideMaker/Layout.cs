@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using DocumentFormat.OpenXml.Wordprocessing;
 using ShapeCrawler;
 
 /// <summary>
@@ -6,6 +7,8 @@ using ShapeCrawler;
 /// </summary>
 public class Layout(Definition definition, Variant variant): List<BoxLayout>
 {
+    private readonly string Name = variant.Name;
+    private readonly IEnumerable<string> Description = variant.Description;
     public void PopulateFrom()
     {
         // Add well-defined boxes
@@ -63,9 +66,12 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>
         if (config.Listing)
         {   
             Console.WriteLine();
-            Console.WriteLine($"## {variant.Name}");
+            Console.WriteLine($"## {Name}");
             Console.WriteLine();
-            Console.WriteLine(variant.Description);
+            foreach(var line in Description)
+            {
+                Console.WriteLine(line);        
+            }
         }
 
         // Fill in description field
@@ -75,10 +81,10 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>
             if (description_box is not null)
             {
                 var tf = description_box.TextFrame;
-                var maxlines = Math.Min(variant.Description.Count,tf.Paragraphs.Count);
+                var maxlines = Math.Min(Description.Count(),tf.Paragraphs.Count);
                 for (int l = 0; l < maxlines; l++)
                 {
-                    tf.Paragraphs[l].Text = variant.Description[l];
+                    tf.Paragraphs[l].Text = Description.Skip(l).First();
                 }
             }
         }
