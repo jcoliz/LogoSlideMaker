@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using ShapeCrawler;
 
 /// <summary>
@@ -10,7 +11,7 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>
         // Add well-defined boxes
         base.AddRange
         (
-            definition.Boxes.Select(x=>LayoutBox(x))
+            definition.Boxes.Aggregate<Box,BoxLayout[]>(new BoxLayout[] {}, LayoutAggregateBox)
         );
 
         // Add loose rows
@@ -18,6 +19,11 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>
         (
             definition.Rows.Select(x => new BoxLayout() { Logos = LayoutRow(x).ToArray() })
         );
+    }
+
+    private BoxLayout[] LayoutAggregateBox(BoxLayout[] layouts, Box box)
+    {
+        return layouts.Concat([ LayoutBox(box) ]).ToArray();
     }
 
     private BoxLayout LayoutBox(Box box)
