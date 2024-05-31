@@ -9,35 +9,35 @@ namespace LogoSlideMaker.Render;
 /// </summary>
 public class Renderer(RenderConfig config)
 {
-    public void Render(ILayout layout, ISlideShapes shapes)
+    public void Render(ILayout source, ISlideShapes target)
     {
         if (config.Listing)
         {   
             Console.WriteLine();
-            Console.WriteLine($"## {layout.Name}");
+            Console.WriteLine($"## {source.Name}");
             Console.WriteLine();
-            foreach(var line in layout.Description)
+            foreach(var line in source.Description)
             {
                 Console.WriteLine(line);        
             }
         }
 
         // Fill in description field
-        if (layout.Description.Count() > 0)
+        if (source.Description.Count() > 0)
         {
-            var description_box = shapes.TryGetByName<IShape>("Description");
+            var description_box = target.TryGetByName<IShape>("Description");
             if (description_box is not null)
             {
                 var tf = description_box.TextFrame;
-                var maxlines = Math.Min(layout.Description.Count(),tf.Paragraphs.Count);
+                var maxlines = Math.Min(source.Description.Count(),tf.Paragraphs.Count);
                 for (int l = 0; l < maxlines; l++)
                 {
-                    tf.Paragraphs[l].Text = layout.Description.Skip(l).First();
+                    tf.Paragraphs[l].Text = source.Description.Skip(l).First();
                 }
             }
         }
 
-        foreach(var boxlayout in layout)
+        foreach(var boxlayout in source)
         {
             if (config.Listing)
             {   
@@ -63,10 +63,10 @@ public class Renderer(RenderConfig config)
 
                 {
                     using var stream = new FileStream(logo.Path,FileMode.Open);
-                    shapes.AddPicture(stream);
+                    target.AddPicture(stream);
                 }
                 
-                var pic = shapes.OfType<IPicture>().Last();
+                var pic = target.OfType<IPicture>().Last();
 
                 // Adjust size of icon depending on size of source image. The idea is all
                 // icons occupy the same number of pixel area
@@ -89,8 +89,8 @@ public class Renderer(RenderConfig config)
                 decimal text_width = text_width_inches * config.Dpi;
                 decimal text_height = config.TextHeight * config.Dpi;
 
-                shapes.AddRectangle(100,100,100,100);
-                var shape = shapes.Last();
+                target.AddRectangle(100,100,100,100);
+                var shape = target.Last();
 
                 shape.X = text_x;
                 shape.Y = text_y;
