@@ -67,7 +67,7 @@ foreach(var layout in layouts)
     {
         notes.Add($"Version: {options.Version}");
     }    
-    notes.Add($"Logo count: {layout.Sum(x=>x.Logos.Count())}");
+    notes.Add($"Logo count: {layout.Sum(x=>x.Logos.Count(y=>y.Logo != null))}");
     slide.AddNotes(notes);
 
     renderer.Render(layout, slide.Shapes);
