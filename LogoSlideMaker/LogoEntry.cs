@@ -67,3 +67,4 @@ public record Entry
     public string[] NotTags { get; }
 }
 
+public enum Commands { Invalid = 0, End = 1 }
