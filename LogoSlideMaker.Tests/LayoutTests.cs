@@ -165,4 +165,37 @@ public class LayoutTests
         Assert.That(layout.First().Logos[3], Has.Property("X").EqualTo(12.5m));
     }
 
+    /// <summary>
+    /// Icons are spaced evenly across the row AS IF there were `mincolumns` columns
+    /// </summary>
+    [Test]
+    public void MinColumns()
+    {
+        var definition = new Definition() 
+        {
+            Rows = 
+            [
+                new Row()
+                {
+                    Logos = [ "test", "test" ],
+                    XPosition = 5.0m,
+                    Width = 10.0m,
+                    MinColumns = 5
+                }
+
+            ],
+            Logos = 
+            { 
+                { "test", new Logo() } 
+            },
+
+        };
+        var layout = new Layout.Layout(definition, new Variant());
+
+        layout.Populate();
+
+        Assert.That(layout.First().Logos[0], Has.Property("X").EqualTo(5.0m));
+        Assert.That(layout.First().Logos[1], Has.Property("X").EqualTo(7.5m));
+    }
+
 }
