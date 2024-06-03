@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogoSlideMaker", "LogoSlideMaker\LogoSlideMaker.csproj", "{A974A383-5853-43BA-8791-FD7C2F33EBBE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogoSlideMaker.Lib", "LogoSlideMaker.Lib\LogoSlideMaker.Lib.csproj", "{68D366F2-0B5C-4B77-A210-F611374EBDE9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{A974A383-5853-43BA-8791-FD7C2F33EBBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A974A383-5853-43BA-8791-FD7C2F33EBBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A974A383-5853-43BA-8791-FD7C2F33EBBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68D366F2-0B5C-4B77-A210-F611374EBDE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68D366F2-0B5C-4B77-A210-F611374EBDE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68D366F2-0B5C-4B77-A210-F611374EBDE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68D366F2-0B5C-4B77-A210-F611374EBDE9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\submodules\ShapeCrawler\src\ShapeCrawler\ShapeCrawler.csproj" />
+    <ProjectReference Include="..\LogoSlideMaker.Lib\LogoSlideMaker.Lib.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
