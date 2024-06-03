@@ -73,4 +73,30 @@ public class LayoutTests
         Assert.That(layout.First().Logos, Has.Length.EqualTo(5));
     }
 
+    [Test]
+    public void LayoutTakesRowYPosition()
+    {
+        var definition = new Definition() 
+        {
+            Rows = 
+            [
+                new Row()
+                {
+                    Logos = [ "test", "test" , "test" , "test" , "test"  ],
+                    YPosition = 5.0m
+                }
+
+            ],
+            Logos = 
+            { 
+                { "test", new Logo() } 
+            },
+
+        };
+        var layout = new Layout.Layout(definition, new Variant());
+
+        layout.Populate();
+
+        Assert.That(layout.First().Logos, Has.All.With.Property("Y").EqualTo(5.0m));
+    }
 }
