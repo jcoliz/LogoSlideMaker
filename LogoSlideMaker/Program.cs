@@ -61,6 +61,9 @@ foreach(var layout in layouts)
     var copyingSlide = pres.Slides[layout.Source];
     pres.Slides.Add(copyingSlide);
     var slide = pres.Slides.Last();
+
+    slide.AddNotes([ $"*** Updated: {DateTime.Now:M/dd/yyyy h:mm tt K}"]);
+
     renderer.Render(layout, slide.Shapes);
 }
 
