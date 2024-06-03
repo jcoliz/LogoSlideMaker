@@ -1,6 +1,7 @@
 using ShapeCrawler;
 using LogoSlideMaker.Configure;
 using LogoSlideMaker.Layout;
+using DocumentFormat.OpenXml.Office2021.DocumentTasks;
 
 namespace LogoSlideMaker.Render;
 
@@ -23,16 +24,28 @@ public class Renderer(RenderConfig config)
         }
 
         // Fill in description field
-        if (source.Description.Count() > 0)
+        var num_description_lines = source.Description.Count();
+        if (num_description_lines > 0)
         {
             var description_box = target.TryGetByName<IShape>("Description");
             if (description_box is not null)
             {
                 var tf = description_box.TextFrame;
-                var maxlines = Math.Min(source.Description.Count(),tf.Paragraphs.Count);
-                for (int l = 0; l < maxlines; l++)
+
+                // Ensure there are enough paragraphs to insert text
+                while (tf.Paragraphs.Count < num_description_lines)
                 {
-                    tf.Paragraphs[l].Text = source.Description.Skip(l).First();
+                    tf.Paragraphs.Add();
+                }
+
+                var queue = new Queue<string>(source.Description);
+                foreach(var para in tf.Paragraphs)
+                {
+                    if (queue.Count == 0)
+                    {
+                        break;
+                    }
+                    para.Text = queue.Dequeue();
                 }
             }
         }
