@@ -99,4 +99,34 @@ public class LayoutTests
 
         Assert.That(layout.First().Logos, Has.All.With.Property("Y").EqualTo(5.0m));
     }
+
+    [Test]
+    public void XPositionsAtExtents()
+    {
+        var definition = new Definition() 
+        {
+            Rows = 
+            [
+                new Row()
+                {
+                    Logos = [ "test", "test" , "test" , "test" , "test"  ],
+                    XPosition = 5.0m,
+                    Width = 10.0m
+                }
+
+            ],
+            Logos = 
+            { 
+                { "test", new Logo() } 
+            },
+
+        };
+        var layout = new Layout.Layout(definition, new Variant());
+
+        layout.Populate();
+
+        Assert.That(layout.First().Logos[0], Has.Property("X").EqualTo(5.0m));
+        Assert.That(layout.Last().Logos[^1], Has.Property("X").EqualTo(15.0m));
+    }
+
 }
