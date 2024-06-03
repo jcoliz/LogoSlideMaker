@@ -42,6 +42,35 @@ public class LayoutTests
         layout.Populate();
 
         Assert.That(layout, Has.Count.EqualTo(1));
+        Assert.That(layout.First().Logos, Has.Length.EqualTo(1));
+    }
+
+    [Test]
+    public void Five()
+    {
+        var definition = new Definition() 
+        {
+            Rows = 
+            [
+                new Row()
+                {
+                    Logos = [ "test", "test" , "test" , "test" , "test"  ]
+                }
+
+            ],
+            Logos = 
+            { 
+                { "test", new Logo() } 
+            },
+
+        };
+        var variant = new Variant();
+        var layout = new Layout.Layout(definition, variant);
+
+        layout.Populate();
+
+        Assert.That(layout, Has.Count.EqualTo(1));
+        Assert.That(layout.First().Logos, Has.Length.EqualTo(5));
     }
 
 }
