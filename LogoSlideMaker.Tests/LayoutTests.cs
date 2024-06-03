@@ -100,6 +100,9 @@ public class LayoutTests
         Assert.That(layout.First().Logos, Has.All.With.Property("Y").EqualTo(5.0m));
     }
 
+    /// <summary>
+    /// First and last icons on row are pushed to the fulllest left and right of the row
+    /// </summary>
     [Test]
     public void XPositionsAtExtents()
     {
@@ -127,6 +130,39 @@ public class LayoutTests
 
         Assert.That(layout.First().Logos[0], Has.Property("X").EqualTo(5.0m));
         Assert.That(layout.Last().Logos[^1], Has.Property("X").EqualTo(15.0m));
+    }
+
+    /// <summary>
+    /// Icons are spaced evenly across the row
+    /// </summary>
+    [Test]
+    public void XPositionsSpaced()
+    {
+        var definition = new Definition() 
+        {
+            Rows = 
+            [
+                new Row()
+                {
+                    Logos = [ "test", "test" , "test" , "test" , "test"  ],
+                    XPosition = 5.0m,
+                    Width = 10.0m
+                }
+
+            ],
+            Logos = 
+            { 
+                { "test", new Logo() } 
+            },
+
+        };
+        var layout = new Layout.Layout(definition, new Variant());
+
+        layout.Populate();
+
+        Assert.That(layout.First().Logos[1], Has.Property("X").EqualTo(7.5m));
+        Assert.That(layout.First().Logos[2], Has.Property("X").EqualTo(10.0m));
+        Assert.That(layout.First().Logos[3], Has.Property("X").EqualTo(12.5m));
     }
 
 }
