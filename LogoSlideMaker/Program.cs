@@ -62,7 +62,12 @@ foreach(var layout in layouts)
     pres.Slides.Add(copyingSlide);
     var slide = pres.Slides.Last();
 
-    slide.AddNotes([ $"*** Updated: {DateTime.Now:M/dd/yyyy h:mm tt K}"]);
+    List<string> notes = [ $"*** Updated: {DateTime.Now:M/dd/yyyy h:mm tt K}"];
+    if (options.Version is not null)
+    {
+        notes.Add($"*** Version: {options.Version}");
+    }
+    slide.AddNotes(notes);
 
     renderer.Render(layout, slide.Shapes);
 }
