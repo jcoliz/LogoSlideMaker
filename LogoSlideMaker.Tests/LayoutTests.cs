@@ -5,6 +5,8 @@ namespace LogoSlideMaker.Tests;
 
 public class LayoutTests
 {
+    #region Empty
+    
     [Test]
     public void Empty()
     {
@@ -16,6 +18,10 @@ public class LayoutTests
 
         Assert.That(layout, Is.Empty);
     }
+
+    #endregion
+
+    #region Rows
 
     [Test]
     public void One()
@@ -180,7 +186,8 @@ public class LayoutTests
                     Logos = [ "test", "test" ],
                     XPosition = 5.0m,
                     Width = 10.0m,
-                    MinColumns = 5
+                    MinColumns = 5,
+
                 }
 
             ],
@@ -198,4 +205,5 @@ public class LayoutTests
         Assert.That(layout.First().Logos[1], Has.Property("X").EqualTo(7.5m));
     }
 
+    #endregion
 }
