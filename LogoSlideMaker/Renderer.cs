@@ -119,9 +119,8 @@ public class Renderer(RenderConfig config)
                 font.Size = config.FontSize;
                 font.LatinName = config.FontName;
                 font.Color.Update(config.FontColor);
-                shape.Fill.SetNoFill(); //SetColor(config.BackgroundColor);
-                shape.Outline.Weight = 0;
-                shape.Outline.HexColor = config.BackgroundColor;            
+                shape.Fill.SetNoFill();
+                shape.Outline.SetNoOutline();            
             }
         }
     }
