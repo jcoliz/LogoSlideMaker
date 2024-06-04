@@ -9,6 +9,7 @@ public record Box
     public decimal? YPosition { get; set; } // Calculate based on BoxSpacing if missing
     public decimal? Width { get; set; }
     public int MinColumns { get; set; }
+    public int Page { get; set; }
     public string Title { get; set; } = string.Empty;
     public Dictionary<int,List<string>> Logos { get; set; } = new Dictionary<int,List<string>>();
 }
