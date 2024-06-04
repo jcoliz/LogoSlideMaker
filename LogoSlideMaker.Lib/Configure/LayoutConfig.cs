@@ -28,4 +28,12 @@ public record Config
     /// </summary>
     public decimal? DefaultWidth { get; set; }
 
+    /// <summary>
+    /// Distance from a box's outer container to outside of square icon and
+    /// outside of default-size text block.
+    /// </summary>
+    /// <remarks>
+    /// Only used when boxes have an outer container specified
+    /// </remarks>
+    public decimal? Padding { get; set; }
 }

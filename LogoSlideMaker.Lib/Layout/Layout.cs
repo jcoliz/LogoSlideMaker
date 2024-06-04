@@ -38,7 +38,7 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>, IL
     {
         // Fill in missing box.YPosition if it has none
         decimal YPosition = 0m;
-        if (box.YPosition is null)
+        if (box.YPosition is null && box.Outer is null)
         {
             var last = layouts.LastOrDefault();
             if (last is null)
@@ -62,17 +62,38 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>, IL
     {
         var logos = box.Logos
             .OrderBy(x=>x.Key)
-            .Select((x,i) => new Row() 
-            {
-                XPosition = box.XPosition,
-                YPosition = (box.YPosition ?? YPosition) + i * definition.Layout.LineSpacing,
-                Width = box.Width ?? definition.Layout.DefaultWidth ?? throw new ApplicationException("Must specify default with or box width"),
-                MinColumns = box.MinColumns,
-                Logos = x.Value
-            })
+            .Select(x=>x.Value)
+            .Select(MakeRow(box,YPosition))
             .SelectMany(x => LayoutRow(x));
 
         return new BoxLayout() { Heading = box.Title, Logos = logos.ToArray() };
+    }
+
+    private Func<List<string>,int,Row> MakeRow(Box box, decimal YPosition)
+    {
+        Rectangle inner 
+            = (box.Outer is null)
+            ? new Rectangle() 
+                { 
+                    X = box.XPosition ?? 0, // throw new ApplicationException("Must specify explicit X position or outer dimensions"),
+                    Y = box.YPosition ?? YPosition,
+                    Width = box.Width ?? definition.Layout.DefaultWidth ?? throw new ApplicationException("Must specify default with or box width")
+                } 
+            : new Rectangle()
+            {
+                X = box.Outer.X + (definition.Layout.Padding ?? 0) + definition.Render.TextWidth / 2m,
+                Y = box.Outer.Y + (definition.Layout.Padding ?? 0) + definition.Render.IconSize / 2m,
+                Width = box.Outer.Width - (definition.Layout.Padding ?? 0) * 2 - definition.Render.TextWidth
+            };
+
+        return (List<string> logos, int col) => new Row() 
+            {
+                XPosition = inner.X,
+                YPosition = inner.Y + col * definition.Layout.LineSpacing,
+                Width = inner.Width,
+                MinColumns = box.MinColumns,
+                Logos = logos
+            };
     }
 
     private IEnumerable<LogoLayout> LayoutRow(Row _row)
