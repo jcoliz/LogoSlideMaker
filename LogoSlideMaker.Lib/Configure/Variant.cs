@@ -39,4 +39,13 @@ public record Variant
     /// Which slide # to use as the basis, starting from 0
     /// </summary>
     public int Source { get; set; }
+
+    /// <summary>
+    /// Which pages of boxes to include
+    /// </summary>
+    /// <remarks>
+    /// By default, only includes 'loose' boxes, not assigned to any
+    /// particular page.
+    /// </remarks>
+    public List<int> Pages { get; set; } = new();
 }
