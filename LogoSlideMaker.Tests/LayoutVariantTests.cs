@@ -12,10 +12,12 @@ namespace LogoSlideMaker.Tests;
 /// Logos can be filtered by tag or by page
 /// </remarks>
 public class LayoutVariantTests
-{    
+{
+    /// <summary>
+    /// Scenario: Variant with unspecified pages displays only boxes with unspecified page
+    /// </summary>
     [Test]
-    [Explicit("Failing test for in-progress feature")]
-    public void OnlyUnspecified()
+    public void OnlyUnspecifiedPage()
     {
         // Given: Two boxes, one with unspecified page, one in page 1
         var definition = Load("pages.toml");
@@ -34,14 +36,16 @@ public class LayoutVariantTests
         Assert.That(layout.First().Logos.Select(x=>x.Logo), Has.All.With.Property("Title").EqualTo("zero"));
     }
 
+    /// <summary>
+    /// Scenario: Variant with specified pages displays only boxes with specified page
+    /// </summary>
     [Test]
-    [Explicit("Failing test for in-progress feature")]
     public void OnlySpecifiedPage()
     {
         // Given: Two boxes, one with unspecified page, one in page 1
         var definition = Load("pages.toml");
         
-        // Given: A variant with no specified page
+        // Given: A variant with a specified page
         var variant = new Variant() { Pages = [ 1 ] };
         
         // When: Creating and populating these into a layout
@@ -55,10 +59,56 @@ public class LayoutVariantTests
         Assert.That(layout.First().Logos.Select(x=>x.Logo), Has.All.With.Property("Title").EqualTo("one"));
     }
 
+    /// <summary>
+    /// Scenario: Variant with multiple specified pages displays all boxes with those pages
+    /// </summary>
+    [Test]
+    public void MultiplePage()
+    {
+        // Given: Four boxes, one with unspecified page, one each in pages 1,2,3
+        var definition = Load("two-pages.toml");
+        
+        // Given: A variant with two specified pages
+        var variant = new Variant() { Pages = [ 1, 2 ] };
+        
+        // When: Creating and populating these into a layout
+        var layout = new Layout.Layout(definition, variant);
+        layout.Populate();
+
+        // Then: Has two boxes of logos
+        Assert.That(layout, Has.Count.EqualTo(2));
+
+        // And: Second box of logos are the "two" logo
+        Assert.That(layout.Skip(1).First().Logos.Select(x=>x.Logo), Has.All.With.Property("Title").EqualTo("two"));
+    }
+
+    /// <summary>
+    /// Scenario: All boxes display normally when pages are not mentioned at all
+    /// </summary>
+    [Test]
+    public void AllWhenNoPages()
+    {
+        // Given: Two boxes, both with unspecified pages
+        var definition = Load("nopages.toml");
+        
+        // Given: A variant with no specified page
+        var variant = new Variant();
+        
+        // When: Creating and populating these into a layout
+        var layout = new Layout.Layout(definition, variant);
+        layout.Populate();
+
+        // Then: Has two boxes of logos
+        Assert.That(layout, Has.Count.EqualTo(2));
+
+        // And: Second box of logos are the "one" logo
+        Assert.That(layout.Skip(1).First().Logos.Select(x=>x.Logo), Has.All.With.Property("Title").EqualTo("one"));
+    }
+
     private static Definition Load(string filename)
     {
         var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
-        var resource = names.Where(x=>x.Contains(filename)).Single();
+        var resource = names.Where(x=>x.Contains($".{filename}")).Single();
         var stream = Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource);
         var sr = new StreamReader(stream!);
         var toml = sr.ReadToEnd();

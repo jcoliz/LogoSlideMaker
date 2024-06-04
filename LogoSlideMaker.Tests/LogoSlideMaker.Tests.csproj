@@ -24,9 +24,11 @@
 
   <ItemGroup>
     <Content Remove="data/pages.toml" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="data/pages.toml" />
+    <Content Remove="data/nopages.toml" />
+    <EmbeddedResource Include="data/nopages.toml" />
+    <Content Remove="data/two-pages.toml" />
+    <EmbeddedResource Include="data/two-pages.toml" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,33 @@
+[layout]
+default_width = 10
+
+[logos.zero]
+title = "zero"
+
+[logos.one]
+title = "one"
+
+[logos.two]
+title = "two"
+
+[logos.three]
+title = "one"
+
+[[boxes]]
+logos.1 = [ "zero", "zero" ]
+yposition = 0
+
+[[boxes]]
+logos.1 = [ "one", "one", "one" ]
+yposition = 0
+page = 1
+
+[[boxes]]
+logos.1 = [ "two", "two", "two", "two"  ]
+yposition = 0
+page = 2
+
+[[boxes]]
+logos.1 = [ "three", "three", "three", "three", "three" ]
+yposition = 0
+page = 3
