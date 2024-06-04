@@ -1,5 +1,4 @@
 using LogoSlideMaker.Configure;
-using LogoSlideMaker.Layout;
 
 namespace LogoSlideMaker.Tests;
 
@@ -7,9 +6,7 @@ namespace LogoSlideMaker.Tests;
 /// Rows feature: User can lay out logos in rows of evenly-spaced logos
 /// </summary>
 public class LayoutRowTests
-{
-    #region Empty
-    
+{    
     [Test]
     public void Empty()
     {
@@ -21,10 +18,6 @@ public class LayoutRowTests
 
         Assert.That(layout, Is.Empty);
     }
-
-    #endregion
-
-    #region Rows
 
     [Test]
     public void One()
@@ -207,6 +200,4 @@ public class LayoutRowTests
         Assert.That(layout.First().Logos[0], Has.Property("X").EqualTo(5.0m));
         Assert.That(layout.First().Logos[1], Has.Property("X").EqualTo(7.5m));
     }
-
-    #endregion
 }
