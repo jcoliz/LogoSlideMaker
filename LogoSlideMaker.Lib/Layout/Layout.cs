@@ -38,7 +38,7 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>, IL
     {
         // Fill in missing box.YPosition if it has none
         decimal YPosition = 0m;
-        if (box.YPosition is null && box.Outer is null)
+        if (box.YPosition is null && box.Outer?.Y is null)
         {
             var last = layouts.LastOrDefault();
             if (last is null)
@@ -82,14 +82,14 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>, IL
             : new Rectangle()
             {
                 X = box.Outer.X + (definition.Layout.Padding ?? 0) + definition.Render.TextWidth / 2m,
-                Y = box.Outer.Y + (definition.Layout.Padding ?? 0) + definition.Render.IconSize / 2m,
+                Y = (box.Outer.Y is not null) ? box.Outer.Y + (definition.Layout.Padding ?? 0) + definition.Render.IconSize / 2m : YPosition,
                 Width = box.Outer.Width - (definition.Layout.Padding ?? 0) * 2 - definition.Render.TextWidth
             };
 
         return (List<string> logos, int col) => new Row() 
             {
                 XPosition = inner.X,
-                YPosition = inner.Y + col * definition.Layout.LineSpacing,
+                YPosition = (inner.Y ?? 0) + col * definition.Layout.LineSpacing,
                 Width = inner.Width,
                 MinColumns = box.MinColumns,
                 Logos = logos
