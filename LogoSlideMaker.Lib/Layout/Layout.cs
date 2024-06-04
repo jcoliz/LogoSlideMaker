@@ -16,14 +16,19 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>, IL
         // Add well-defined boxes
         base.AddRange
         (
-            definition.Boxes.Aggregate<Box,List<BoxLayout>>(new(), LayoutAggregateBox)
+            definition.Boxes
+                .Where(x=>BoxIncludedInVariant(x))
+                .Aggregate<Box,List<BoxLayout>>(new(), LayoutAggregateBox)
         );
 
-        // Add loose rows
-        base.AddRange
-        (
-            definition.Rows.Select(x => new BoxLayout() { Logos = LayoutRow(x).ToArray() })
-        );
+        // Add loose rows, only if pages are not specified
+        if (variant.Pages.Count == 0)
+        {
+            base.AddRange
+            (
+                definition.Rows.Select(x => new BoxLayout() { Logos = LayoutRow(x).ToArray() })
+            );
+        }
     }
 
     /// <summary>
@@ -137,6 +142,14 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>, IL
 
         // Otherwise, Entries with tags are excluded by default
         return false;
+    }
+
+    private bool BoxIncludedInVariant(Box box)
+    {
+        if (variant.Pages.Count == 0 && box.Page == 0)
+            return true;
+
+        return variant.Pages.Contains(box.Page);
     }
 
     /// <summary>
