@@ -3,7 +3,10 @@ using LogoSlideMaker.Layout;
 
 namespace LogoSlideMaker.Tests;
 
-public class LayoutTests
+/// <summary>
+/// Rows feature: User can lay out logos in rows of evenly-spaced logos
+/// </summary>
+public class LayoutRowTests
 {
     #region Empty
     
