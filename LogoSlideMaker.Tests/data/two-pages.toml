@@ -11,7 +11,7 @@ title = "one"
 title = "two"
 
 [logos.three]
-title = "one"
+title = "three"
 
 [[boxes]]
 logos.1 = [ "zero", "zero" ]

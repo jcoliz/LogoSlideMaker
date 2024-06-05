@@ -14,6 +14,66 @@ namespace LogoSlideMaker.Tests;
 public class LayoutVariantTests
 {
     /// <summary>
+    /// Scenario: By default, logos with tags are not included
+    /// </summary>
+    [Test]
+    public void NoTags()
+    {
+        // Given: Some logos with tags, and some without
+        var definition = Load("tags.toml");
+
+        // And: A variant with no tags
+        var variant = new Variant();
+        
+        // When: Creating and populating these into a layout
+        var layout = new Layout.Layout(definition, variant);
+        layout.Populate();
+
+        // Then: Only the logos with no tags are included
+        Assert.That(layout.First().Logos, Has.Length.EqualTo(1));
+    }
+
+    /// <summary>
+    /// Scenario: Variant with one tag gets all matching logos and un-tagged
+    /// </summary>
+    [Test]
+    public void OneTag()
+    {
+        // Given: Some logos with tags, and some without
+        var definition = Load("tags.toml");
+
+        // And: A variant with no one tag
+        var variant = new Variant() { Include = [ "t1"] };
+        
+        // When: Creating and populating these into a layout
+        var layout = new Layout.Layout(definition, variant);
+        layout.Populate();
+
+        // Then: Only the logos with that tag and those with no tags are included
+        Assert.That(layout.First().Logos.Select(x=>x.Logo.Title), Is.EquivalentTo(new string[] { "zero", "one", "two" } ));
+    }
+
+    /// <summary>
+    /// Scenario: Variant with two tags gets all matching logos and un-tagged
+    /// </summary>
+    [Test]
+    public void TwoTags()
+    {
+        // Given: Some logos with tags, and some without
+        var definition = Load("tags.toml");
+
+        // And: A variant with no one tag
+        var variant = new Variant() { Include = [ "t2", "t3" ] };
+        
+        // When: Creating and populating these into a layout
+        var layout = new Layout.Layout(definition, variant);
+        layout.Populate();
+
+        // Then: Only the logos with that tag and those with no tags are included
+        Assert.That(layout.First().Logos.Select(x=>x.Logo.Title), Is.EquivalentTo(new string[] { "zero", "two", "three" } ));
+    }
+
+    /// <summary>
     /// Scenario: Variant with unspecified pages displays only boxes with unspecified page
     /// </summary>
     [Test]

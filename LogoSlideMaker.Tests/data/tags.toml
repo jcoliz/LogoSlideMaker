@@ -1,0 +1,17 @@
+[logos.zero]
+title = "zero"
+
+[logos.one]
+title = "one"
+tags = [ "t1" ]
+
+[logos.two]
+title = "two"
+tags = [ "t1", "t2" ]
+
+[logos.three]
+title = "three"
+tags = [ "t3" ]
+
+[[rows]]
+logos = [ "zero", "one", "two", "three" ]
