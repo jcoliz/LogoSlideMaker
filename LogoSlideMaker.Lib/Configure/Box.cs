@@ -21,6 +21,11 @@ public record Box
     public int MinColumns { get; set; }
     public int Page { get; set; }
     public string Title { get; set; } = string.Empty;
+    /// <summary>
+    /// Localized titles
+    /// </summary>
+    public Dictionary<string,string> Lang { get; set; } = new();
+
     public Dictionary<int,List<string>> Logos { get; set; } = new Dictionary<int,List<string>>();
 }
 

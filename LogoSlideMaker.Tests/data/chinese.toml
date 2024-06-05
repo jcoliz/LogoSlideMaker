@@ -1,0 +1,18 @@
+[layout]
+title = "Hello"
+lang.zh = "週夷住却兼投"
+
+[[variants]]
+name = "Chinese"
+description = [ "条子図観図技様供放提理", "環購改比技師尾整屋同" ]
+lang = "zh"
+
+[logos.one]
+title = "one"
+lang.zh = "以屋"
+
+[[boxes]]
+title = "three logos"
+logos.1 = [ "one", "one", "one" ]
+yposition = 0
+lang.zh = "期覧米形"

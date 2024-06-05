@@ -11,6 +11,11 @@ public record Logo
     public string Title { get; set; } = string.Empty;
 
     /// <summary>
+    /// Localized titles
+    /// </summary>
+    public Dictionary<string,string> Lang { get; set; } = new();
+
+    /// <summary>
     /// Where to find the image data
     /// </summary>
     public string Path { get; set; } = string.Empty;

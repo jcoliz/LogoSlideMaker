@@ -8,6 +8,11 @@ public record Config
     public string? Title { get; set; }
 
     /// <summary>
+    /// Localized titles
+    /// </summary>
+    public Dictionary<string,string> Lang { get; set; } = new();
+
+    /// <summary>
     /// Default vertical space between successive lines, in inches
     /// </summary>
     /// <remarks>

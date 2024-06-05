@@ -49,12 +49,36 @@ public record Variant
     /// </remarks>
     public List<int> Pages { get; set; } = new();
 
+    /// <summary>
+    /// Specification for logo masking
+    /// </summary>
     public Masking Mask { get; set; } = new();
+
+    /// <summary>
+    /// What alternate language should be used for this variant
+    /// </summary>
+    /// <remarks>
+    /// Will display the text in lang.xxx logos, boxes, and slide title
+    /// NOTE: Not implemented yet
+    /// </remarks>
+    public string? Lang { get; set; }
 }
 
+/// <summary>
+/// Specification for logo masking
+/// </summary>
+/// <remarks>
+/// Logos with these tags will be replaced by the mask logo
+/// </remarks>
 public record Masking 
 {
+    /// <summary>
+    /// Which logo to use as the mask
+    /// </summary>
     public string Logo { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Which tags identify logos which should should be masked
+    /// </summary>
     public List<string> Tags { get; set; } = new();
 }

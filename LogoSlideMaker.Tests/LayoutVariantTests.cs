@@ -121,6 +121,15 @@ public class LayoutVariantTests
         Assert.That(layout.First().Logos.Select(x=>x.Logo), Has.None.With.Property("Title").EqualTo("two"));
     }
 
+    [Test]
+    /// <summary>
+    /// Scenario: Can load file with chinese language annotations
+    /// </summary>
+    public void Chinese()
+    {
+        Load("chinese.toml");
+    }
+
     private static Definition Load(string filename)
     {
         var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
