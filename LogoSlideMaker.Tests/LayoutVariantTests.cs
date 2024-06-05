@@ -74,6 +74,26 @@ public class LayoutVariantTests
     }
 
     /// <summary>
+    /// Scenario: User can tag a single entry, and will only be included in variants with those tags
+    /// </summary>
+    [Test]
+    public void LogoTags()
+    {
+        // Given: A logo with a tag specified in the row
+        var definition = Load("tags.toml");
+
+        // And: A variant with that tag
+        var variant = new Variant() { Include = [ "t4" ] };
+        
+        // When: Creating and populating these into a layout
+        var layout = new Layout.Layout(definition, variant);
+        layout.Populate();
+
+        // Then: Only the logos with that tag and those with no tags are included
+        Assert.That(layout.First().Logos.Select(x=>x.Logo.Title), Is.EquivalentTo(new string[] { "zero", "two", "zero" } ));
+    }
+
+    /// <summary>
     /// Scenario: Variant with unspecified pages displays only boxes with unspecified page
     /// </summary>
     [Test]

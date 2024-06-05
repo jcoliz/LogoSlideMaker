@@ -7,11 +7,11 @@ tags = [ "t1" ]
 
 [logos.two]
 title = "two"
-tags = [ "t1", "t2" ]
+tags = [ "t1", "t2", "t4" ]
 
 [logos.three]
 title = "three"
 tags = [ "t3" ]
 
 [[rows]]
-logos = [ "zero", "one", "two", "three" ]
+logos = [ "zero", "one", "two", "three", "zero:t4" ]
