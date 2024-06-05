@@ -48,4 +48,13 @@ public record Variant
     /// particular page.
     /// </remarks>
     public List<int> Pages { get; set; } = new();
+
+    public Masking Mask { get; set; } = new();
+}
+
+public record Masking 
+{
+    public string Logo { get; set; } = string.Empty;
+
+    public List<string> Tags { get; set; } = new();
 }

@@ -105,6 +105,23 @@ public class LayoutVariantTests
         Assert.That(layout.Skip(1).First().Logos.Select(x=>x.Logo), Has.All.With.Property("Title").EqualTo("one"));
     }
 
+    [Test]
+    [Explicit("Failing test for in-progress feature")]
+    public void Masking()
+    {
+        var definition = Load("masking.toml");
+                
+        // When: Creating and populating these into a layout
+        var layout = new Layout.Layout(definition, definition.Variants[0]);
+        layout.Populate();
+
+        // Then: Has four logos
+        Assert.That(layout.First().Logos, Has.Length.EqualTo(4));
+
+        // And: Logo "two" is never shown
+        Assert.That(layout.First().Logos.Select(x=>x.Logo), Has.None.With.Property("Title").EqualTo("two"));
+    }
+
     private static Definition Load(string filename)
     {
         var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();

@@ -29,6 +29,8 @@
     <EmbeddedResource Include="data/nopages.toml" />
     <Content Remove="data/two-pages.toml" />
     <EmbeddedResource Include="data/two-pages.toml" />
+    <Content Remove="data/masking.toml" />
+    <EmbeddedResource Include="data/masking.toml" />
   </ItemGroup>
 
 </Project>
