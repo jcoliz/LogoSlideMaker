@@ -40,7 +40,7 @@ public record Entry
     /// <remarks>
     /// Used to lookup into Definition.Logos
     /// </remarks>
-    public string? Id { get; }
+    public string? Id { get; init; }
 
     /// <summary>
     /// Processing command

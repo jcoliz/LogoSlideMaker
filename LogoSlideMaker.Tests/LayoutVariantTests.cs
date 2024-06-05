@@ -106,7 +106,6 @@ public class LayoutVariantTests
     }
 
     [Test]
-    [Explicit("Failing test for in-progress feature")]
     public void Masking()
     {
         var definition = Load("masking.toml");

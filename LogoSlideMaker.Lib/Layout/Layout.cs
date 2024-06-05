@@ -119,7 +119,42 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>, IL
     /// <returns></returns>
     private ICollection<Entry> IncludedRowEntries(Row row)
     {
-        return row.Logos.Select(x=>new Entry(x)).Where(x => EntryIncludedInVariant(x)).ToArray();
+        return row.Logos
+            .Select(x=>new Entry(x))
+            .Where(EntryIncludedInVariant)
+            .Select(MaskedIfNeeded)
+            .ToArray();
+    }
+
+    private Entry MaskedIfNeeded(Entry entry)
+    {
+        // Start with the tags explicitly specified on this entry
+        var tags = entry.Tags.ToList();
+
+        // Add tags from logo if there is a logo
+        if (entry.Id != null)
+        {
+            var logo = definition.Logos[entry.Id];
+
+            // Also include placement-only tags which are included in the
+            // id with an at-sign,
+            // e.g. "app@tag"
+            tags.AddRange( logo.Tags );
+
+            // TODO: Note that a logo definition cannot declare a "not"
+            // tag. That is only used in entry placements. We COULD add
+            // that in the future. It would go here.
+        }
+
+        if (variant.Mask is not null && tags.Intersect(variant.Mask.Tags).Any())
+        {
+            return entry with { Id = variant.Mask.Logo };
+        }
+        else
+        {
+            return entry;
+        }
+
     }
 
     /// <summary>
@@ -161,6 +196,10 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>, IL
         if (tags.Intersect(variant.Include.Union(variant.Blank)).Any())
             return true;
 
+        // Masked entries are included
+        if (variant.Mask is not null && tags.Intersect(variant.Mask.Tags).Any())
+            return true;
+
         // Otherwise, Entries with tags are excluded by default
         return false;
     }
@@ -188,6 +227,10 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>, IL
 
         // Explicitly included logos are always included
         if (logo.Tags.Intersect(variant.Include).Any())
+            return true;
+
+        // Masked tags are shown at this stage, will be masked later
+        if (variant.Mask is not null && logo.Tags.Intersect(variant.Mask.Tags).Any())
             return true;
 
         return false;
