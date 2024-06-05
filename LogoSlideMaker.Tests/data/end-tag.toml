@@ -1,0 +1,5 @@
+[logos.zero]
+title = "zero"
+
+[[rows]]
+logos = [ "zero", "zero", "@end:t1", "zero", "zero", "zero", "zero" ]

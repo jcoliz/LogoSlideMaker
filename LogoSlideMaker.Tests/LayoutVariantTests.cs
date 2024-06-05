@@ -50,7 +50,7 @@ public class LayoutVariantTests
         layout.Populate();
 
         // Then: Only the logos with that tag and those with no tags are included
-        Assert.That(layout.First().Logos.Select(x=>x.Logo.Title), Is.EquivalentTo(new string[] { "zero", "one", "two" } ));
+        Assert.That(layout.First().Logos.Select(x=>x.Logo.Title), Is.EqualTo(new string[] { "zero", "one", "two" } ));
     }
 
     /// <summary>
@@ -70,7 +70,7 @@ public class LayoutVariantTests
         layout.Populate();
 
         // Then: Only the logos with that tag and those with no tags are included
-        Assert.That(layout.First().Logos.Select(x=>x.Logo.Title), Is.EquivalentTo(new string[] { "zero", "two", "three" } ));
+        Assert.That(layout.First().Logos.Select(x=>x.Logo.Title), Is.EqualTo(new string[] { "zero", "two", "three" } ));
     }
 
     /// <summary>
@@ -90,7 +90,87 @@ public class LayoutVariantTests
         layout.Populate();
 
         // Then: Only the logos with that tag and those with no tags are included
-        Assert.That(layout.First().Logos.Select(x=>x.Logo.Title), Is.EquivalentTo(new string[] { "zero", "two", "zero" } ));
+        Assert.That(layout.First().Logos.Select(x=>x.Logo.Title), Is.EqualTo(new string[] { "zero", "two", "zero" } ));
+    }
+
+    /// <summary>
+    /// Scenario: Logo with not-tag is excluded when variant has that tag
+    /// </summary>
+    [Test]
+    public void LogoNotTags()
+    {
+        // Given: A logo with a not-tag specified in the row
+        var definition = Load("not-tags.toml");
+
+        // And: A variant with that tag
+        var variant = new Variant() { Include = [ "t2" ] };
+        
+        // When: Creating and populating these into a layout
+        var layout = new Layout.Layout(definition, variant);
+        layout.Populate();
+
+        // Then: Only the logos with that tag and those with no tags are included
+        Assert.That(layout.First().Logos.Select(x=>x.Logo.Title), Is.EqualTo(new string[] { "zero", "three" } ));
+    }
+
+    /// <summary>
+    /// Scenario: Logo with not-tag is included when variant has no tags
+    /// </summary>
+    [Test]
+    public void LogoNotTagsNoTags()
+    {
+        // Given: A logo with a not-tag specified in the row
+        var definition = Load("not-tags.toml");
+
+        // And: A variant with no tags
+        var variant = new Variant();
+        
+        // When: Creating and populating these into a layout
+        var layout = new Layout.Layout(definition, variant);
+        layout.Populate();
+
+        // Then: Only the logos with that tag and those with no tags are included
+        Assert.That(layout.First().Logos.Select(x=>x.Logo.Title), Is.EqualTo(new string[] { "zero", "zero" } ));
+    }
+
+    /// <summary>
+    /// Scenario: Logo with tagged end command is ignored when variant has no tag
+    /// </summary>
+    [Test]
+    public void LogoEndCommandIgnored()
+    {
+        // Given: A logo with a not-tag specified in the row
+        var definition = Load("end-tag.toml");
+
+        // And: A variant with no tags
+        var variant = new Variant();
+        
+        // When: Creating and populating these into a layout
+        var layout = new Layout.Layout(definition, variant);
+        layout.Populate();
+
+        // Then: All logos includwed
+        Assert.That(layout.First().Logos, Has.Length.EqualTo(6));
+    }
+
+    /// <summary>
+    /// Scenario: Logo with tagged end command stops when variant has  tag
+    /// </summary>
+    [Test]
+    public void LogoEndCommand()
+    {
+        // Given: A logo with an end command specified in the row
+        var definition = Load("end-tag.toml");
+
+        // And: A variant with the matching tag
+        var variant = new Variant() { Include = [ "t1" ] };
+        
+        // When: Creating and populating these into a layout
+        var layout = new Layout.Layout(definition, variant);
+        layout.Populate();
+
+        // Then: Stops when end tag encountered
+        Assert.That(layout.First().Logos, Has.Length.EqualTo(2));
     }
 
     /// <summary>

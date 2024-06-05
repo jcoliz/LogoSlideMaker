@@ -35,6 +35,10 @@
     <EmbeddedResource Include="data/chinese.toml" />
     <Content Remove="data/tags.toml" />
     <EmbeddedResource Include="data/tags.toml" />
+    <Content Remove="data/not-tags.toml" />
+    <EmbeddedResource Include="data/not-tags.toml" />
+    <Content Remove="data/end-tag.toml" />
+    <EmbeddedResource Include="data/end-tag.toml" />
   </ItemGroup>
 
 </Project>
