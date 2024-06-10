@@ -282,6 +282,22 @@ public class LayoutVariantTests
     }
 
     [Test]
+    public void MaskingOnlySelected()
+    {
+        var definition = Load("masking-only.toml");
+                
+        // When: Creating and populating these into a layout
+        var layout = new Layout.Layout(definition, definition.Variants[0]);
+        layout.Populate();
+
+        // Then: Has give logos
+        Assert.That(layout.First().Logos, Has.Length.EqualTo(5));
+
+        // And: Logo "three" is shown
+        Assert.That(layout.First().Logos.Select(x=>x.Logo), Has.Some.With.Property("Title").EqualTo("three"));
+    }
+
+    [Test]
     /// <summary>
     /// Scenario: Can load file with chinese language annotations
     /// </summary>

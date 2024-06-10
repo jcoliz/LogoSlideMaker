@@ -1,0 +1,25 @@
+[[variants]]
+include = [ "ok" ]
+mask.logo = "mask"
+mask.tags = [ "hidden" ]
+
+[layout]
+default_width = 10
+
+[logos.one]
+title = "one"
+
+[logos.two]
+title = "two"
+tags = [ "hidden" ]
+
+[logos.three]
+title = "three"
+tags = [ "ok" ]
+
+[logos.mask]
+title = "mask"
+
+[[boxes]]
+logos.1 = [ "one", "two", "one", "two", "three" ]
+yposition = 0

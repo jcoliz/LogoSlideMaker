@@ -31,6 +31,8 @@
     <EmbeddedResource Include="data/two-pages.toml" />
     <Content Remove="data/masking.toml" />
     <EmbeddedResource Include="data/masking.toml" />
+    <Content Remove="data/masking-only.toml" />
+    <EmbeddedResource Include="data/masking-only.toml" />
     <Content Remove="data/chinese.toml" />
     <EmbeddedResource Include="data/chinese.toml" />
     <Content Remove="data/tags.toml" />
