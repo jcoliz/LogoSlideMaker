@@ -9,6 +9,7 @@ title = "one"
 logos.1 = [ "one", "one", "one", "one", "one" ]
 logos.2 = [ "one" ]
 yposition = 0
+auto_flow = true
 
 [[boxes]]
 logos.1 = [ "one", "one", "one", "one", "one" ]

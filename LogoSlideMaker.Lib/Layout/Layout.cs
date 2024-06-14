@@ -61,13 +61,54 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>, IL
     private BoxLayout LayoutBox(Box box, decimal YPosition)
     {
         var logos = box.Logos
-            .OrderBy(x=>x.Key)
-            .Select(x=>x.Value)
+            .OrderBy(x => x.Key)
+            .Select(x => x.Value);
+
+        var flow = box.AutoFlow ? AutoFlow(logos) : logos!;
+
+        var layouts = flow
             .Select(MakeRow(box,YPosition))
             .SelectMany(x => LayoutRow(x));
 
-        return new BoxLayout() { Heading = box.Title, Logos = logos.ToArray() };
+        return new BoxLayout() { Heading = box.Title, Logos = layouts.ToArray() };
     }
+
+    /// <summary>
+    /// Reflow logos into matching-length rows
+    /// </summary>
+    private IEnumerable<List<string>> AutoFlow(IEnumerable<List<string>> logos)
+    {
+        // Initially, we have this many rows
+        var num_rows = logos.Count();
+
+        // We have this many logos
+        var num_logos = logos.Sum(x=>x.Count);
+
+        // Ergo, we need this many columns
+        var num_cols = num_logos / num_rows + (num_logos % num_rows > 0 ? 1 : 0);
+
+        var result = new List<List<string>>();
+        var current = new List<string>();
+        var current_col = 0;
+        // Reflow the logos into the correct columns
+        foreach(var logo in logos.SelectMany(x=>x))
+        {
+            current.Add(logo);
+            if (++ current_col >= num_cols)
+            {
+                result.Add(current);
+                current = new List<string>();
+                current_col = 0;
+            }
+        }
+        if (current.Count > 0)
+        {
+            result.Add(current);
+        }
+
+        return result;
+    }
+
 
     private Func<List<string>,int,Row> MakeRow(Box box, decimal YPosition)
     {

@@ -86,7 +86,6 @@ public class LayoutBoxTests
     }
 
     [Test]
-    [Explicit("Failing test for In progress feature")]
     public void AutoFlow()
     {
         // Given: A box with unbalanced rows and autoflow set to true
@@ -99,6 +98,21 @@ public class LayoutBoxTests
         // Then: Logos are evenly distributed amongst rows
         Assert.That(layout.First().Logos[0..2], Has.All.Property("Y").EqualTo(0));
         Assert.That(layout.First().Logos[3..], Has.All.Property("Y").EqualTo(10));
+    }
+
+    [Test]
+    public void NoAutoFlow()
+    {
+        // Given: A box with unbalanced rows and autoflow set to FALSE
+        var definition = Load("auto-flow.toml");
+        definition.Boxes[0].AutoFlow = false;
+
+        // When: Creating and populating these into a layout
+        var layout = new Layout.Layout(definition, new Variant());
+        layout.Populate();
+
+        // Then: First row of logos all on same line
+        Assert.That(layout.First().Logos[0..^1], Has.All.Property("Y").EqualTo(0));
     }
 
     private static Definition Load(string filename)
