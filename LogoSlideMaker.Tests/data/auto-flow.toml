@@ -5,6 +5,10 @@ line_spacing = 10
 [logos.one]
 title = "one"
 
+[logos.two]
+title = "two"
+tags = [ "exclude" ]
+
 [[boxes]]
 logos.1 = [ "one", "one", "one", "one", "one" ]
 logos.2 = [ "one" ]
@@ -14,9 +18,13 @@ auto_flow = true
 [[boxes]]
 logos.1 = [ "one", "one", "one", "one", "one" ]
 logos.2 = [ "one" ]
-min_columns = 5
+min_columns = 4
+auto_flow = true
 
 [[boxes]]
-logos.1 = [ "one", "one", "one", "one", "one", "one", "one" ]
-logos.2 = [ "one" ]
-min_columns = 5
+logos.1 = [ "one", "two", "two", "one", "one", "one", "one", "two", "two", "one", "two", "one" ]
+logos.2 = [ "one", "one", "two" , "one", "one", "one", "two" ]
+logos.3 = [ "one", "one", "one", "one", "one" ]
+logos.4 = [ "two", "one", "one"  ]
+min_columns = 6
+auto_flow = true

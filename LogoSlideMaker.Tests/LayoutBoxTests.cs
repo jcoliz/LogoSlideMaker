@@ -96,8 +96,45 @@ public class LayoutBoxTests
         layout.Populate();
 
         // Then: Logos are evenly distributed amongst rows
-        Assert.That(layout.First().Logos[0..2], Has.All.Property("Y").EqualTo(0));
+        Assert.That(layout.First().Logos[0..3], Has.All.Property("Y").EqualTo(0));
         Assert.That(layout.First().Logos[3..], Has.All.Property("Y").EqualTo(10));
+    }
+
+    [Test]
+    public void AutoFlowMinColumns()
+    {
+        // Given: A box with unbalanced rows and autoflow set to true, and min-columns set
+        // to something which will still cause imbalance (here, 4)
+        var definition = Load("auto-flow.toml");
+
+        // When: Creating and populating these into a layout
+        var layout = new Layout.Layout(definition, new Variant());
+        layout.Populate();
+
+        // Then: First min_columns logos on first line 
+        Assert.That(layout[1].Logos[0..4], Has.All.Property("Y").EqualTo(20));
+
+        // And: Remaining logos on second line 
+        Assert.That(layout[1].Logos[4..], Has.All.Property("Y").EqualTo(30));
+    }
+
+    [Test]
+    public void AutoFlowMinColumnsTags()
+    {
+        // Given: A box with unbalanced rows and autoflow set to true, and min-columns set
+        // to something which will still cause imbalance (here, 6), and there are some
+        // logos excluded by tags
+        var definition = Load("auto-flow.toml");
+
+        // When: Creating and populating these into a layout
+        var layout = new Layout.Layout(definition, new Variant());
+        layout.Populate();
+
+        // Then: First min_columns logos on first line 
+        Assert.That(layout[2].Logos[0..6], Has.All.Property("Y").EqualTo(40));
+
+        // And: Second min_columns logos on second line 
+        Assert.That(layout[2].Logos[6..12], Has.All.Property("Y").EqualTo(50));
     }
 
     [Test]

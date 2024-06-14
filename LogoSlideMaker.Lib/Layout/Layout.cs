@@ -64,7 +64,7 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>, IL
             .OrderBy(x => x.Key)
             .Select(x => x.Value);
 
-        var flow = box.AutoFlow ? AutoFlow(logos) : logos!;
+        var flow = box.AutoFlow ? AutoFlow(box,logos) : logos!;
 
         var layouts = flow
             .Select(MakeRow(box,YPosition))
@@ -76,24 +76,36 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>, IL
     /// <summary>
     /// Reflow logos into matching-length rows
     /// </summary>
-    private IEnumerable<List<string>> AutoFlow(IEnumerable<List<string>> logos)
+    private IEnumerable<List<string>> AutoFlow(Box box, IEnumerable<List<string>> logos)
     {
+        // In order to autoflow, we first have to filter out unincluded logos.
+        // This is a duplication of later logic, so should figure out how to NOT 
+        // repeat that.
+
+        var entries = IncludedEntries(logos.SelectMany(x => x));
+
         // Initially, we have this many rows
         var num_rows = logos.Count();
 
         // We have this many logos
-        var num_logos = logos.Sum(x=>x.Count);
+        var num_logos = entries.Count;
 
         // Ergo, we need this many columns
         var num_cols = num_logos / num_rows + (num_logos % num_rows > 0 ? 1 : 0);
+
+        // However, if this is LESS than min-columns, use that instead
+        if (num_cols < box.MinColumns)
+        {
+            num_cols = box.MinColumns;
+        }
 
         var result = new List<List<string>>();
         var current = new List<string>();
         var current_col = 0;
         // Reflow the logos into the correct columns
-        foreach(var logo in logos.SelectMany(x=>x))
+        foreach(var logo in entries)
         {
-            current.Add(logo);
+            current.Add(logo.Id ?? string.Empty);
             if (++ current_col >= num_cols)
             {
                 result.Add(current);
@@ -140,7 +152,7 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>, IL
     private IEnumerable<LogoLayout> LayoutRow(Row _row)
     {
         // Filter down to only included logos.
-        var entries = IncludedRowEntries(_row);
+        var entries = IncludedEntries(_row.Logos);
         var row = _row with { Logos = entries.Select(x=>x.Id ?? string.Empty).ToList()};
 
         var layout = entries
@@ -158,9 +170,9 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>, IL
     /// </summary>
     /// <param name="row"></param>
     /// <returns></returns>
-    private ICollection<Entry> IncludedRowEntries(Row row)
+    private ICollection<Entry> IncludedEntries(IEnumerable<string> logos)
     {
-        return row.Logos
+        return logos
             .Select(x=>new Entry(x))
             .Where(EntryIncludedInVariant)
             .Select(MaskedIfNeeded)
