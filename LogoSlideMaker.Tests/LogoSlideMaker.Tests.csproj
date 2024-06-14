@@ -41,6 +41,8 @@
     <EmbeddedResource Include="data/not-tags.toml" />
     <Content Remove="data/end-tag.toml" />
     <EmbeddedResource Include="data/end-tag.toml" />
+    <Content Remove="data/auto-flow.toml" />
+    <EmbeddedResource Include="data/auto-flow.toml" />
   </ItemGroup>
 
 </Project>

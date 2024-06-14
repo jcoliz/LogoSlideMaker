@@ -20,6 +20,11 @@ public record Box
     public Rectangle? Outer { get; set; }
     public int MinColumns { get; set; }
     public int Page { get; set; }
+
+    /// <summary>
+    /// Whether row should be re-composed to flow nicely
+    /// </summary>
+    public bool AutoFlow { get; set; }
     public string Title { get; set; } = string.Empty;
     /// <summary>
     /// Localized titles

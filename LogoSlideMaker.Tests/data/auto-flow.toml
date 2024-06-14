@@ -1,0 +1,21 @@
+[layout]
+default_width = 10
+line_spacing = 10
+
+[logos.one]
+title = "one"
+
+[[boxes]]
+logos.1 = [ "one", "one", "one", "one", "one" ]
+logos.2 = [ "one" ]
+yposition = 0
+
+[[boxes]]
+logos.1 = [ "one", "one", "one", "one", "one" ]
+logos.2 = [ "one" ]
+min_columns = 5
+
+[[boxes]]
+logos.1 = [ "one", "one", "one", "one", "one", "one", "one" ]
+logos.2 = [ "one" ]
+min_columns = 5

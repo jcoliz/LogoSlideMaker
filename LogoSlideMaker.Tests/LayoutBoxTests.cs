@@ -1,4 +1,6 @@
+using System.Reflection;
 using LogoSlideMaker.Configure;
+using Tomlyn;
 
 namespace LogoSlideMaker.Tests;
 
@@ -81,6 +83,33 @@ public class LayoutBoxTests
 
         // Then: Top of logo in second box is aligned to outer container plus padding, plus box and line spacing
         Assert.That(layout.Last().Logos.First().Y, Is.EqualTo(100+10+5m/2+200+150));
+    }
 
+    [Test]
+    [Explicit("Failing test for In progress feature")]
+    public void AutoFlow()
+    {
+        // Given: A box with unbalanced rows and autoflow set to true
+        var definition = Load("auto-flow.toml");
+
+        // When: Creating and populating these into a layout
+        var layout = new Layout.Layout(definition, new Variant());
+        layout.Populate();
+
+        // Then: Logos are evenly distributed amongst rows
+        Assert.That(layout.First().Logos[0..2], Has.All.Property("Y").EqualTo(0));
+        Assert.That(layout.First().Logos[3..], Has.All.Property("Y").EqualTo(10));
+    }
+
+    private static Definition Load(string filename)
+    {
+        var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
+        var resource = names.Where(x=>x.Contains($".{filename}")).Single();
+        var stream = Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource);
+        var sr = new StreamReader(stream!);
+        var toml = sr.ReadToEnd();
+        var definitions = Toml.ToModel<Definition>(toml);
+
+        return definitions;
     }
 }
