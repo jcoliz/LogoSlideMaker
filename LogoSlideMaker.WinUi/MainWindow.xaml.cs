@@ -36,6 +36,9 @@ public sealed partial class MainWindow : Window
     {
         this.InitializeComponent();
         this.LoadResources();
+
+        // TODO: Get the actual system DPI (not just assume 1.5)
+        this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32((Int32)(1.5*(1280+96*2)), (Int32)(1.5 * (720+96*2))));
     }
 
     private void LoadResources()
@@ -56,6 +59,8 @@ public sealed partial class MainWindow : Window
         Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender,
         Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs args)
     {
+        var s = this.AppWindow.Size;
+
         // Draw a white background
         args.DrawingSession.FillRectangle(new Rect() { X = 96, Y = 96, Width = 1280, Height = 720 }, Microsoft.UI.Colors.White);
 
