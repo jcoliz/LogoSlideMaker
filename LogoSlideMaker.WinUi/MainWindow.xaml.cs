@@ -6,7 +6,9 @@ using System.Reflection;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using LogoSlideMaker.Configure;
+using Microsoft.Graphics.Canvas.Brushes;
 using Microsoft.Graphics.Canvas.Svg;
+using Microsoft.Graphics.Canvas.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -101,7 +103,7 @@ public sealed partial class MainWindow : Window
                 var Height = icon_height * config.Dpi;
 
                 // Draw a placeholder logo
-                args.DrawingSession.FillRectangle(new Rect() { X = 96.0f + (float)X, Y = 96.0f + (float)Y, Width = (float)Width, Height = (float)Height}, Microsoft.UI.Colors.Red);
+                args.DrawingSession.DrawRectangle(new Rect() { X = 96.0f + (float)X, Y = 96.0f + (float)Y, Width = (float)Width, Height = (float)Height }, Microsoft.UI.Colors.Red, 1);
 
                 var text_width_inches = logo.TextWidth ?? config.TextWidth;
 
@@ -120,7 +122,10 @@ public sealed partial class MainWindow : Window
                 shape.Height = (float)text_height;
 
                 // Draw a placeholder textbox
-                args.DrawingSession.FillRectangle(shape, Microsoft.UI.Colors.Blue);
+                args.DrawingSession.DrawRectangle(shape, Microsoft.UI.Colors.Blue, 1);
+
+                var tf = new CanvasTextFormat() { FontSize = config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
+                args.DrawingSession.DrawText(logo.Title, shape, new CanvasSolidColorBrush(sender,Microsoft.UI.Colors.Black), tf);
 
 #if false
                 var tf = shape.TextFrame;
