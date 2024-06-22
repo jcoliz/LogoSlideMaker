@@ -27,8 +27,11 @@ public sealed partial class MainWindow : Window
         this.InitializeComponent();
     }
 
-    private void myButton_Click(object sender, RoutedEventArgs e)
+    void CanvasControl_Draw(
+        Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender,
+        Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs args)
     {
-        myButton.Content = "Clicked";
+        args.DrawingSession.DrawEllipse(155, 115, 80, 30, Microsoft.UI.Colors.Black, 3);
+        args.DrawingSession.DrawText("Hello, Win2D World!", 100, 100, Microsoft.UI.Colors.Yellow);
     }
 }
