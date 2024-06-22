@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "LogoSlideMaker.WinUi (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "LogoSlideMaker.WinUi (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
