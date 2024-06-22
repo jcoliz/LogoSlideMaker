@@ -69,6 +69,10 @@ public sealed partial class MainWindow : Window
         var config = _definition.Render;
         foreach (var boxlayout in _layout)
         {
+            // TODO: It would be nice to render the box boundaries, and maybe even including the 
+            // padding. However, that's not possible right now, because the box layout discards
+            // that information
+
             foreach (var logolayout in boxlayout.Logos)
             {
                 var logo = logolayout.Logo;
