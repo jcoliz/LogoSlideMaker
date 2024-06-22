@@ -10,6 +10,6 @@
     mc:Ignorable="d">
 
     <Grid>
-        <win2dcanvas:CanvasControl Draw="CanvasControl_Draw" ClearColor="CornflowerBlue"/>
+        <win2dcanvas:CanvasControl x:Name="canvas" Draw="CanvasControl_Draw" ClearColor="CornflowerBlue"/>
     </Grid>
 </Window>
