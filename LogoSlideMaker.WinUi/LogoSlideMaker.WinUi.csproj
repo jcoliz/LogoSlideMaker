@@ -11,6 +11,10 @@
     <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Sample\sample.toml" />
+    <None Remove="Sample\wine-svgrepo-com.svg" />
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="Assets\SplashScreen.scale-200.png" />
@@ -23,10 +27,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Sample\sample.toml" />
+    <EmbeddedResource Include="Sample\wine-svgrepo-com.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.2.0" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version=" 1.5.240227000" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
-    <Manifest Include="$(ApplicationManifest)" />
+	<PackageReference Include="Tomlyn" Version="0.17.0" />
+	  <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
   <!-- 

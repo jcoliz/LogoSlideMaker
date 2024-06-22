@@ -1,0 +1,22 @@
+﻿[layout]
+line_spacing = 1.5
+padding = 0.25
+
+[render]
+icon_size = 0.75
+text_height = 0.5
+text_distace = 0.75 
+text_width = 1.25
+font_size = 12
+dpi = 96
+
+[logos.wine]
+title = "Glass of Wine"
+path = "Sample/wine-svgrepo-com.svg"
+
+[[boxes]]
+logos.1 = [ "wine", "wine", "wine", "wine", "wine" ]
+logos.2 = [ "wine" ]
+outer = { x = 0.25, y = 0.25, width = 8, height = 3 }
+min_columns = 4
+auto_flow = true
