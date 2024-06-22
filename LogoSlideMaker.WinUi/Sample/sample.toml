@@ -12,7 +12,11 @@ dpi = 96
 
 [logos.wine]
 title = "Glass of Wine"
-path = "Sample/wine-svgrepo-com.svg"
+path = "wine.png"
+
+[logos.wine-svg]
+title = "Glass of Wine (SVG)"
+path = "wine-svgrepo-com.svg"
 
 [[boxes]]
 logos.1 = [ "wine", "wine", "wine", "wine", "wine" ]

@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using LogoSlideMaker.Configure;
+using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
 using Microsoft.Graphics.Canvas.Svg;
 using Microsoft.Graphics.Canvas.Text;
@@ -19,6 +20,7 @@ using Microsoft.UI.Xaml.Navigation;
 using Tomlyn;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage.Streams;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -32,6 +34,8 @@ public sealed partial class MainWindow : Window
     private Definition? _definition;
     private Layout.Layout? _layout;
 
+    private readonly Dictionary<string, CanvasBitmap> bitmaps = new();
+
     public MainWindow()
     {
         this.InitializeComponent();
@@ -39,6 +43,22 @@ public sealed partial class MainWindow : Window
 
         // TODO: Get the actual system DPI (not just assume 1.5)
         this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32((Int32)(1.5*(1280+96*2)), (Int32)(1.5 * (720+96*2))));
+
+        this.canvas.CreateResources += Canvas_CreateResources;
+    }
+
+    private async void Canvas_CreateResources(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs args)
+    {
+        foreach (var logo in _definition.Logos)
+        {
+            // We can only load PNGs right now
+            if (!bitmaps.ContainsKey(logo.Key) && Path.GetExtension(logo.Value.Path).ToLowerInvariant() == ".png")
+            {
+                var cb = await LoadBitmap(sender, logo.Value.Path);
+                bitmaps[logo.Value.Path] = cb;
+            }
+        }
+        canvas.Invalidate();
     }
 
     private void LoadResources()
@@ -106,13 +126,21 @@ public sealed partial class MainWindow : Window
                 var icon_width = config.IconSize * width_factor * logo.Scale;
                 var icon_height = config.IconSize * height_factor * logo.Scale;
 
-                var X = (logolayout.X - icon_width / 2.0m) * config.Dpi;
-                var Y = (logolayout.Y - icon_height / 2.0m) * config.Dpi;
-                var Width = icon_width * config.Dpi;
-                var Height = icon_height * config.Dpi;
+                var icon_rect = new Rect();
+                icon_rect.X = (float)((logolayout.X - icon_width / 2.0m) * config.Dpi + 96);
+                icon_rect.Y = (float)((logolayout.Y - icon_height / 2.0m) * config.Dpi + 96);
+                icon_rect.Width = (float)(icon_width * config.Dpi);
+                icon_rect.Height = (float)(icon_height * config.Dpi);
 
                 // Draw a placeholder logo
-                args.DrawingSession.DrawRectangle(new Rect() { X = 96.0f + (float)X, Y = 96.0f + (float)Y, Width = (float)Width, Height = (float)Height }, Microsoft.UI.Colors.Red, 1);
+                args.DrawingSession.DrawRectangle(icon_rect, Microsoft.UI.Colors.Red, 1);
+
+                // Draw the actual logo
+                var bitmap = bitmaps.GetValueOrDefault(logolayout.Logo.Path);
+                if (bitmap is not null)
+                {
+                    args.DrawingSession.DrawImage(bitmap, icon_rect);
+                }
 
                 var text_width_inches = logo.TextWidth ?? config.TextWidth;
 
@@ -151,5 +179,17 @@ public sealed partial class MainWindow : Window
 #endif
             }
         }
+    }
+
+    private async Task<CanvasBitmap> LoadBitmap(ICanvasResourceCreator resourceCreator, string filename)
+    {
+        var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
+        var resource = names.Where(x => x.Contains($".{filename}")).Single();
+        var stream = Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource);
+
+        var randomAccessStream = stream.AsRandomAccessStream();
+        var result = await CanvasBitmap.LoadAsync(resourceCreator, randomAccessStream);
+
+        return result;
     }
 }
