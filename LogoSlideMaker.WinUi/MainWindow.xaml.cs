@@ -9,11 +9,15 @@ using LogoSlideMaker.Layout;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
 using Microsoft.Graphics.Canvas.Text;
+using Microsoft.Graphics.Canvas.UI;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
 using Svg;
 using Tomlyn;
 using Windows.Foundation;
+using Windows.Storage;
+using Windows.Storage.Pickers;
 using WinRT;
 
 namespace LogoSlideMaker.WinUi;
@@ -65,6 +69,21 @@ public sealed partial class MainWindow : Window
 
         _layout = new Layout.Layout(_definition, new Variant());
         _layout.Populate();
+    }
+
+    private async Task LoadDefinitionAsync(StorageFile storageFile)
+    {
+        using var stream = await storageFile.OpenStreamForReadAsync();
+
+        var sr = new StreamReader(stream);
+        var toml = sr.ReadToEnd();
+        _definition = Toml.ToModel<Definition>(toml);
+
+        _layout = new Layout.Layout(_definition, new Variant());
+        _layout.Populate();
+
+        // TODO: https://microsoft.github.io/Win2D/WinUI2/html/LoadingResourcesOutsideCreateResources.htm
+        Canvas_CreateResources(this.canvas, new CanvasCreateResourcesEventArgs( CanvasCreateResourcesReason.NewDevice));
     }
 
     void CanvasControl_Draw(
@@ -205,9 +224,30 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void AppBarButton_Click(object sender, RoutedEventArgs e)
+    private async void OpenFile_Click(object sender, RoutedEventArgs e)
     {
+        var picker = new Windows.Storage.Pickers.FileOpenPicker();
 
+        // https://github.com/microsoft/WindowsAppSDK/issues/1188
+        // Get the current window's HWND by passing in the Window object
+        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        // Associate the HWND with the file picker
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+        picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.List;
+        picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
+        picker.FileTypeFilter.Add(".toml");
+
+        var file = await picker.PickSingleFileAsync();
+        if (file != null)
+        {
+            await LoadDefinitionAsync(file);
+        }
+    }
+
+    private void DoExport_Click(object sender, RoutedEventArgs e)
+    {
+        // Will save this out as powerpoint file
     }
 
     private void CommandBar_Closing(object sender, object e)

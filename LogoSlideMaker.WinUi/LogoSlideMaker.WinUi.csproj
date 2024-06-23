@@ -12,6 +12,7 @@
     <EnableMsixTooling>true</EnableMsixTooling>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Sample\sample-packed.toml" />
     <None Remove="Sample\sample.toml" />
     <None Remove="Sample\Slide1.PNG" />
     <None Remove="Sample\wine-svgrepo-com.svg" />
@@ -29,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Sample\sample-packed.toml" />
     <EmbeddedResource Include="Sample\sample.toml" />
     <EmbeddedResource Include="Sample\Slide1.PNG" />
     <EmbeddedResource Include="Sample\wine-svgrepo-com.svg" />
