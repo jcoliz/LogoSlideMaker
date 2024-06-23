@@ -17,6 +17,15 @@
         </Grid.RowDefinitions>
         <CommandBar IsOpen="True" IsSticky="True" OverflowButtonVisibility="Collapsed" HorizontalAlignment="Left" Closing="CommandBar_Closing">
             <AppBarButton Icon="OpenFile" Label="Open" Click="OpenFile_Click"/>
+            <AppBarButton Icon="View" Label="View" Click="PickView_Click">
+                <AppBarButton.Flyout>
+                    <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                        <MenuFlyoutItem Text="Page 1"/>
+                        <MenuFlyoutItem Text="Page 2"/>
+                        <MenuFlyoutItem Text="Page 3"/>
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
             <AppBarButton Icon="Download" Label="Export" Click="DoExport_Click"/>
         </CommandBar>
         <win2dcanvas:CanvasControl Grid.Row="1" x:Name="canvas" Draw="CanvasControl_Draw" ClearColor="CornflowerBlue"/>

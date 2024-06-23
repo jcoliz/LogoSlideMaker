@@ -250,6 +250,12 @@ public sealed partial class MainWindow : Window
         // Will save this out as powerpoint file
     }
 
+    private void PickView_Click(object sender, RoutedEventArgs e)
+    {
+        // Will let us choose which variant to display
+        // Note that this will not require reloading resources, just invalidate the canvas and redraw
+    }
+
     private void CommandBar_Closing(object sender, object e)
     {
         sender.As<CommandBar>().IsOpen = true;
