@@ -3,29 +3,18 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using LogoSlideMaker.Configure;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
-using Microsoft.Graphics.Canvas.Svg;
 using Microsoft.Graphics.Canvas.Text;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
+using Svg;
 using Tomlyn;
 using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Storage.Streams;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace LogoSlideMaker.WinUi;
+
 /// <summary>
 /// An empty window that can be used on its own or navigated to within a Frame.
 /// </summary>
@@ -35,12 +24,11 @@ public sealed partial class MainWindow : Window
     private Layout.Layout? _layout;
 
     private readonly Dictionary<string, CanvasBitmap> bitmaps = new();
-    private readonly Dictionary<string, CanvasSvgDocument> svgs = new();
 
     public MainWindow()
     {
         this.InitializeComponent();
-        this.LoadResources();
+        this.LoadDefinition();
 
         // TODO: Get the actual system DPI (not just assume 1.5)
         this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32((Int32)(1.5*(1280+96*2)), (Int32)(1.5 * (720+96*2))));
@@ -55,22 +43,14 @@ public sealed partial class MainWindow : Window
             // We can only load PNGs right now
             if (!bitmaps.ContainsKey(logo.Key) )
             {
-                if (Path.GetExtension(logo.Value.Path).ToLowerInvariant() == ".png")
-                {
-                    var cb = await LoadBitmap(sender, logo.Value.Path);
-                    bitmaps[logo.Value.Path] = cb;
-                }
-                else if (Path.GetExtension(logo.Value.Path).ToLowerInvariant() == ".svg")
-                {
-                    var svg = await LoadSvg(sender, logo.Value.Path);
-                    svgs[logo.Value.Path] = svg;
-                }
+                var cb = await LoadBitmap(sender, logo.Value.Path);
+                bitmaps[logo.Value.Path] = cb;
             }
         }
         canvas.Invalidate();
     }
 
-    private void LoadResources()
+    private void LoadDefinition()
     {
         var filename = "sample.toml";
         var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
@@ -88,8 +68,6 @@ public sealed partial class MainWindow : Window
         Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender,
         Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs args)
     {
-        var s = this.AppWindow.Size;
-
         // Draw a white background
         args.DrawingSession.FillRectangle(new Rect() { X = 96, Y = 96, Width = 1280, Height = 720 }, Microsoft.UI.Colors.White);
 
@@ -116,15 +94,8 @@ public sealed partial class MainWindow : Window
                     continue;
                 }
 
-                {
-                    //using var stream = new FileStream(logo.Path, FileMode.Open);
-                    //var doc = await CanvasSvgDocument.LoadAsync(sender, (Windows.Storage.Streams.IRandomAccessStream)stream);
-
-                    //doc.
-                    //args.DrawingSession.DrawSvg( (doc);
-                }
-
-                //var pic = target.OfType<IPicture>().Last();
+                // TODO: DRY refactor this versus powerpoint rendering, which has a lot of
+                // overlap, but not 100%
 
                 // Adjust size of icon depending on size of source image. The idea is all
                 // icons occupy the same number of pixel area
@@ -141,7 +112,7 @@ public sealed partial class MainWindow : Window
                 icon_rect.Width = (float)(icon_width * config.Dpi);
                 icon_rect.Height = (float)(icon_height * config.Dpi);
 
-                // Draw a placeholder logo
+                // Draw a logo bounding box
                 args.DrawingSession.DrawRectangle(icon_rect, Microsoft.UI.Colors.Red, 1);
 
                 // Draw the actual logo
@@ -149,11 +120,6 @@ public sealed partial class MainWindow : Window
                 if (bitmap is not null)
                 {
                     args.DrawingSession.DrawImage(bitmap, icon_rect);
-                }
-                var svg = svgs.GetValueOrDefault(logolayout.Logo.Path);
-                if (svg is not null)
-                {
-                    args.DrawingSession.DrawSvg(svg, new Size() { Width = icon_rect.Width, Height = icon_rect.Height }, (float)icon_rect.X, (float)icon_rect.Y);
                 }
 
                 var text_width_inches = logo.TextWidth ?? config.TextWidth;
@@ -172,52 +138,46 @@ public sealed partial class MainWindow : Window
                 shape.Width = (float)text_width;
                 shape.Height = (float)text_height;
 
-                // Draw a placeholder textbox
+                // Draw a text bounding box
                 args.DrawingSession.DrawRectangle(shape, Microsoft.UI.Colors.Blue, 1);
 
+                // Draw the actual text
                 var tf = new CanvasTextFormat() { FontSize = config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
                 args.DrawingSession.DrawText(logo.Title, shape, new CanvasSolidColorBrush(sender,Microsoft.UI.Colors.Black), tf);
-
-#if false
-                var tf = shape.TextFrame;
-                tf.Text = logo.Title;
-                tf.LeftMargin = 0;
-                tf.RightMargin = 0;
-                var font = tf.Paragraphs.First().Portions.First().Font;
-
-                font.Size = config.FontSize;
-                font.LatinName = config.FontName;
-                font.Color.Update(config.FontColor);
-                shape.Fill.SetNoFill();
-                shape.Outline.SetNoOutline();
-#endif
             }
         }
     }
 
+    /// <summary>
+    /// Load a single bitmap from embedded storage
+    /// </summary>
+    /// <param name="resourceCreator">Where to create bitmaps</param>
+    /// <param name="filename">Name of source file</param>
+    /// <returns>Created bitmap in this canvas</returns>
     private async Task<CanvasBitmap> LoadBitmap(ICanvasResourceCreator resourceCreator, string filename)
     {
         var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
         var resource = names.Where(x => x.Contains($".{filename}")).Single();
         var stream = Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource);
 
-        var randomAccessStream = stream.AsRandomAccessStream();
-        var result = await CanvasBitmap.LoadAsync(resourceCreator, randomAccessStream);
+        if (filename.ToLowerInvariant().EndsWith(".svg"))
+        {
+            var svg = SvgDocument.Open<SvgDocument>(stream);
+            var bitmap = svg.Draw();
+            var pngStream = new MemoryStream();
+            bitmap.Save(pngStream, System.Drawing.Imaging.ImageFormat.Png);
+            pngStream.Seek(0, SeekOrigin.Begin);
+            var randomAccessStream = pngStream.AsRandomAccessStream();
+            var result = await CanvasBitmap.LoadAsync(resourceCreator, randomAccessStream);
 
-        return result;
-    }
-    private async Task<CanvasSvgDocument> LoadSvg(ICanvasResourceCreator resourceCreator, string filename)
-    {
-        // There's no great way to get the size right on SvgDocument. Ergo, I will just load it in and
-        // rasterize it, then cache it AS a bitmap.
+            return result;
+        }
+        else
+        {
+            var randomAccessStream = stream.AsRandomAccessStream();
+            var result = await CanvasBitmap.LoadAsync(resourceCreator, randomAccessStream);
 
-        var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
-        var resource = names.Where(x => x.Contains($".{filename}")).Single();
-        var stream = Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource);
-
-        var randomAccessStream = stream.AsRandomAccessStream();
-        var result = await CanvasSvgDocument.LoadAsync(resourceCreator, randomAccessStream);
-
-        return result;
+            return result;
+        }
     }
 }
