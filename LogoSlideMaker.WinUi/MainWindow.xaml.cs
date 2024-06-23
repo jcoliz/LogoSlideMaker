@@ -35,6 +35,7 @@ public sealed partial class MainWindow : Window
     private Layout.Layout? _layout;
 
     private readonly Dictionary<string, CanvasBitmap> bitmaps = new();
+    private readonly Dictionary<string, CanvasSvgDocument> svgs = new();
 
     public MainWindow()
     {
@@ -52,10 +53,18 @@ public sealed partial class MainWindow : Window
         foreach (var logo in _definition.Logos)
         {
             // We can only load PNGs right now
-            if (!bitmaps.ContainsKey(logo.Key) && Path.GetExtension(logo.Value.Path).ToLowerInvariant() == ".png")
+            if (!bitmaps.ContainsKey(logo.Key) )
             {
-                var cb = await LoadBitmap(sender, logo.Value.Path);
-                bitmaps[logo.Value.Path] = cb;
+                if (Path.GetExtension(logo.Value.Path).ToLowerInvariant() == ".png")
+                {
+                    var cb = await LoadBitmap(sender, logo.Value.Path);
+                    bitmaps[logo.Value.Path] = cb;
+                }
+                else if (Path.GetExtension(logo.Value.Path).ToLowerInvariant() == ".svg")
+                {
+                    var svg = await LoadSvg(sender, logo.Value.Path);
+                    svgs[logo.Value.Path] = svg;
+                }
             }
         }
         canvas.Invalidate();
@@ -141,6 +150,11 @@ public sealed partial class MainWindow : Window
                 {
                     args.DrawingSession.DrawImage(bitmap, icon_rect);
                 }
+                var svg = svgs.GetValueOrDefault(logolayout.Logo.Path);
+                if (svg is not null)
+                {
+                    args.DrawingSession.DrawSvg(svg, new Size() { Width = icon_rect.Width, Height = icon_rect.Height }, (float)icon_rect.X, (float)icon_rect.Y);
+                }
 
                 var text_width_inches = logo.TextWidth ?? config.TextWidth;
 
@@ -189,6 +203,20 @@ public sealed partial class MainWindow : Window
 
         var randomAccessStream = stream.AsRandomAccessStream();
         var result = await CanvasBitmap.LoadAsync(resourceCreator, randomAccessStream);
+
+        return result;
+    }
+    private async Task<CanvasSvgDocument> LoadSvg(ICanvasResourceCreator resourceCreator, string filename)
+    {
+        // There's no great way to get the size right on SvgDocument. Ergo, I will just load it in and
+        // rasterize it, then cache it AS a bitmap.
+
+        var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
+        var resource = names.Where(x => x.Contains($".{filename}")).Single();
+        var stream = Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource);
+
+        var randomAccessStream = stream.AsRandomAccessStream();
+        var result = await CanvasSvgDocument.LoadAsync(resourceCreator, randomAccessStream);
 
         return result;
     }

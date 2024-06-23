@@ -19,8 +19,8 @@ title = "Glass of Wine (SVG)"
 path = "wine-svgrepo-com.svg"
 
 [[boxes]]
-logos.1 = [ "wine", "wine", "wine", "wine", "wine" ]
-logos.2 = [ "wine" ]
+logos.1 = [ "wine", "wine-svg", "wine", "wine-svg", "wine" ]
+logos.2 = [ "wine-svg" ]
 outer = { x = 0.25, y = 0.25, width = 8, height = 3 }
 min_columns = 4
 auto_flow = true
