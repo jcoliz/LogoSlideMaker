@@ -11,6 +11,14 @@
     Title="Logo Slide Maker">
 
     <Grid>
-        <win2dcanvas:CanvasControl x:Name="canvas" Draw="CanvasControl_Draw" ClearColor="CornflowerBlue"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="64" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <CommandBar IsOpen="True" IsSticky="True" OverflowButtonVisibility="Collapsed" HorizontalAlignment="Left" Closing="CommandBar_Closing">
+            <AppBarButton Icon="OpenFile" Label="Open" Click="AppBarButton_Click"/>
+            <AppBarButton Icon="Download" Label="Export" Click="AppBarButton_Click"/>
+        </CommandBar>
+        <win2dcanvas:CanvasControl Grid.Row="1" x:Name="canvas" Draw="CanvasControl_Draw" ClearColor="CornflowerBlue"/>
     </Grid>
 </Window>

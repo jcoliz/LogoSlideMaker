@@ -10,9 +10,11 @@ using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
 using Microsoft.Graphics.Canvas.Text;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Svg;
 using Tomlyn;
 using Windows.Foundation;
+using WinRT;
 
 namespace LogoSlideMaker.WinUi;
 
@@ -32,7 +34,7 @@ public sealed partial class MainWindow : Window
         this.LoadDefinition();
 
         // TODO: Get the actual system DPI (not just assume 1.5)
-        this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32((Int32)(1.5*(1280+96*2)), (Int32)(1.5 * (720+96*2))));
+        this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32((Int32)(1.5*(1280+96*2)), (Int32)(1.5 * (720+64+96*2))));
 
         this.canvas.CreateResources += Canvas_CreateResources;
     }
@@ -201,5 +203,15 @@ public sealed partial class MainWindow : Window
 
             return result;
         }
+    }
+
+    private void AppBarButton_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
+
+    private void CommandBar_Closing(object sender, object e)
+    {
+        sender.As<CommandBar>().IsOpen = true;
     }
 }
