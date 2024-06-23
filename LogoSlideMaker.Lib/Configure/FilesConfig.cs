@@ -5,6 +5,11 @@
 /// </summary>
 public record FilesConfig
 {
+    /// <summary>
+    /// Powerpoint output
+    /// </summary>
+    public string? Output { get; set; } = null;
+
     public TemplateConfig Template { get; set; } = new();
 }
 
