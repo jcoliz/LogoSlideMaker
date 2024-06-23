@@ -29,6 +29,7 @@ public sealed partial class MainWindow : Window
 {
     private Definition? _definition;
     private Layout.Layout? _layout;
+    private string? currentFile;
 
     private readonly Dictionary<string, CanvasBitmap> bitmaps = new();
 
@@ -73,6 +74,8 @@ public sealed partial class MainWindow : Window
 
     private async Task LoadDefinitionAsync(StorageFile storageFile)
     {
+        currentFile = storageFile.Path;
+
         using var stream = await storageFile.OpenStreamForReadAsync();
 
         var sr = new StreamReader(stream);
@@ -84,6 +87,18 @@ public sealed partial class MainWindow : Window
 
         // TODO: https://microsoft.github.io/Win2D/WinUI2/html/LoadingResourcesOutsideCreateResources.htm
         Canvas_CreateResources(this.canvas, new CanvasCreateResourcesEventArgs( CanvasCreateResourcesReason.NewDevice));
+    }
+
+    private async Task ReloadAsync()
+    {
+        if (currentFile is null)
+        {
+            return;        
+        }
+
+        var storageFile = await StorageFile.GetFileFromPathAsync(currentFile);
+
+        await LoadDefinitionAsync(storageFile);
     }
 
     void CanvasControl_Draw(
@@ -243,6 +258,11 @@ public sealed partial class MainWindow : Window
         {
             await LoadDefinitionAsync(file);
         }
+    }
+
+    private async void Reload_Click(object sender, RoutedEventArgs e)
+    {
+        await ReloadAsync();
     }
 
     private void DoExport_Click(object sender, RoutedEventArgs e)

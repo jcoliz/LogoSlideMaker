@@ -17,6 +17,7 @@
         </Grid.RowDefinitions>
         <CommandBar IsOpen="True" IsSticky="True" OverflowButtonVisibility="Collapsed" HorizontalAlignment="Left" Closing="CommandBar_Closing">
             <AppBarButton Icon="OpenFile" Label="Open" Click="OpenFile_Click"/>
+            <AppBarButton Icon="Refresh" Label="Reload" Click="Reload_Click"/>
             <AppBarButton Icon="View" Label="View" Click="PickView_Click">
                 <AppBarButton.Flyout>
                     <MenuFlyout Placement="BottomEdgeAlignedLeft">
