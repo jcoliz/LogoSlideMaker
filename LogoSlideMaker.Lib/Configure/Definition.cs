@@ -1,3 +1,5 @@
+using LogoSlideMaker.Lib.Configure;
+
 namespace LogoSlideMaker.Configure;
 
 /// <summary>
@@ -5,6 +7,8 @@ namespace LogoSlideMaker.Configure;
 /// </summary>
 public record Definition
 {
+    public FilesConfig Files { get; set; } = new();
+
     /// <summary>
     /// Global setup configuration
     /// </summary>

@@ -13,6 +13,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Sample\sample.toml" />
+    <None Remove="Sample\Slide1.PNG" />
     <None Remove="Sample\wine-svgrepo-com.svg" />
     <None Remove="Sample\wine.png" />
   </ItemGroup>
@@ -29,6 +30,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Sample\sample.toml" />
+    <EmbeddedResource Include="Sample\Slide1.PNG" />
     <EmbeddedResource Include="Sample\wine-svgrepo-com.svg" />
     <EmbeddedResource Include="Sample\wine.png" />
   </ItemGroup>

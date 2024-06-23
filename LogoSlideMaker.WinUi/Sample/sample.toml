@@ -1,4 +1,7 @@
-﻿[layout]
+﻿[files]
+template.bitmaps = [ "Slide1.PNG" ]
+
+[layout]
 line_spacing = 1.5
 padding = 0.25
 
@@ -19,8 +22,29 @@ title = "Glass of Wine (SVG)"
 path = "wine-svgrepo-com.svg"
 
 [[boxes]]
-logos.1 = [ "wine", "wine-svg", "wine", "wine-svg", "wine" ]
-logos.2 = [ "wine-svg" ]
-outer = { x = 0.25, y = 0.25, width = 8, height = 3 }
+logos.1 = [ "wine", "wine-svg", "wine", "wine-svg" ]
+logos.2 = [ "wine", "wine-svg" ]
+outer = { x = 0.3333, y = 0.3333, width = 6.15, height = 3.26 }
+min_columns = 4
+auto_flow = true
+
+[[boxes]]
+logos.1 = [ "wine", "wine-svg", "wine", "wine-svg" ]
+logos.2 = [ "wine", "wine-svg" ]
+outer = { x = 0.3333, y = 3.91, width = 6.15, height = 3.26 }
+min_columns = 4
+auto_flow = true
+
+[[boxes]]
+logos.1 = [ "wine", "wine-svg", "wine", "wine-svg" ]
+logos.2 = [ "wine", "wine-svg" ]
+outer = { x = 6.85, y = 0.3333, width = 6.15, height = 3.26 }
+min_columns = 4
+auto_flow = true
+
+[[boxes]]
+logos.1 = [ "wine", "wine-svg", "wine", "wine-svg" ]
+logos.2 = [ "wine", "wine-svg" ]
+outer = { x = 6.85, y = 3.91, width = 6.15, height = 3.26 }
 min_columns = 4
 auto_flow = true
