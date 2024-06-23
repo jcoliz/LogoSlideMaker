@@ -94,12 +94,19 @@ public sealed partial class MainWindow : Window
         }
 
         var config = _definition.Render;
+
+        // Draw bounding boxes for any boxes with explicit outer dimensions
+        foreach (var box in _definition.Boxes) 
+        {
+            if (box.Outer != null)
+            {
+                var boxRect = new Rect() { X = (double)(box.Outer.X * config.Dpi + 96), Y = (double)(box.Outer.Y * config.Dpi + 96), Width = (double)(box.Outer.Width * config.Dpi), Height = (double)(box.Outer.Height * config.Dpi) };
+                args.DrawingSession.DrawRectangle(boxRect, Microsoft.UI.Colors.Purple, 1);
+            }
+        }
+
         foreach (var boxlayout in _layout)
         {
-            // TODO: It would be nice to render the box boundaries, and maybe even including the 
-            // padding. However, that's not possible right now, because the box layout discards
-            // that information
-
             foreach (var logolayout in boxlayout.Logos)
             {
                 var logo = logolayout.Logo;
