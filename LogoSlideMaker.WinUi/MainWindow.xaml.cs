@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using LogoSlideMaker.Configure;
+using LogoSlideMaker.Layout;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
 using Microsoft.Graphics.Canvas.Text;
@@ -38,13 +39,13 @@ public sealed partial class MainWindow : Window
 
     private async void Canvas_CreateResources(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs args)
     {
-        foreach (var logo in _definition.Logos)
+        foreach (var file in _definition.Logos.Select(x=>x.Value.Path).Concat(_definition.Files.Template.Bitmaps))
         {
             // We can only load PNGs right now
-            if (!bitmaps.ContainsKey(logo.Key) )
+            if (!bitmaps.ContainsKey(file) )
             {
-                var cb = await LoadBitmap(sender, logo.Value.Path);
-                bitmaps[logo.Value.Path] = cb;
+                var cb = await LoadBitmap(sender, file);
+                bitmaps[file] = cb;
             }
         }
         canvas.Invalidate();
@@ -68,8 +69,22 @@ public sealed partial class MainWindow : Window
         Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender,
         Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs args)
     {
-        // Draw a white background
-        args.DrawingSession.FillRectangle(new Rect() { X = 96, Y = 96, Width = 1280, Height = 720 }, Microsoft.UI.Colors.White);
+        var bgRect = new Rect() { X = 96, Y = 96, Width = 1280, Height = 720 };
+
+        // If there is a bitmap template, draw that
+        if ((_definition?.Files.Template.Bitmaps.Count ?? 0) > 0)
+        {
+            var bitmap = bitmaps.GetValueOrDefault(_definition.Files.Template.Bitmaps[0]);
+            if (bitmap is not null)
+            {
+                args.DrawingSession.DrawImage(bitmap, bgRect);
+            }
+        }
+        else
+        {
+            // Else Draw a white background
+            args.DrawingSession.FillRectangle(bgRect, Microsoft.UI.Colors.White);
+        }
 
         // Render each logo in the layout
 
