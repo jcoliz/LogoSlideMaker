@@ -34,10 +34,14 @@ public record Box
     public Dictionary<int,List<string>> Logos { get; set; } = new Dictionary<int,List<string>>();
 }
 
-public record Rectangle
+public record Size
+{
+    public decimal Width { get; set; }
+    public decimal? Height { get; set; }
+}
+
+public record Rectangle: Size
 {
     public decimal X { get; set; }
     public decimal? Y { get; set; }
-    public decimal Width { get; set; }
-    public decimal? Height { get; set; }
 }
