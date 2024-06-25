@@ -1,8 +1,7 @@
 using LogoSlideMaker.Configure;
 using LogoSlideMaker.Layout;
-using LogoSlideMaker.Primitives;
 
-namespace Primitives;
+namespace LogoSlideMaker.Primitives;
 
 public interface IGetImageSize
 {
@@ -28,7 +27,12 @@ public class GeneratePrimitives(RenderConfig config, IGetImageSize getLogoSize)
     {
         var result = new List<Primitive>();
 
-        var logo = logolayout.Logo!;
+        var logo = logolayout.Logo;
+
+        if (logo is null)
+        {
+            return [];
+        }
 
         var size = getLogoSize.GetSize(logo.Path);
         var aspect = size.Width! / size.Height!;
