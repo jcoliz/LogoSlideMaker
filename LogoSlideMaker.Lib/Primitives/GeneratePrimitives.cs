@@ -5,6 +5,7 @@ namespace LogoSlideMaker.Primitives;
 
 public interface IGetImageSize
 {
+    public bool Contains(string imagePath);
     public Size GetSize(string imagePath);
 }
 
