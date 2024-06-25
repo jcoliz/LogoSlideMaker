@@ -117,6 +117,7 @@ public sealed partial class MainWindow : Window, IGetImageSize
         Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender,
         Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs args)
     {
+        // TODO: Move to primitives
         var bgRect = new Rect() { X = 96, Y = 96, Width = 1280, Height = 720 };
 
         // If there is a bitmap template, draw that
@@ -143,6 +144,7 @@ public sealed partial class MainWindow : Window, IGetImageSize
 
         var config = _definition.Render;
 
+        // TODO: Move to primitives
         // Draw bounding boxes for any boxes with explicit outer dimensions
         foreach (var box in _definition.Boxes) 
         {
