@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using LogoSlideMaker.Configure;
 using LogoSlideMaker.Layout;
 using LogoSlideMaker.Primitives;
+using LogoSlideMaker.WinUi.LogoSlideMaker_WinUi_XamlTypeInfo;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
 using Microsoft.Graphics.Canvas.Text;
@@ -21,6 +22,7 @@ using Windows.Foundation;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using WinRT;
+using static System.Net.Mime.MediaTypeNames;
 using Size = LogoSlideMaker.Configure.Size;
 
 namespace LogoSlideMaker.WinUi;
@@ -33,9 +35,12 @@ public sealed partial class MainWindow : Window, IGetImageSize
     private Definition? _definition;
     private Layout.Layout? _layout;
     private string? currentFile;
+    private CanvasTextFormat? tf;
+    private ICanvasBrush? solidBlack;
 
     private readonly Dictionary<string, CanvasBitmap> bitmaps = new();
     private readonly Dictionary<string, Size> bitmapSizes = new();
+    private readonly List<Primitive> _primitives = new();
 
     Size IGetImageSize.GetSize(string imagePath)
     {
@@ -45,7 +50,7 @@ public sealed partial class MainWindow : Window, IGetImageSize
     public MainWindow()
     {
         this.InitializeComponent();
-        this.LoadDefinition();
+        this.LoadDefinition_Embedded();
 
         // TODO: Get the actual system DPI (not just assume 1.5)
         this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32((Int32)(1.5*(1280+96*2)), (Int32)(1.5 * (720+64+96*2))));
@@ -55,6 +60,9 @@ public sealed partial class MainWindow : Window, IGetImageSize
 
     private async void Canvas_CreateResources(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs args)
     {
+        tf = new() { FontSize = _definition.Render.FontSize * 96.0f / 72.0f, FontFamily = _definition.Render.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
+        solidBlack = new CanvasSolidColorBrush(sender, Microsoft.UI.Colors.Black);
+
         foreach (var file in _definition.Logos.Select(x=>x.Value.Path).Concat(_definition.Files.Template.Bitmaps))
         {
             // We can only load PNGs right now
@@ -70,18 +78,14 @@ public sealed partial class MainWindow : Window, IGetImageSize
         canvas.Invalidate();
     }
 
-    private void LoadDefinition()
+    private void LoadDefinition_Embedded()
     {
         var filename = "sample.toml";
         var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
         var resource = names.Where(x => x.Contains($".{filename}")).Single();
         var stream = Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource);
-        var sr = new StreamReader(stream!);
-        var toml = sr.ReadToEnd();
-        _definition = Toml.ToModel<Definition>(toml);
 
-        _layout = new Layout.Layout(_definition, new Variant());
-        _layout.Populate();
+        LoadDefinition_Local(stream!);
     }
 
     private async Task LoadDefinitionAsync(StorageFile storageFile)
@@ -90,6 +94,14 @@ public sealed partial class MainWindow : Window, IGetImageSize
 
         using var stream = await storageFile.OpenStreamForReadAsync();
 
+        LoadDefinition_Local(stream);
+
+        // TODO: https://microsoft.github.io/Win2D/WinUI2/html/LoadingResourcesOutsideCreateResources.htm
+        Canvas_CreateResources(this.canvas, new CanvasCreateResourcesEventArgs( CanvasCreateResourcesReason.NewDevice));
+    }
+
+    private void LoadDefinition_Local(Stream stream)
+    {
         var sr = new StreamReader(stream);
         var toml = sr.ReadToEnd();
         _definition = Toml.ToModel<Definition>(toml);
@@ -97,8 +109,54 @@ public sealed partial class MainWindow : Window, IGetImageSize
         _layout = new Layout.Layout(_definition, new Variant());
         _layout.Populate();
 
-        // TODO: https://microsoft.github.io/Win2D/WinUI2/html/LoadingResourcesOutsideCreateResources.htm
-        Canvas_CreateResources(this.canvas, new CanvasCreateResourcesEventArgs( CanvasCreateResourcesReason.NewDevice));
+        GeneratePrimitives();
+    }
+
+    /// <summary>
+    /// Generate and retain all primitives needed to display this slide
+    /// </summary>
+    private void GeneratePrimitives()
+    {
+        _primitives.Clear();
+        var config = _definition.Render;
+
+        // Add primitives for a background
+        var bgRect = new Configure.Rectangle() { Width = 1280, Height = 720 };
+
+        // If there is a bitmap template, draw that
+        var definedBitmaps = _definition?.Files.Template.Bitmaps;
+        if (definedBitmaps is not null && definedBitmaps.Count > 0 && bitmaps.ContainsKey(definedBitmaps[0]))
+        {
+            _primitives.Add(new ImagePrimitive()
+            {
+                Rectangle = bgRect,
+                Path = definedBitmaps[0]
+            });
+        }
+        else
+        {
+            // Else Draw a white background
+            _primitives.Add(new RectanglePrimitive()
+            {
+                Rectangle = bgRect,
+                Fill = true
+            });
+        }
+
+        // Add needed primitives for each logo
+        var generator = new GeneratePrimitives(config, this);
+        _primitives.AddRange(_layout.SelectMany(x => x.Logos).SelectMany(generator.ToPrimitives));
+
+        // Add bounding boxes for any boxes with explicit outer dimensions
+        _primitives.AddRange(
+            _definition.Boxes
+                .Where(x => x.Outer is not null)
+                .Select(x => new RectanglePrimitive() 
+                { 
+                    Rectangle = x.Outer
+                } 
+            )
+        );
     }
 
     private async Task ReloadAsync()
@@ -117,73 +175,9 @@ public sealed partial class MainWindow : Window, IGetImageSize
         Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender,
         Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs args)
     {
-        // TODO: Move to primitives
-        var bgRect = new Rect() { X = 96, Y = 96, Width = 1280, Height = 720 };
-
-        // If there is a bitmap template, draw that
-        if ((_definition?.Files.Template.Bitmaps.Count ?? 0) > 0)
+        foreach (var p in _primitives)
         {
-            var bitmap = bitmaps.GetValueOrDefault(_definition.Files.Template.Bitmaps[0]);
-            if (bitmap is not null)
-            {
-                args.DrawingSession.DrawImage(bitmap, bgRect);
-            }
-        }
-        else
-        {
-            // Else Draw a white background
-            args.DrawingSession.FillRectangle(bgRect, Microsoft.UI.Colors.White);
-        }
-
-        // Render each logo in the layout
-
-        if (_definition is null)
-        {
-            return;        
-        }
-
-        var config = _definition.Render;
-
-        // TODO: Move to primitives
-        // Draw bounding boxes for any boxes with explicit outer dimensions
-        foreach (var box in _definition.Boxes) 
-        {
-            if (box.Outer != null)
-            {
-                var boxRect = new Rect() { X = (double)(box.Outer.X * config.Dpi + 96), Y = (double)(box.Outer.Y * config.Dpi + 96), Width = (double)(box.Outer.Width * config.Dpi), Height = (double)(box.Outer.Height * config.Dpi) };
-                args.DrawingSession.DrawRectangle(boxRect, Microsoft.UI.Colors.Purple, 1);
-            }
-        }
-
-        // Note that this doesn't need to be done here. Primitives can be generated when loaded
-        // and stored.
-        // TODO: Big question is, how will we get the image sizes
-        var generator = new GeneratePrimitives(config,this);
-        var primitives = _layout.SelectMany(x=>x.Logos).Select(generator.ToPrimitives);
-
-        var tf = new CanvasTextFormat() { FontSize = config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
-        foreach(var p in primitives)
-        {
-            if (p is TextPrimitive text)
-            {
-                // Draw a text bounding box
-                args.DrawingSession.DrawRectangle(text.Rectangle.AsWindowsRect(), Microsoft.UI.Colors.Blue, 1);
-
-                // Draw the actual text
-                args.DrawingSession.DrawText(text.Text, text.Rectangle.AsWindowsRect(), new CanvasSolidColorBrush(sender,Microsoft.UI.Colors.Black), tf);
-            }
-            else if (p is ImagePrimitive image)
-            {
-                // Draw a logo bounding box
-                args.DrawingSession.DrawRectangle(image.Rectangle.AsWindowsRect(), Microsoft.UI.Colors.Red, 1);
-
-                // Draw the actual logo
-                var bitmap = bitmaps.GetValueOrDefault(image.Path);
-                if (bitmap is not null)
-                {
-                    args.DrawingSession.DrawImage(bitmap, image.Rectangle.AsWindowsRect());
-                }
-            }
+            Draw(p, args.DrawingSession);
         }
     }
 
@@ -261,12 +255,68 @@ public sealed partial class MainWindow : Window, IGetImageSize
     {
         sender.As<CommandBar>().IsOpen = true;
     }
+
+    private void Draw(Primitive primitive, CanvasDrawingSession session)
+    {
+        switch (primitive)
+        {
+            case TextPrimitive text:
+                Draw(text,session);
+                break;
+
+            case ImagePrimitive image:
+                Draw(image,session);
+                break;
+
+            case RectanglePrimitive rect:
+                Draw(rect,session);
+                break;
+
+            default:
+                throw new NotImplementedException();
+        }
+    }
+    private void Draw(TextPrimitive primitive, CanvasDrawingSession session)
+    {
+        // Draw a text bounding box
+        session.DrawRectangle(primitive.Rectangle.AsWindowsRect(), Microsoft.UI.Colors.Blue, 1);
+
+        // Draw the actual text
+        session.DrawText(primitive.Text, primitive.Rectangle.AsWindowsRect(), solidBlack, tf);
+    }
+
+    private void Draw(ImagePrimitive primitive, CanvasDrawingSession session)
+    {
+        // Draw a logo bounding box
+        session.DrawRectangle(primitive.Rectangle.AsWindowsRect(), Microsoft.UI.Colors.Red, 1);
+
+        // Draw the actual logo
+        var bitmap = bitmaps.GetValueOrDefault(primitive.Path);
+        if (bitmap is not null)
+        {
+            session.DrawImage(bitmap, primitive.Rectangle.AsWindowsRect());
+        }
+    }
+
+    private void Draw(RectanglePrimitive primitive, CanvasDrawingSession session)
+    {
+        if (primitive.Fill)
+        {
+            session.FillRectangle(primitive.Rectangle.AsWindowsRect(), Microsoft.UI.Colors.White);
+        }
+        else
+        {
+            session.DrawRectangle(primitive.Rectangle.AsWindowsRect(), Microsoft.UI.Colors.Purple, 1);
+        }
+    }
+
 }
 
 internal static class Converters
 {
-    internal static Windows.Foundation.Rect AsWindowsRect(this LogoSlideMaker.Configure.Rectangle source)
+    internal static Windows.Foundation.Rect AsWindowsRect(this Configure.Rectangle source)
     {
         return new Rect() { X = (double)source.X, Y = (double)source.Y, Width = (double)source.Width, Height = (double)source.Height };
     }
+
 }
