@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using LogoSlideMaker.Configure;
 using LogoSlideMaker.Layout;
+using LogoSlideMaker.Primitives;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
 using Microsoft.Graphics.Canvas.Text;
@@ -19,19 +21,26 @@ using Windows.Foundation;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using WinRT;
+using Size = LogoSlideMaker.Configure.Size;
 
 namespace LogoSlideMaker.WinUi;
 
 /// <summary>
 /// An empty window that can be used on its own or navigated to within a Frame.
 /// </summary>
-public sealed partial class MainWindow : Window
+public sealed partial class MainWindow : Window, IGetImageSize
 {
     private Definition? _definition;
     private Layout.Layout? _layout;
     private string? currentFile;
 
     private readonly Dictionary<string, CanvasBitmap> bitmaps = new();
+    private readonly Dictionary<string, Size> bitmapSizes = new();
+
+    Size IGetImageSize.GetSize(string imagePath)
+    {
+        return bitmapSizes.GetValueOrDefault(imagePath) ?? throw new KeyNotFoundException();
+    }
 
     public MainWindow()
     {
@@ -53,6 +62,9 @@ public sealed partial class MainWindow : Window
             {
                 var cb = await LoadBitmap(sender, file);
                 bitmaps[file] = cb;
+
+                var bounds = cb.GetBounds(sender);
+                bitmapSizes[file] = new Size() { Width = (decimal)bounds.Width, Height = (decimal)bounds.Height };
             }
         }
         canvas.Invalidate();
@@ -141,67 +153,34 @@ public sealed partial class MainWindow : Window
             }
         }
 
-        foreach (var boxlayout in _layout)
+        // Note that this doesn't need to be done here. Primitives can be generated when loaded
+        // and stored.
+        // TODO: Big question is, how will we get the image sizes
+        var generator = new GeneratePrimitives(config,this);
+        var primitives = _layout.SelectMany(x=>x.Logos).Select(generator.ToPrimitives);
+
+        var tf = new CanvasTextFormat() { FontSize = config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
+        foreach(var p in primitives)
         {
-            foreach (var logolayout in boxlayout.Logos)
+            if (p is TextPrimitive text)
             {
-                var logo = logolayout.Logo;
-
-                if (logo is null)
-                {
-                    continue;
-                }
-
-                // TODO: DRY refactor this versus powerpoint rendering, which has a lot of
-                // overlap, but not 100%
-
-                // Adjust size of icon depending on size of source image. The idea is all
-                // icons occupy the same number of pixel area
-
-                var aspect = 1.0m; // pic.Width / pic.Height;
-                var width_factor = (decimal)Math.Sqrt((double)aspect);
-                var height_factor = 1.0m / width_factor;
-                var icon_width = config.IconSize * width_factor * logo.Scale;
-                var icon_height = config.IconSize * height_factor * logo.Scale;
-
-                var icon_rect = new Rect();
-                icon_rect.X = (float)((logolayout.X - icon_width / 2.0m) * config.Dpi + 96);
-                icon_rect.Y = (float)((logolayout.Y - icon_height / 2.0m) * config.Dpi + 96);
-                icon_rect.Width = (float)(icon_width * config.Dpi);
-                icon_rect.Height = (float)(icon_height * config.Dpi);
-
-                // Draw a logo bounding box
-                args.DrawingSession.DrawRectangle(icon_rect, Microsoft.UI.Colors.Red, 1);
-
-                // Draw the actual logo
-                var bitmap = bitmaps.GetValueOrDefault(logolayout.Logo.Path);
-                if (bitmap is not null)
-                {
-                    args.DrawingSession.DrawImage(bitmap, icon_rect);
-                }
-
-                var text_width_inches = logo.TextWidth ?? config.TextWidth;
-
-                var text_x = (logolayout.X - text_width_inches / 2.0m) * config.Dpi;
-                var text_y = (logolayout.Y - config.TextHeight / 2.0m + config.TextDistace) * config.Dpi;
-                var text_width = text_width_inches * config.Dpi;
-                var text_height = config.TextHeight * config.Dpi;
-
-                //target.AddRectangle(100, 100, 100, 100);
-                //var shape = target.Last();
-
-                var shape = new Rect();
-                shape.X = 96.0f + (float)text_x;
-                shape.Y = 96.0f + (float)text_y;
-                shape.Width = (float)text_width;
-                shape.Height = (float)text_height;
-
                 // Draw a text bounding box
-                args.DrawingSession.DrawRectangle(shape, Microsoft.UI.Colors.Blue, 1);
+                args.DrawingSession.DrawRectangle(text.Rectangle.AsWindowsRect(), Microsoft.UI.Colors.Blue, 1);
 
                 // Draw the actual text
-                var tf = new CanvasTextFormat() { FontSize = config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
-                args.DrawingSession.DrawText(logo.Title, shape, new CanvasSolidColorBrush(sender,Microsoft.UI.Colors.Black), tf);
+                args.DrawingSession.DrawText(text.Text, text.Rectangle.AsWindowsRect(), new CanvasSolidColorBrush(sender,Microsoft.UI.Colors.Black), tf);
+            }
+            else if (p is ImagePrimitive image)
+            {
+                // Draw a logo bounding box
+                args.DrawingSession.DrawRectangle(image.Rectangle.AsWindowsRect(), Microsoft.UI.Colors.Red, 1);
+
+                // Draw the actual logo
+                var bitmap = bitmaps.GetValueOrDefault(image.Path);
+                if (bitmap is not null)
+                {
+                    args.DrawingSession.DrawImage(bitmap, image.Rectangle.AsWindowsRect());
+                }
             }
         }
     }
@@ -279,5 +258,13 @@ public sealed partial class MainWindow : Window
     private void CommandBar_Closing(object sender, object e)
     {
         sender.As<CommandBar>().IsOpen = true;
+    }
+}
+
+internal static class Converters
+{
+    internal static Windows.Foundation.Rect AsWindowsRect(this LogoSlideMaker.Configure.Rectangle source)
+    {
+        return new Rect() { X = (double)source.X, Y = (double)source.Y, Width = (double)source.Width, Height = (double)source.Height };
     }
 }
