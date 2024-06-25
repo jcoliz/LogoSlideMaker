@@ -16,3 +16,8 @@ public record ImagePrimitive: Primitive
 {
     public string Path { get; init; } = string.Empty;
 }
+
+public record RectanglePrimitive : Primitive
+{
+    public bool Fill { get; init; } = false;
+}
