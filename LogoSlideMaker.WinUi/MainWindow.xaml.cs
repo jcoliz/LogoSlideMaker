@@ -1,17 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using LogoSlideMaker.Configure;
-using LogoSlideMaker.Layout;
 using LogoSlideMaker.Primitives;
 using LogoSlideMaker.WinUi.Services;
-
-//using LogoSlideMaker.WinUi.LogoSlideMaker_WinUi_XamlTypeInfo;
 using LogoSlideMaker.WinUi.ViewModels;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
@@ -19,16 +7,16 @@ using Microsoft.Graphics.Canvas.Text;
 using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
-using Svg;
-using Tomlyn;
+using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Storage;
-using Windows.Storage.Pickers;
 using WinRT;
-using static System.Net.Mime.MediaTypeNames;
-using Size = LogoSlideMaker.Configure.Size;
 
 namespace LogoSlideMaker.WinUi;
 
