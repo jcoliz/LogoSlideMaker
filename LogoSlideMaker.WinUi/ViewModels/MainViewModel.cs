@@ -31,13 +31,17 @@ namespace LogoSlideMaker.WinUi.ViewModels
         /// <summary>
         /// Generate and retain all primitives needed to display this slide
         /// </summary>
-        private void GeneratePrimitives()
+        /// <remarks>
+        /// Note that we can't generate primitives until we've loaded and (more importantly)
+        /// measured all the images
+        /// </remarks>
+        public void GeneratePrimitives()
         {
             _primitives.Clear();
             var config = _definition.Render;
 
             // Add primitives for a background
-            var bgRect = new Configure.Rectangle() { Width = 1280, Height = 720 };
+            var bgRect = new Configure.Rectangle() { X = 0, Y = 0, Width = 1280, Height = 720 };
 
             // If there is a bitmap template, draw that
             var definedBitmaps = _definition?.Files.Template.Bitmaps;
@@ -69,7 +73,13 @@ namespace LogoSlideMaker.WinUi.ViewModels
                     .Where(x => x.Outer is not null)
                     .Select(x => new RectanglePrimitive()
                     {
-                        Rectangle = x.Outer
+                        Rectangle = x.Outer with 
+                        { 
+                            X = x.Outer.X * 96m, 
+                            Y = x.Outer.Y * 96m,
+                            Width = x.Outer.Width * 96m,
+                            Height = x.Outer.Height * 96m
+                        }
                     }
                 )
             );

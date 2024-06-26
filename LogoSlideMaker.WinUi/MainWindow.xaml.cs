@@ -67,6 +67,12 @@ public sealed partial class MainWindow : Window
         {
             await bitmapCache.LoadAsync(sender, file);
         }
+
+        // Now that all the bitmaps are loaded, we now have enough information to
+        // generate the drawing primitives so we can render them.
+        viewModel.GeneratePrimitives();
+
+        // Much has been updated, redraw!!
         canvas.Invalidate();
     }
 
@@ -113,6 +119,7 @@ public sealed partial class MainWindow : Window
         {
             Draw(p, args.DrawingSession);
         }
+
     }
 
     private async void OpenFile_Click(object sender, RoutedEventArgs e)

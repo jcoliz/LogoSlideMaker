@@ -30,7 +30,7 @@ public class GeneratePrimitives(RenderConfig config, IGetImageSize getLogoSize)
 
         var logo = logolayout.Logo;
 
-        if (logo is null)
+        if (logo is null || ! getLogoSize.Contains(logo.Path))
         {
             return [];
         }
