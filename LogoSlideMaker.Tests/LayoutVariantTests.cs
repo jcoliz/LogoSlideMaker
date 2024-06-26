@@ -50,7 +50,7 @@ public class LayoutVariantTests
         layout.Populate();
 
         // Then: Only the logos with that tag and those with no tags are included
-        Assert.That(layout.First().Logos.Select(x=>x.Logo.Title), Is.EqualTo(new string[] { "zero", "one", "two" } ));
+        Assert.That(layout.First().Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "one", "two" } ));
     }
 
     /// <summary>
@@ -70,7 +70,7 @@ public class LayoutVariantTests
         layout.Populate();
 
         // Then: Only the logos with that tag and those with no tags are included
-        Assert.That(layout.First().Logos.Select(x=>x.Logo.Title), Is.EqualTo(new string[] { "zero", "two", "three" } ));
+        Assert.That(layout.First().Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "two", "three" } ));
     }
 
     /// <summary>
@@ -90,7 +90,7 @@ public class LayoutVariantTests
         layout.Populate();
 
         // Then: Only the logos with that tag and those with no tags are included
-        Assert.That(layout.First().Logos.Select(x=>x.Logo.Title), Is.EqualTo(new string[] { "zero", "two", "zero" } ));
+        Assert.That(layout.First().Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "two", "zero" } ));
     }
 
     /// <summary>
@@ -110,7 +110,7 @@ public class LayoutVariantTests
         layout.Populate();
 
         // Then: Only the logos with that tag and those with no tags are included
-        Assert.That(layout.First().Logos.Select(x=>x.Logo.Title), Is.EqualTo(new string[] { "zero", "three" } ));
+        Assert.That(layout.First().Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "three" } ));
     }
 
     /// <summary>
@@ -130,7 +130,7 @@ public class LayoutVariantTests
         layout.Populate();
 
         // Then: Only the logos with that tag and those with no tags are included
-        Assert.That(layout.First().Logos.Select(x=>x.Logo.Title), Is.EqualTo(new string[] { "zero", "zero" } ));
+        Assert.That(layout.First().Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "zero" } ));
     }
 
     /// <summary>
