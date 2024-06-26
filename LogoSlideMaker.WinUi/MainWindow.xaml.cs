@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using LogoSlideMaker.Configure;
 using LogoSlideMaker.Layout;
@@ -51,11 +52,19 @@ public sealed partial class MainWindow : Window
         this.InitializeComponent();
         this.LoadDefinition_Embedded();
 
-        // TODO: Get the actual system DPI (not just assume 1.5)
-        this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32((Int32)(1.5*(1280+96*2)), (Int32)(1.5 * (720+64+96*2))));
+        var dpi = GetDpiForWindow(hWnd);
+        this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32((Int32)(dpi*1280/96), (Int32)(dpi*(720+64)/96)));
 
         this.canvas.CreateResources += Canvas_CreateResources;
     }
+
+    [DllImport("User32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    private static extern int GetDpiForWindow(IntPtr hwnd);
+
+    /// <summary>
+    /// Get the current window's HWND by passing in the Window object
+    /// </summary>
+    private IntPtr hWnd => WinRT.Interop.WindowNative.GetWindowHandle(this);
 
     private async void Canvas_CreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs args)
     {
@@ -127,10 +136,8 @@ public sealed partial class MainWindow : Window
         var picker = new Windows.Storage.Pickers.FileOpenPicker();
 
         // https://github.com/microsoft/WindowsAppSDK/issues/1188
-        // Get the current window's HWND by passing in the Window object
-        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
         // Associate the HWND with the file picker
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
 
         picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.List;
         picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
