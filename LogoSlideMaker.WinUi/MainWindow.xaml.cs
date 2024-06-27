@@ -148,6 +148,10 @@ public sealed partial class MainWindow : Window
     private void DoExport_Click(object sender, RoutedEventArgs e)
     {
         // Will save this out as powerpoint file
+        // Get the default output file from the definition
+        // Bring up a save picker to let user have ultimate decision on file
+        // Render to slide
+        // Give user option to launch the ppt (would be nice)
     }
 
     private void PickView_Click(object sender, RoutedEventArgs e)
