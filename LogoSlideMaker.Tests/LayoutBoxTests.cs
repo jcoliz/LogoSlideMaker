@@ -39,14 +39,14 @@ public class LayoutBoxTests
         var layout = engine.CreateSlideLayout();
 
         // Then: Top of logo is aligned to outer container plus padding
-        Assert.That(layout.Boxes[0].Logos.First().Y, Is.EqualTo(100+10+5m/2));
-        Assert.That(layout.Boxes[0].Logos.Last().Y, Is.EqualTo(100+10+5m/2));
+        Assert.That(layout.Logos[0].Y, Is.EqualTo(100+10+5m/2));
+        Assert.That(layout.Logos[^1].Y, Is.EqualTo(100+10+5m/2));
 
         // Then: Left of left-most text box is aligned to outer container plus padding
-        Assert.That(layout.Boxes[0].Logos.First().X, Is.EqualTo(100+10+40m/2));
+        Assert.That(layout.Logos[0].X, Is.EqualTo(100+10+40m/2));
 
         // Then: Left of right-most text box is aligned to outer container plus padding
-        Assert.That(layout.Boxes[0].Logos.Last().X, Is.EqualTo(100+1000-10-40m/2));
+        Assert.That(layout.Logos[^1].X, Is.EqualTo(100+1000-10-40m/2));
     }
 
     [Test]
@@ -83,7 +83,7 @@ public class LayoutBoxTests
         var layout = engine.CreateSlideLayout();
 
         // Then: Top of logo in second box is aligned to outer container plus padding, plus box and line spacing
-        Assert.That(layout.Boxes[^1].Logos.First().Y, Is.EqualTo(100+10+5m/2+200+150));
+        Assert.That(layout.Logos[5].Y, Is.EqualTo(100+10+5m/2+200+150));
     }
 
     [Test]
@@ -98,8 +98,8 @@ public class LayoutBoxTests
         var layout = engine.CreateSlideLayout();
 
         // Then: Logos are evenly distributed amongst rows
-        Assert.That(layout.Boxes[0].Logos[0..2], Has.All.Property("Y").EqualTo(0));
-        Assert.That(layout.Boxes[0].Logos[3..], Has.All.Property("Y").EqualTo(10));
+        Assert.That(layout.Logos[0..2], Has.All.Property("Y").EqualTo(0));
+        Assert.That(layout.Logos[3..], Has.All.Property("Y").EqualTo(10));
     }
 
     [Test]

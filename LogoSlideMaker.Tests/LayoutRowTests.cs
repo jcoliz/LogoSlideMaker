@@ -16,7 +16,7 @@ public class LayoutRowTests
         var engine = new LayoutEngine(definition, variant);
         var layout = engine.CreateSlideLayout();
 
-        Assert.That(layout.Boxes, Has.Length.EqualTo(0));
+        Assert.That(layout.Logos, Has.Length.EqualTo(0));
     }
 
     [Test]
@@ -42,8 +42,7 @@ public class LayoutRowTests
         var engine = new LayoutEngine(definition, variant);
         var layout = engine.CreateSlideLayout();
 
-        Assert.That(layout.Boxes, Has.Length.EqualTo(1));
-        Assert.That(layout.Boxes[0].Logos, Has.Length.EqualTo(1));
+        Assert.That(layout.Logos, Has.Length.EqualTo(1));
     }
 
     [Test]
@@ -69,8 +68,7 @@ public class LayoutRowTests
         var engine = new LayoutEngine(definition, variant);
         var layout = engine.CreateSlideLayout();
 
-        Assert.That(layout.Boxes, Has.Length.EqualTo(1));
-        Assert.That(layout.Boxes[0].Logos, Has.Length.EqualTo(5));
+        Assert.That(layout.Logos, Has.Length.EqualTo(5));
     }
 
     [Test]
@@ -97,7 +95,7 @@ public class LayoutRowTests
         var engine = new LayoutEngine(definition, variant);
         var layout = engine.CreateSlideLayout();
 
-        Assert.That(layout.Boxes[0].Logos, Has.All.With.Property("Y").EqualTo(5.0m));
+        Assert.That(layout.Logos, Has.All.With.Property("Y").EqualTo(5.0m));
     }
 
     /// <summary>
@@ -128,8 +126,8 @@ public class LayoutRowTests
         var engine = new LayoutEngine(definition, variant);
         var layout = engine.CreateSlideLayout();
 
-        Assert.That(layout.Boxes[0].Logos[0], Has.Property("X").EqualTo(5.0m));
-        Assert.That(layout.Boxes[^1].Logos[^1], Has.Property("X").EqualTo(15.0m));
+        Assert.That(layout.Logos[0], Has.Property("X").EqualTo(5.0m));
+        Assert.That(layout.Logos[^1], Has.Property("X").EqualTo(15.0m));
     }
 
     /// <summary>
@@ -160,9 +158,9 @@ public class LayoutRowTests
         var engine = new LayoutEngine(definition, variant);
         var layout = engine.CreateSlideLayout();
 
-        Assert.That(layout.Boxes[0].Logos[1], Has.Property("X").EqualTo(7.5m));
-        Assert.That(layout.Boxes[0].Logos[2], Has.Property("X").EqualTo(10.0m));
-        Assert.That(layout.Boxes[0].Logos[3], Has.Property("X").EqualTo(12.5m));
+        Assert.That(layout.Logos[1], Has.Property("X").EqualTo(7.5m));
+        Assert.That(layout.Logos[2], Has.Property("X").EqualTo(10.0m));
+        Assert.That(layout.Logos[3], Has.Property("X").EqualTo(12.5m));
     }
 
     /// <summary>
@@ -195,7 +193,7 @@ public class LayoutRowTests
         var engine = new LayoutEngine(definition, variant);
         var layout = engine.CreateSlideLayout();
 
-        Assert.That(layout.Boxes[0].Logos[0], Has.Property("X").EqualTo(5.0m));
-        Assert.That(layout.Boxes[0].Logos[1], Has.Property("X").EqualTo(7.5m));
+        Assert.That(layout.Logos[0], Has.Property("X").EqualTo(5.0m));
+        Assert.That(layout.Logos[1], Has.Property("X").EqualTo(7.5m));
     }
 }
