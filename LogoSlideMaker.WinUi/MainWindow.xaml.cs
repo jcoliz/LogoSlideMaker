@@ -60,10 +60,7 @@ public sealed partial class MainWindow : Window
         tf = new() { FontSize = config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
         solidBlack = new CanvasSolidColorBrush(sender, Microsoft.UI.Colors.Black);
 
-        foreach (var file in viewModel.ImagePaths)
-        {
-            await bitmapCache.LoadAsync(sender, file);
-        }
+        await bitmapCache.LoadAsync(sender, viewModel.ImagePaths);
 
         // Now that all the bitmaps are loaded, we now have enough information to
         // generate the drawing primitives so we can render them.

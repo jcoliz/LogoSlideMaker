@@ -15,12 +15,24 @@ namespace LogoSlideMaker.WinUi.Services
     /// <summary>
     /// Contains ready-to-draw canvas bitmaps for all images we may want to draw
     /// </summary>
-    internal class BitmapCache: IGetImageSize
+    internal class BitmapCache : IGetImageSize
     {
+        /// <summary>
+        /// Load and retain bitmap for each paths if not already present
+        /// </summary>
+        /// <param name="paths">Paths to resource files</param>
+        public async Task LoadAsync(ICanvasResourceCreator resourceCreator, IEnumerable<string> paths)
+        {
+            foreach (var path in paths)
+            {
+                await LoadAsync(resourceCreator, path);
+            }
+        }
+
         /// <summary>
         /// Load and retain bitmap for this path, if not already present
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="path">Path to resource file</param>
         public async Task LoadAsync(ICanvasResourceCreator resourceCreator, string path)
         {
             // We can only load PNGs right now
