@@ -10,23 +10,21 @@ public class LayoutEngine(Definition definition, Variant variant)
     public SlideLayout CreateSlideLayout()
     {
         // Add well-defined boxes
-        var boxes = new List<BoxLayout>
-        (
+        var logos =
             definition.Boxes
-                .Where(x=>BoxIncludedInVariant(x))
-                .Aggregate<Box,List<BoxLayout>>(new(), LayoutAggregateBox)
-        );
+                .Where(x => BoxIncludedInVariant(x))
+                .Aggregate<Box, List<LogoLayout>>(new(), LayoutAggregateBox);
 
         // Add loose rows, only if pages are not specified
         if (variant.Pages.Count == 0)
         {
-            boxes.AddRange
+            logos.AddRange
             (
-                definition.Rows.Select(x => new BoxLayout() { Logos = LayoutRow(x).ToArray(), Heading = "Others" })
+                definition.Rows.SelectMany(x => LayoutRow(x))
             );
         }
 
-        return new SlideLayout() { Variant = variant, Boxes = boxes.ToArray() };
+        return new SlideLayout() { Variant = variant, Logos = logos.ToArray() };
     }
 
     /// <summary>
@@ -36,22 +34,25 @@ public class LayoutEngine(Definition definition, Variant variant)
     public IEnumerable<string> AsMarkdown()
     {
         // Collect boxes and rows into boxlayouts
-        // TODO: This could be cleaned up a bit
 
         // Add well-defined boxes
-        var boxes = new List<BoxLayout>
-        (
+        var boxes =
             definition.Boxes
                 .Where(x => BoxIncludedInVariant(x))
-                .Aggregate<Box, List<BoxLayout>>(new(), LayoutAggregateBox)
-        );
+                .Select(x => (box: x, row: new Row() { Logos = x.Logos.SelectMany(y => y.Value).ToList() }))
+                .Select(x => new BoxLayout() { Heading = x.box.Title, Logos = LayoutRow(x.row).ToArray() })
+                .ToList();
 
-        // Add loose rows, only if pages are not specified
+        // Add loose rows into an "Others" box, only if pages are not specified
         if (variant.Pages.Count == 0)
         {
-            boxes.AddRange
+            boxes.Add
             (
-                definition.Rows.Select(x => new BoxLayout() { Logos = LayoutRow(x).ToArray(), Heading = "Others" })
+                new BoxLayout()
+                {
+                    Heading = "Others",
+                    Logos = LayoutRow(new Row() { Logos = definition.Rows.SelectMany(x => x.Logos).ToList() }).ToArray()
+                }
             );
         }
 
@@ -84,7 +85,7 @@ public class LayoutEngine(Definition definition, Variant variant)
     /// <summary>
     /// Layout a single box, considering the state of already-laid-out boxes
     /// </summary>
-    private List<BoxLayout> LayoutAggregateBox(List<BoxLayout> layouts, Box box)
+    private List<LogoLayout> LayoutAggregateBox(List<LogoLayout> layouts, Box box)
     {
         // Fill in missing box.YPosition if it has none
         decimal YPosition = 0m;
@@ -95,10 +96,10 @@ public class LayoutEngine(Definition definition, Variant variant)
             {
                 throw new ApplicationException("Must set explicit YPosition on first box");
             }
-            YPosition = last.Logos.Max(x=>x.Y) + definition.Layout.LineSpacing + definition.Layout.BoxSpacing;
+            YPosition = last.Y + definition.Layout.LineSpacing + definition.Layout.BoxSpacing;
         }
 
-        layouts.Add( LayoutBox(box, YPosition) );
+        layouts.AddRange( LayoutBox(box, YPosition) );
         return layouts;
     }
 
@@ -108,15 +109,13 @@ public class LayoutEngine(Definition definition, Variant variant)
     /// <param name="YPosition">
     /// Default yposition to use if box has no intrinsic position defined
     /// </param>
-    private BoxLayout LayoutBox(Box box, decimal YPosition)
+    private IEnumerable<LogoLayout> LayoutBox(Box box, decimal YPosition)
     {
-        var logos = box.Logos
+        return box.Logos
             .OrderBy(x=>x.Key)
             .Select(x=>x.Value)
             .Select(MakeRow(box,YPosition))
             .SelectMany(x => LayoutRow(x));
-
-        return new BoxLayout() { Heading = box.Title, Logos = logos.ToArray() };
     }
 
     private Func<List<string>,int,Row> MakeRow(Box box, decimal YPosition)
@@ -321,5 +320,5 @@ public record BoxLayout
 public record SlideLayout
 {
     public Variant Variant { get; init; } = new();
-    public BoxLayout[] Boxes { get; init; } = [];
+    public LogoLayout[] Logos { get; init; } = [];
 }

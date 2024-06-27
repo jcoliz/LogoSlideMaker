@@ -11,17 +11,6 @@ public class Renderer(RenderConfig config)
 {
     public void Render(SlideLayout source, ISlideShapes target)
     {
-        if (config.Listing)
-        {   
-            Console.WriteLine();
-            Console.WriteLine($"## {source.Variant.Name}");
-            Console.WriteLine();
-            foreach(var line in source.Variant.Description)
-            {
-                Console.WriteLine(line);        
-            }
-        }
-
         // Fill in description field
         var num_description_lines = source.Variant.Description.Count();
         if (num_description_lines > 0)
@@ -49,28 +38,13 @@ public class Renderer(RenderConfig config)
             }
         }
 
-        foreach(var boxlayout in source.Boxes)
-        {
-            if (config.Listing)
-            {   
-                Console.WriteLine();
-                Console.WriteLine($"### {boxlayout.Heading}");
-                Console.WriteLine();
-            }
-
-            foreach(var logolayout in boxlayout.Logos)
+            foreach(var logolayout in source.Logos)
             {                
                 var logo = logolayout.Logo;
 
                 if (logo is null)
                 {
                     continue;
-                }
-
-                if (config.Listing)
-                {
-                    string alt_text = string.IsNullOrWhiteSpace(logo.AltText) ? string.Empty : $"{logo.AltText} ";
-                    Console.WriteLine($"* {alt_text}{logo.Title}");
                 }
 
                 {
@@ -121,6 +95,5 @@ public class Renderer(RenderConfig config)
                 shape.Fill.SetNoFill();
                 shape.Outline.SetNoOutline();            
             }
-        }
     }
 }

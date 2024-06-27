@@ -46,6 +46,7 @@ if (options.Listing)
 
 if (definitions.Render.Listing)
 {
+    // TODO: In the case of "listing", render the listing as a separate pass.
     Console.WriteLine($"# {definitions.Layout.Title}");
 }
 
@@ -67,7 +68,7 @@ foreach(var layout in layouts)
     {
         notes.Add($"Version: {options.Version}");
     }    
-    notes.Add($"Logo count: {layout.Boxes.Sum(x=>x.Logos.Count(y=>y.Logo != null))}");
+    notes.Add($"Logo count: {layout.Logos.Count(y=>y.Logo != null)}");
     slide.AddNotes(notes);
 
     renderer.Render(layout, slide.Shapes);

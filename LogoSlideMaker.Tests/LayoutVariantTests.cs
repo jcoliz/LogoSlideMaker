@@ -31,7 +31,7 @@ public class LayoutVariantTests
         var layout = engine.CreateSlideLayout();
 
         // Then: Only the logos with no tags are included
-        Assert.That(layout.Boxes[0].Logos, Has.Length.EqualTo(1));
+        Assert.That(layout.Logos, Has.Length.EqualTo(1));
     }
 
     /// <summary>
@@ -51,7 +51,7 @@ public class LayoutVariantTests
         var layout = engine.CreateSlideLayout();
 
         // Then: Only the logos with that tag and those with no tags are included
-        Assert.That(layout.Boxes[0].Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "one", "two" } ));
+        Assert.That(layout.Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "one", "two" } ));
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public class LayoutVariantTests
         var layout = engine.CreateSlideLayout();
 
         // Then: Only the logos with that tag and those with no tags are included
-        Assert.That(layout.Boxes[0].Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "two", "three" } ));
+        Assert.That(layout.Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "two", "three" } ));
     }
 
     /// <summary>
@@ -91,7 +91,7 @@ public class LayoutVariantTests
         var layout = engine.CreateSlideLayout();
 
         // Then: Only the logos with that tag and those with no tags are included
-        Assert.That(layout.Boxes[0].Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "two", "zero" } ));
+        Assert.That(layout.Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "two", "zero" } ));
     }
 
     /// <summary>
@@ -111,7 +111,7 @@ public class LayoutVariantTests
         var layout = engine.CreateSlideLayout();
 
         // Then: Only the logos with that tag and those with no tags are included
-        Assert.That(layout.Boxes[0].Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "three" } ));
+        Assert.That(layout.Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "three" } ));
     }
 
     /// <summary>
@@ -131,7 +131,7 @@ public class LayoutVariantTests
         var layout = engine.CreateSlideLayout();
 
         // Then: Only the logos with that tag and those with no tags are included
-        Assert.That(layout.Boxes[0].Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "zero" } ));
+        Assert.That(layout.Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "zero" } ));
     }
 
     /// <summary>
@@ -151,7 +151,7 @@ public class LayoutVariantTests
         var layout = engine.CreateSlideLayout();
 
         // Then: All logos includwed
-        Assert.That(layout.Boxes[0].Logos, Has.Length.EqualTo(6));
+        Assert.That(layout.Logos, Has.Length.EqualTo(6));
     }
 
     /// <summary>
@@ -171,7 +171,7 @@ public class LayoutVariantTests
         var layout = engine.CreateSlideLayout();
 
         // Then: Stops when end tag encountered
-        Assert.That(layout.Boxes[0].Logos, Has.Length.EqualTo(2));
+        Assert.That(layout.Logos, Has.Length.EqualTo(2));
     }
 
     /// <summary>
@@ -191,10 +191,10 @@ public class LayoutVariantTests
         var layout = engine.CreateSlideLayout();
 
         // Then: Has only one box of logos
-        Assert.That(layout.Boxes, Has.Length.EqualTo(1));
+        Assert.That(layout.Logos, Has.Length.EqualTo(2));
 
         // And: All logos are the "zero" logo, the logo contained in the box with unspecified page
-        Assert.That(layout.Boxes[0].Logos.Select(x=>x.Logo), Has.All.With.Property("Title").EqualTo("zero"));
+        Assert.That(layout.Logos.Select(x=>x.Logo), Has.All.With.Property("Title").EqualTo("zero"));
     }
 
     /// <summary>
@@ -214,10 +214,10 @@ public class LayoutVariantTests
         var layout = engine.CreateSlideLayout();
 
         // Then: Has only one box of logos
-        Assert.That(layout.Boxes, Has.Length.EqualTo(1));
+        Assert.That(layout.Logos, Has.Length.EqualTo(3));
 
         // And: All logos are the "one" logo, the logo contained in the page 1 box
-        Assert.That(layout.Boxes[0].Logos.Select(x=>x.Logo), Has.All.With.Property("Title").EqualTo("one"));
+        Assert.That(layout.Logos.Select(x=>x.Logo), Has.All.With.Property("Title").EqualTo("one"));
     }
 
     /// <summary>
@@ -237,10 +237,10 @@ public class LayoutVariantTests
         var layout = engine.CreateSlideLayout();
 
         // Then: Has two boxes of logos
-        Assert.That(layout.Boxes, Has.Length.EqualTo(2));
+        Assert.That(layout.Logos, Has.Length.EqualTo(7));
 
         // And: Second box of logos are the "two" logo
-        Assert.That(layout.Boxes[1].Logos.Select(x=>x.Logo), Has.All.With.Property("Title").EqualTo("two"));
+        Assert.That(layout.Logos[3..].Select(x=>x.Logo), Has.All.With.Property("Title").EqualTo("two"));
     }
 
     /// <summary>
@@ -260,10 +260,10 @@ public class LayoutVariantTests
         var layout = engine.CreateSlideLayout();
 
         // Then: Has two boxes of logos
-        Assert.That(layout.Boxes, Has.Length.EqualTo(2));
+        Assert.That(layout.Logos, Has.Length.EqualTo(5));
 
         // And: Second box of logos are the "one" logo
-        Assert.That(layout.Boxes[1].Logos.Select(x=>x.Logo), Has.All.With.Property("Title").EqualTo("one"));
+        Assert.That(layout.Logos[3..].Select(x=>x.Logo), Has.All.With.Property("Title").EqualTo("one"));
     }
 
     [Test]
@@ -276,10 +276,10 @@ public class LayoutVariantTests
         var layout = engine.CreateSlideLayout();
 
         // Then: Has four logos
-        Assert.That(layout.Boxes[0].Logos, Has.Length.EqualTo(4));
+        Assert.That(layout.Logos, Has.Length.EqualTo(4));
 
         // And: Logo "two" is never shown
-        Assert.That(layout.Boxes[0].Logos.Select(x=>x.Logo), Has.None.With.Property("Title").EqualTo("two"));
+        Assert.That(layout.Logos.Select(x=>x.Logo), Has.None.With.Property("Title").EqualTo("two"));
     }
 
     [Test]
@@ -292,10 +292,10 @@ public class LayoutVariantTests
         var layout = engine.CreateSlideLayout();
 
         // Then: Has give logos
-        Assert.That(layout.Boxes[0].Logos, Has.Length.EqualTo(5));
+        Assert.That(layout.Logos, Has.Length.EqualTo(5));
 
         // And: Logo "three" is shown
-        Assert.That(layout.Boxes[0].Logos.Select(x=>x.Logo), Has.Some.With.Property("Title").EqualTo("three"));
+        Assert.That(layout.Logos.Select(x=>x.Logo), Has.Some.With.Property("Title").EqualTo("three"));
     }
 
     [Test]
