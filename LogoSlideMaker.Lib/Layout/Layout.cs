@@ -22,11 +22,63 @@ public class LayoutEngine(Definition definition, Variant variant)
         {
             boxes.AddRange
             (
-                definition.Rows.Select(x => new BoxLayout() { Logos = LayoutRow(x).ToArray() })
+                definition.Rows.Select(x => new BoxLayout() { Logos = LayoutRow(x).ToArray(), Heading = "Others" })
             );
         }
 
         return new SlideLayout() { Variant = variant, Boxes = boxes.ToArray() };
+    }
+
+    /// <summary>
+    /// Create a textual representation of this slide
+    /// </summary>
+    /// <returns>Lines of markdown</returns>
+    public IEnumerable<string> AsMarkdown()
+    {
+        // Collect boxes and rows into boxlayouts
+        // TODO: This could be cleaned up a bit
+
+        // Add well-defined boxes
+        var boxes = new List<BoxLayout>
+        (
+            definition.Boxes
+                .Where(x => BoxIncludedInVariant(x))
+                .Aggregate<Box, List<BoxLayout>>(new(), LayoutAggregateBox)
+        );
+
+        // Add loose rows, only if pages are not specified
+        if (variant.Pages.Count == 0)
+        {
+            boxes.AddRange
+            (
+                definition.Rows.Select(x => new BoxLayout() { Logos = LayoutRow(x).ToArray(), Heading = "Others" })
+            );
+        }
+
+        // Render them into text
+
+        var result = new List<string>([string.Empty, $"### {variant.Name}"]);
+        result.AddRange(variant.Description);
+        result.Add(string.Empty);
+
+        result.AddRange(boxes.SelectMany(x =>
+        {
+            var result = new List<string>([string.Empty, $"### {x.Heading}", string.Empty]);
+            result.AddRange
+            (
+                x.Logos
+                    .Where(y => y.Logo is not null)
+                    .Select(y => y.Logo!)
+                    .Select(y =>
+                    {
+                        string alt_text = string.IsNullOrWhiteSpace(y.AltText) ? string.Empty : $"{y.AltText} ";
+                        return $"* {alt_text}{y.Title}";
+                    })
+            );
+            return result;
+        }));
+
+        return result;
     }
 
     /// <summary>
