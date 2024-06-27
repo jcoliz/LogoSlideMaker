@@ -40,6 +40,9 @@ public sealed partial class MainWindow : Window
         this.InitializeComponent();
         this.LoadDefinition_Embedded();
 
+        // TODO: Would be nice to have a better icon, but that's a pain. Will come back to it!
+        // https://github.com/microsoft/microsoft-ui-xaml/issues/4056
+
         var dpi = GetDpiForWindow(hWnd);
         this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32((Int32)(dpi*1280/96), (Int32)(dpi*(720+64)/96)));
 
@@ -151,6 +154,20 @@ public sealed partial class MainWindow : Window
     {
         // Will let us choose which variant to display
         // Note that this will not require reloading resources, just invalidate the canvas and redraw
+
+        // What I'd LIKE to do is have a menu dynamically created based on the slides (variants)
+        // available. Sadly tht's not possible
+        // https://github.com/microsoft/microsoft-ui-xaml/issues/1087
+
+        // So, what I'll ultimately do is need to bring up a picker dialog.
+        // For now, we'll simply cycle through the available slides
+
+        int current = viewModel.SlideNumber++;
+        if (viewModel.SlideNumber == current)
+        {
+            viewModel.SlideNumber = 0;
+        }
+        canvas.Invalidate();
     }
 
     private void CommandBar_Closing(object sender, object e)

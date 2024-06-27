@@ -28,7 +28,7 @@ namespace LogoSlideMaker.WinUi.ViewModels
             }
             set
             {
-                if (_definition is not null && _slideNumber < _definition.Variants.Count && value != _slideNumber)
+                if (_definition is not null && value < _definition.Variants.Count && value != _slideNumber)
                 {
                     _slideNumber = value;
 
