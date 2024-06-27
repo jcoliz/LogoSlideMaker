@@ -16,16 +16,70 @@ namespace LogoSlideMaker.WinUi.ViewModels
 
         public RenderConfig? RenderConfig => _definition?.Render;
 
+        /// <summary>
+        /// Of the slides (variants) defined in the definition, which one are we showing
+        /// First slide is zero (TODO: Should be '1')
+        /// </summary>
+        public int SlideNumber 
+        { 
+            get
+            {
+                return _slideNumber;
+            }
+            set
+            {
+                if (_definition is not null && _slideNumber < _definition.Variants.Count && value != _slideNumber)
+                {
+                    _slideNumber = value;
+
+                    PopulateLayout();
+                    GeneratePrimitives();
+                }
+            }
+        }
+        private int _slideNumber = 0;
+
+        /// <summary>
+        /// Display names of the slides
+        /// </summary>
+        public IEnumerable<string> SlideNames
+        {
+            get
+            {
+                if (_definition is null)
+                {
+                    return ["N/A"];
+                }
+                if (_definition.Variants.Count == 0)
+                {
+                    return ["Default"];
+                }
+                return _definition.Variants.Select((x,i) => $"{i}. {x.Name}");
+            }
+        }
+
         public void LoadDefinition(Stream stream)
         {
             var sr = new StreamReader(stream);
             var toml = sr.ReadToEnd();
             _definition = Toml.ToModel<Definition>(toml);
 
-            _layout = new Layout.Layout(_definition, new Variant());
-            _layout.Populate();
+            PopulateLayout();
 
             GeneratePrimitives();
+        }
+
+        private void PopulateLayout()
+        {
+            if (_definition is null)
+            {
+                return;
+            }
+
+            var variant = _definition.Variants.Count > 0 ? _definition.Variants[_slideNumber] : new Variant();
+
+            _layout = new Layout.Layout(_definition, variant);
+            _layout.Populate();
         }
 
         /// <summary>

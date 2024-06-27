@@ -20,6 +20,14 @@ path = "wine.png"
 [logos.wine-svg]
 title = "Glass of Wine (SVG)"
 path = "wine-svgrepo-com.svg"
+tags = [ "svg" ]
+
+[[variants]]
+name = "Only PNG"
+
+[[variants]]
+name = "Both PNG & SVG"
+include = [ "svg" ]
 
 [[boxes]]
 logos.1 = [ "wine", "wine-svg", "wine", "wine-svg" ]
