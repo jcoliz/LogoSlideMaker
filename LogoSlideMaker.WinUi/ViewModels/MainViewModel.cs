@@ -37,6 +37,11 @@ namespace LogoSlideMaker.WinUi.ViewModels
         /// </remarks>
         public void GeneratePrimitives()
         {
+            if (_definition is null || _layout is null)
+            {
+                return;
+            }
+
             _primitives.Clear();
             var config = _definition.Render;
 
@@ -44,7 +49,7 @@ namespace LogoSlideMaker.WinUi.ViewModels
             var bgRect = new Configure.Rectangle() { X = 0, Y = 0, Width = 1280, Height = 720 };
 
             // If there is a bitmap template, draw that
-            var definedBitmaps = _definition?.Files.Template.Bitmaps;
+            var definedBitmaps = _definition.Files.Template.Bitmaps;
             if (definedBitmaps is not null && definedBitmaps.Count > 0 && bitmaps.Contains(definedBitmaps[0]))
             {
                 _primitives.Add(new ImagePrimitive()
@@ -73,7 +78,7 @@ namespace LogoSlideMaker.WinUi.ViewModels
                     .Where(x => x.Outer is not null)
                     .Select(x => new RectanglePrimitive()
                     {
-                        Rectangle = x.Outer with 
+                        Rectangle = x.Outer! with 
                         { 
                             X = x.Outer.X * 96m, 
                             Y = x.Outer.Y * 96m,

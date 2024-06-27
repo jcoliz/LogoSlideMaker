@@ -56,7 +56,7 @@ public sealed partial class MainWindow : Window
 
     private async void Canvas_CreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs args)
     {
-        var config = viewModel.RenderConfig;
+        var config = viewModel.RenderConfig!;
         tf = new() { FontSize = config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
         solidBlack = new CanvasSolidColorBrush(sender, Microsoft.UI.Colors.Black);
 
@@ -217,6 +217,6 @@ internal static class Converters
 {
     internal static Windows.Foundation.Rect AsWindowsRect(this Configure.Rectangle source)
     {
-        return new Rect() { X = (double)source.X, Y = (double)source.Y, Width = (double)source.Width, Height = (double)source.Height };
+        return new Rect() { X = (double)source.X, Y = (double)(source.Y ?? 0), Width = (double)source.Width, Height = (double)(source.Height ?? 0)};
     }
 }
