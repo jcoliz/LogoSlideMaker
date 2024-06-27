@@ -18,6 +18,11 @@ namespace LogoSlideMaker.WinUi.Services
     internal class BitmapCache : IGetImageSize
     {
         /// <summary>
+        /// Base directory where files are located, or null for embedded storage
+        /// </summary>
+        public string? BaseDirectory { get; set; }
+
+        /// <summary>
         /// Load and retain bitmap for each paths if not already present
         /// </summary>
         /// <param name="paths">Paths to resource files</param>
@@ -72,11 +77,18 @@ namespace LogoSlideMaker.WinUi.Services
         /// <returns>Created bitmap in this canvas</returns>
         private async Task<CanvasBitmap> LoadBitmapAsync(ICanvasResourceCreator resourceCreator, string filename)
         {
-            // TODO: Also need to be able to load bitmaps from local storage!!
-
-            var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
-            var resource = names.Where(x => x.Contains($".{filename}")).Single();
-            var stream = Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource);
+            Stream? stream = null;
+            if (BaseDirectory is null)
+            {
+                var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
+                var resource = names.Where(x => x.Contains($".{filename}")).Single();
+                stream = Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource);
+            }
+            else
+            {
+                var fullPath = Path.GetFullPath(BaseDirectory + Path.DirectorySeparatorChar + filename);
+                stream = File.OpenRead(fullPath);
+            }
 
             if (filename.ToLowerInvariant().EndsWith(".svg"))
             {

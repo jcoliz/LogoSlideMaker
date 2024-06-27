@@ -77,6 +77,7 @@ public sealed partial class MainWindow : Window
         var resource = names.Where(x => x.Contains($".{filename}")).Single();
         var stream = Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource);
 
+        bitmapCache.BaseDirectory = null;
         viewModel.LoadDefinition(stream!);
     }
 
@@ -86,6 +87,7 @@ public sealed partial class MainWindow : Window
 
         using var stream = await storageFile.OpenStreamForReadAsync();
 
+        bitmapCache.BaseDirectory = Path.GetDirectoryName(currentFile);
         viewModel.LoadDefinition(stream);
 
         // TODO: https://microsoft.github.io/Win2D/WinUI2/html/LoadingResourcesOutsideCreateResources.htm

@@ -15,6 +15,7 @@
     <None Remove="Sample\sample-packed.toml" />
     <None Remove="Sample\sample.toml" />
     <None Remove="Sample\Slide1.PNG" />
+    <None Remove="Sample\wine-local.png" />
     <None Remove="Sample\wine-svgrepo-com.svg" />
     <None Remove="Sample\wine.png" />
   </ItemGroup>
@@ -33,6 +34,7 @@
     <EmbeddedResource Include="Sample\sample-packed.toml" />
     <EmbeddedResource Include="Sample\sample.toml" />
     <EmbeddedResource Include="Sample\Slide1.PNG" />
+    <EmbeddedResource Include="Sample\wine-local.png" />
     <EmbeddedResource Include="Sample\wine-svgrepo-com.svg" />
     <EmbeddedResource Include="Sample\wine.png" />
   </ItemGroup>
