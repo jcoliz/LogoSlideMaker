@@ -1,5 +1,6 @@
 using System.Reflection;
 using LogoSlideMaker.Configure;
+using LogoSlideMaker.Layout;
 using Tomlyn;
 
 namespace LogoSlideMaker.Tests;
@@ -24,13 +25,13 @@ public class LayoutVariantTests
 
         // And: A variant with no tags
         var variant = new Variant();
-        
+
         // When: Creating and populating these into a layout
-        var layout = new Layout.Layout(definition, variant);
-        layout.Populate();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
         // Then: Only the logos with no tags are included
-        Assert.That(layout.First().Logos, Has.Length.EqualTo(1));
+        Assert.That(layout.Boxes[0].Logos, Has.Length.EqualTo(1));
     }
 
     /// <summary>
@@ -44,13 +45,13 @@ public class LayoutVariantTests
 
         // And: A variant with no one tag
         var variant = new Variant() { Include = [ "t1"] };
-        
+
         // When: Creating and populating these into a layout
-        var layout = new Layout.Layout(definition, variant);
-        layout.Populate();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
         // Then: Only the logos with that tag and those with no tags are included
-        Assert.That(layout.First().Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "one", "two" } ));
+        Assert.That(layout.Boxes[0].Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "one", "two" } ));
     }
 
     /// <summary>
@@ -64,13 +65,13 @@ public class LayoutVariantTests
 
         // And: A variant with no one tag
         var variant = new Variant() { Include = [ "t2", "t3" ] };
-        
+
         // When: Creating and populating these into a layout
-        var layout = new Layout.Layout(definition, variant);
-        layout.Populate();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
         // Then: Only the logos with that tag and those with no tags are included
-        Assert.That(layout.First().Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "two", "three" } ));
+        Assert.That(layout.Boxes[0].Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "two", "three" } ));
     }
 
     /// <summary>
@@ -84,13 +85,13 @@ public class LayoutVariantTests
 
         // And: A variant with that tag
         var variant = new Variant() { Include = [ "t4" ] };
-        
+
         // When: Creating and populating these into a layout
-        var layout = new Layout.Layout(definition, variant);
-        layout.Populate();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
         // Then: Only the logos with that tag and those with no tags are included
-        Assert.That(layout.First().Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "two", "zero" } ));
+        Assert.That(layout.Boxes[0].Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "two", "zero" } ));
     }
 
     /// <summary>
@@ -104,13 +105,13 @@ public class LayoutVariantTests
 
         // And: A variant with that tag
         var variant = new Variant() { Include = [ "t2" ] };
-        
+
         // When: Creating and populating these into a layout
-        var layout = new Layout.Layout(definition, variant);
-        layout.Populate();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
         // Then: Only the logos with that tag and those with no tags are included
-        Assert.That(layout.First().Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "three" } ));
+        Assert.That(layout.Boxes[0].Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "three" } ));
     }
 
     /// <summary>
@@ -124,13 +125,13 @@ public class LayoutVariantTests
 
         // And: A variant with no tags
         var variant = new Variant();
-        
+
         // When: Creating and populating these into a layout
-        var layout = new Layout.Layout(definition, variant);
-        layout.Populate();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
         // Then: Only the logos with that tag and those with no tags are included
-        Assert.That(layout.First().Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "zero" } ));
+        Assert.That(layout.Boxes[0].Logos.Select(x=>x.Logo!.Title), Is.EqualTo(new string[] { "zero", "zero" } ));
     }
 
     /// <summary>
@@ -144,13 +145,13 @@ public class LayoutVariantTests
 
         // And: A variant with no tags
         var variant = new Variant();
-        
+
         // When: Creating and populating these into a layout
-        var layout = new Layout.Layout(definition, variant);
-        layout.Populate();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
         // Then: All logos includwed
-        Assert.That(layout.First().Logos, Has.Length.EqualTo(6));
+        Assert.That(layout.Boxes[0].Logos, Has.Length.EqualTo(6));
     }
 
     /// <summary>
@@ -164,13 +165,13 @@ public class LayoutVariantTests
 
         // And: A variant with the matching tag
         var variant = new Variant() { Include = [ "t1" ] };
-        
+
         // When: Creating and populating these into a layout
-        var layout = new Layout.Layout(definition, variant);
-        layout.Populate();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
         // Then: Stops when end tag encountered
-        Assert.That(layout.First().Logos, Has.Length.EqualTo(2));
+        Assert.That(layout.Boxes[0].Logos, Has.Length.EqualTo(2));
     }
 
     /// <summary>
@@ -184,16 +185,16 @@ public class LayoutVariantTests
         
         // Given: A variant with no specified page
         var variant = new Variant();
-        
+
         // When: Creating and populating these into a layout
-        var layout = new Layout.Layout(definition, variant);
-        layout.Populate();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
         // Then: Has only one box of logos
-        Assert.That(layout, Has.Count.EqualTo(1));
+        Assert.That(layout.Boxes, Has.Length.EqualTo(1));
 
         // And: All logos are the "zero" logo, the logo contained in the box with unspecified page
-        Assert.That(layout.First().Logos.Select(x=>x.Logo), Has.All.With.Property("Title").EqualTo("zero"));
+        Assert.That(layout.Boxes[0].Logos.Select(x=>x.Logo), Has.All.With.Property("Title").EqualTo("zero"));
     }
 
     /// <summary>
@@ -207,16 +208,16 @@ public class LayoutVariantTests
         
         // Given: A variant with a specified page
         var variant = new Variant() { Pages = [ 1 ] };
-        
+
         // When: Creating and populating these into a layout
-        var layout = new Layout.Layout(definition, variant);
-        layout.Populate();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
         // Then: Has only one box of logos
-        Assert.That(layout, Has.Count.EqualTo(1));
+        Assert.That(layout.Boxes, Has.Length.EqualTo(1));
 
         // And: All logos are the "one" logo, the logo contained in the page 1 box
-        Assert.That(layout.First().Logos.Select(x=>x.Logo), Has.All.With.Property("Title").EqualTo("one"));
+        Assert.That(layout.Boxes[0].Logos.Select(x=>x.Logo), Has.All.With.Property("Title").EqualTo("one"));
     }
 
     /// <summary>
@@ -230,16 +231,16 @@ public class LayoutVariantTests
         
         // Given: A variant with two specified pages
         var variant = new Variant() { Pages = [ 1, 2 ] };
-        
+
         // When: Creating and populating these into a layout
-        var layout = new Layout.Layout(definition, variant);
-        layout.Populate();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
         // Then: Has two boxes of logos
-        Assert.That(layout, Has.Count.EqualTo(2));
+        Assert.That(layout.Boxes, Has.Length.EqualTo(2));
 
         // And: Second box of logos are the "two" logo
-        Assert.That(layout.Skip(1).First().Logos.Select(x=>x.Logo), Has.All.With.Property("Title").EqualTo("two"));
+        Assert.That(layout.Boxes[1].Logos.Select(x=>x.Logo), Has.All.With.Property("Title").EqualTo("two"));
     }
 
     /// <summary>
@@ -253,32 +254,32 @@ public class LayoutVariantTests
         
         // Given: A variant with no specified page
         var variant = new Variant();
-        
+
         // When: Creating and populating these into a layout
-        var layout = new Layout.Layout(definition, variant);
-        layout.Populate();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
         // Then: Has two boxes of logos
-        Assert.That(layout, Has.Count.EqualTo(2));
+        Assert.That(layout.Boxes, Has.Length.EqualTo(2));
 
         // And: Second box of logos are the "one" logo
-        Assert.That(layout.Skip(1).First().Logos.Select(x=>x.Logo), Has.All.With.Property("Title").EqualTo("one"));
+        Assert.That(layout.Boxes[1].Logos.Select(x=>x.Logo), Has.All.With.Property("Title").EqualTo("one"));
     }
 
     [Test]
     public void Masking()
     {
         var definition = Load("masking.toml");
-                
+
         // When: Creating and populating these into a layout
-        var layout = new Layout.Layout(definition, definition.Variants[0]);
-        layout.Populate();
+        var engine = new LayoutEngine(definition, definition.Variants[0]);
+        var layout = engine.CreateSlideLayout();
 
         // Then: Has four logos
-        Assert.That(layout.First().Logos, Has.Length.EqualTo(4));
+        Assert.That(layout.Boxes[0].Logos, Has.Length.EqualTo(4));
 
         // And: Logo "two" is never shown
-        Assert.That(layout.First().Logos.Select(x=>x.Logo), Has.None.With.Property("Title").EqualTo("two"));
+        Assert.That(layout.Boxes[0].Logos.Select(x=>x.Logo), Has.None.With.Property("Title").EqualTo("two"));
     }
 
     [Test]
@@ -287,14 +288,14 @@ public class LayoutVariantTests
         var definition = Load("masking-only.toml");
                 
         // When: Creating and populating these into a layout
-        var layout = new Layout.Layout(definition, definition.Variants[0]);
-        layout.Populate();
+        var engine = new LayoutEngine(definition, definition.Variants[0]);
+        var layout = engine.CreateSlideLayout();
 
         // Then: Has give logos
-        Assert.That(layout.First().Logos, Has.Length.EqualTo(5));
+        Assert.That(layout.Boxes[0].Logos, Has.Length.EqualTo(5));
 
         // And: Logo "three" is shown
-        Assert.That(layout.First().Logos.Select(x=>x.Logo), Has.Some.With.Property("Title").EqualTo("three"));
+        Assert.That(layout.Boxes[0].Logos.Select(x=>x.Logo), Has.Some.With.Property("Title").EqualTo("three"));
     }
 
     [Test]

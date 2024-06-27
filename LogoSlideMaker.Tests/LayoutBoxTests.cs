@@ -1,5 +1,6 @@
 using System.Reflection;
 using LogoSlideMaker.Configure;
+using LogoSlideMaker.Layout;
 using Tomlyn;
 
 namespace LogoSlideMaker.Tests;
@@ -34,18 +35,18 @@ public class LayoutBoxTests
 
         // When: Creating and populating these into a layout
         var variant = new Variant();
-        var layout = new Layout.Layout(definition, variant);
-        layout.Populate();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
         // Then: Top of logo is aligned to outer container plus padding
-        Assert.That(layout.First().Logos.First().Y, Is.EqualTo(100+10+5m/2));
-        Assert.That(layout.First().Logos.Last().Y, Is.EqualTo(100+10+5m/2));
+        Assert.That(layout.Boxes[0].Logos.First().Y, Is.EqualTo(100+10+5m/2));
+        Assert.That(layout.Boxes[0].Logos.Last().Y, Is.EqualTo(100+10+5m/2));
 
         // Then: Left of left-most text box is aligned to outer container plus padding
-        Assert.That(layout.First().Logos.First().X, Is.EqualTo(100+10+40m/2));
+        Assert.That(layout.Boxes[0].Logos.First().X, Is.EqualTo(100+10+40m/2));
 
         // Then: Left of right-most text box is aligned to outer container plus padding
-        Assert.That(layout.First().Logos.Last().X, Is.EqualTo(100+1000-10-40m/2));
+        Assert.That(layout.Boxes[0].Logos.Last().X, Is.EqualTo(100+1000-10-40m/2));
     }
 
     [Test]
@@ -78,11 +79,11 @@ public class LayoutBoxTests
 
         // When: Creating and populating these into a layout
         var variant = new Variant();
-        var layout = new Layout.Layout(definition, variant);
-        layout.Populate();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
         // Then: Top of logo in second box is aligned to outer container plus padding, plus box and line spacing
-        Assert.That(layout.Last().Logos.First().Y, Is.EqualTo(100+10+5m/2+200+150));
+        Assert.That(layout.Boxes[^1].Logos.First().Y, Is.EqualTo(100+10+5m/2+200+150));
     }
 
     [Test]
@@ -92,12 +93,13 @@ public class LayoutBoxTests
         var definition = Load("auto-flow.toml");
 
         // When: Creating and populating these into a layout
-        var layout = new Layout.Layout(definition, new Variant());
-        layout.Populate();
+        var variant = new Variant();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
         // Then: Logos are evenly distributed amongst rows
-        Assert.That(layout.First().Logos[0..3], Has.All.Property("Y").EqualTo(0));
-        Assert.That(layout.First().Logos[3..], Has.All.Property("Y").EqualTo(10));
+        Assert.That(layout.Boxes[0].Logos[0..2], Has.All.Property("Y").EqualTo(0));
+        Assert.That(layout.Boxes[0].Logos[3..], Has.All.Property("Y").EqualTo(10));
     }
 
     [Test]

@@ -1,4 +1,5 @@
 using LogoSlideMaker.Configure;
+using LogoSlideMaker.Layout;
 
 namespace LogoSlideMaker.Tests;
 
@@ -12,11 +13,10 @@ public class LayoutRowTests
     {
         var definition = new Definition();
         var variant = new Variant();
-        var layout = new Layout.Layout(definition, variant);
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
-        layout.Populate();
-
-        Assert.That(layout, Is.Empty);
+        Assert.That(layout.Boxes, Has.Length.EqualTo(0));
     }
 
     [Test]
@@ -39,12 +39,11 @@ public class LayoutRowTests
 
         };
         var variant = new Variant();
-        var layout = new Layout.Layout(definition, variant);
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
-        layout.Populate();
-
-        Assert.That(layout, Has.Count.EqualTo(1));
-        Assert.That(layout.First().Logos, Has.Length.EqualTo(1));
+        Assert.That(layout.Boxes, Has.Length.EqualTo(1));
+        Assert.That(layout.Boxes[0].Logos, Has.Length.EqualTo(1));
     }
 
     [Test]
@@ -67,12 +66,11 @@ public class LayoutRowTests
 
         };
         var variant = new Variant();
-        var layout = new Layout.Layout(definition, variant);
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
-        layout.Populate();
-
-        Assert.That(layout, Has.Count.EqualTo(1));
-        Assert.That(layout.First().Logos, Has.Length.EqualTo(5));
+        Assert.That(layout.Boxes, Has.Length.EqualTo(1));
+        Assert.That(layout.Boxes[0].Logos, Has.Length.EqualTo(5));
     }
 
     [Test]
@@ -95,11 +93,11 @@ public class LayoutRowTests
             },
 
         };
-        var layout = new Layout.Layout(definition, new Variant());
+        var variant = new Variant();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
-        layout.Populate();
-
-        Assert.That(layout.First().Logos, Has.All.With.Property("Y").EqualTo(5.0m));
+        Assert.That(layout.Boxes[0].Logos, Has.All.With.Property("Y").EqualTo(5.0m));
     }
 
     /// <summary>
@@ -126,12 +124,12 @@ public class LayoutRowTests
             },
 
         };
-        var layout = new Layout.Layout(definition, new Variant());
+        var variant = new Variant();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
-        layout.Populate();
-
-        Assert.That(layout.First().Logos[0], Has.Property("X").EqualTo(5.0m));
-        Assert.That(layout.Last().Logos[^1], Has.Property("X").EqualTo(15.0m));
+        Assert.That(layout.Boxes[0].Logos[0], Has.Property("X").EqualTo(5.0m));
+        Assert.That(layout.Boxes[^1].Logos[^1], Has.Property("X").EqualTo(15.0m));
     }
 
     /// <summary>
@@ -158,13 +156,13 @@ public class LayoutRowTests
             },
 
         };
-        var layout = new Layout.Layout(definition, new Variant());
+        var variant = new Variant();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
-        layout.Populate();
-
-        Assert.That(layout.First().Logos[1], Has.Property("X").EqualTo(7.5m));
-        Assert.That(layout.First().Logos[2], Has.Property("X").EqualTo(10.0m));
-        Assert.That(layout.First().Logos[3], Has.Property("X").EqualTo(12.5m));
+        Assert.That(layout.Boxes[0].Logos[1], Has.Property("X").EqualTo(7.5m));
+        Assert.That(layout.Boxes[0].Logos[2], Has.Property("X").EqualTo(10.0m));
+        Assert.That(layout.Boxes[0].Logos[3], Has.Property("X").EqualTo(12.5m));
     }
 
     /// <summary>
@@ -193,11 +191,11 @@ public class LayoutRowTests
             },
 
         };
-        var layout = new Layout.Layout(definition, new Variant());
+        var variant = new Variant();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
-        layout.Populate();
-
-        Assert.That(layout.First().Logos[0], Has.Property("X").EqualTo(5.0m));
-        Assert.That(layout.First().Logos[1], Has.Property("X").EqualTo(7.5m));
+        Assert.That(layout.Boxes[0].Logos[0], Has.Property("X").EqualTo(5.0m));
+        Assert.That(layout.Boxes[0].Logos[1], Has.Property("X").EqualTo(7.5m));
     }
 }

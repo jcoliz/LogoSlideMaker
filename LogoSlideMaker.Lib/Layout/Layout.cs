@@ -5,16 +5,12 @@ namespace LogoSlideMaker.Layout;
 /// <summary>
 /// A collection of icons which have already been chosen and placed
 /// </summary>
-public class Layout(Definition definition, Variant variant): List<BoxLayout>, ILayout
+public class LayoutEngine(Definition definition, Variant variant)
 {
-    public string Name { get; } = variant.Name;
-    public IEnumerable<string> Description { get; } = variant.Description;
-    public int Source { get; } = variant.Source;
-
-    public void Populate()
+    public SlideLayout CreateSlideLayout()
     {
         // Add well-defined boxes
-        base.AddRange
+        var boxes = new List<BoxLayout>
         (
             definition.Boxes
                 .Where(x=>BoxIncludedInVariant(x))
@@ -24,11 +20,13 @@ public class Layout(Definition definition, Variant variant): List<BoxLayout>, IL
         // Add loose rows, only if pages are not specified
         if (variant.Pages.Count == 0)
         {
-            base.AddRange
+            boxes.AddRange
             (
                 definition.Rows.Select(x => new BoxLayout() { Logos = LayoutRow(x).ToArray() })
             );
         }
+
+        return new SlideLayout() { Variant = variant, Boxes = boxes.ToArray() };
     }
 
     /// <summary>
@@ -301,8 +299,28 @@ public record LogoLayout
     public decimal Y { get; init; }
 }
 
+/// <summary>
+/// A group of logo layouts with a heading
+/// </summary>
+/// <remarks>
+/// TODO: The heading is only used for text rendering. Text rendering should
+/// be broken out into its own pipeline, and NOT done as part of the slide
+/// rendering pipeline
+/// </remarks>
 public record BoxLayout
 {
     public string? Heading { get; init; }
     public LogoLayout[] Logos { get; init; } = [];
+}
+
+/// <summary>
+/// All the logos laid out on a given slide, plus details about the variant
+/// </summary>
+/// <remarks>
+/// TODO: Much of this is needed for text rendering, which should be separated
+/// </remarks>
+public record SlideLayout
+{
+    public Variant Variant { get; init; } = new();
+    public BoxLayout[] Boxes { get; init; } = [];
 }

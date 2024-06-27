@@ -1,4 +1,5 @@
 ﻿using LogoSlideMaker.Configure;
+using LogoSlideMaker.Layout;
 using LogoSlideMaker.Primitives;
 using System.Collections.Generic;
 using System.IO;
@@ -78,8 +79,8 @@ namespace LogoSlideMaker.WinUi.ViewModels
 
             var variant = _definition.Variants.Count > 0 ? _definition.Variants[_slideNumber] : new Variant();
 
-            _layout = new Layout.Layout(_definition, variant);
-            _layout.Populate();
+            var engine = new LayoutEngine(_definition, variant);
+            _layout = engine.CreateSlideLayout();
         }
 
         /// <summary>
@@ -124,7 +125,7 @@ namespace LogoSlideMaker.WinUi.ViewModels
 
             // Add needed primitives for each logo
             var generator = new GeneratePrimitives(config, bitmaps);
-            _primitives.AddRange(_layout.SelectMany(x => x.Logos).SelectMany(generator.ToPrimitives));
+            _primitives.AddRange(_layout.Boxes.SelectMany(x => x.Logos).SelectMany(generator.ToPrimitives));
 
             // Add bounding boxes for any boxes with explicit outer dimensions
             _primitives.AddRange(
@@ -145,7 +146,7 @@ namespace LogoSlideMaker.WinUi.ViewModels
         }
 
         private Definition? _definition;
-        private Layout.Layout? _layout;
+        private SlideLayout? _layout;
         private readonly List<Primitive> _primitives = new();
     }
 }
