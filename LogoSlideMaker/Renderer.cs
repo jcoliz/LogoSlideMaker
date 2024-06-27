@@ -1,7 +1,6 @@
 using ShapeCrawler;
 using LogoSlideMaker.Configure;
 using LogoSlideMaker.Layout;
-using DocumentFormat.OpenXml.Office2021.DocumentTasks;
 
 namespace LogoSlideMaker.Render;
 
@@ -10,21 +9,21 @@ namespace LogoSlideMaker.Render;
 /// </summary>
 public class Renderer(RenderConfig config)
 {
-    public void Render(ILayout source, ISlideShapes target)
+    public void Render(SlideLayout source, ISlideShapes target)
     {
         if (config.Listing)
         {   
             Console.WriteLine();
-            Console.WriteLine($"## {source.Name}");
+            Console.WriteLine($"## {source.Variant.Name}");
             Console.WriteLine();
-            foreach(var line in source.Description)
+            foreach(var line in source.Variant.Description)
             {
                 Console.WriteLine(line);        
             }
         }
 
         // Fill in description field
-        var num_description_lines = source.Description.Count();
+        var num_description_lines = source.Variant.Description.Count();
         if (num_description_lines > 0)
         {
             var description_box = target.TryGetByName<IShape>("Description");
@@ -38,7 +37,7 @@ public class Renderer(RenderConfig config)
                     tf.Paragraphs.Add();
                 }
 
-                var queue = new Queue<string>(source.Description);
+                var queue = new Queue<string>(source.Variant.Description);
                 foreach(var para in tf.Paragraphs)
                 {
                     if (queue.Count == 0)
@@ -50,7 +49,7 @@ public class Renderer(RenderConfig config)
             }
         }
 
-        foreach(var boxlayout in source)
+        foreach(var boxlayout in source.Boxes)
         {
             if (config.Listing)
             {   

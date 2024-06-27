@@ -30,8 +30,8 @@ var definitions = Toml.ToModel<Definition>(toml);
 
 // Compose each layout
 var layouts = definitions.Variants.Select(x=> {
-    var layout = new Layout(definitions, x);
-    layout.Populate();
+    var engine = new LayoutEngine(definitions, x);
+    var layout = engine.CreateSlideLayout();
     return layout;
 });
 
@@ -58,7 +58,7 @@ var renderer = new Renderer(definitions.Render);
 // Render each layout
 foreach(var layout in layouts)
 {
-    var copyingSlide = pres.Slides[layout.Source];
+    var copyingSlide = pres.Slides[layout.Variant.Source];
     pres.Slides.Add(copyingSlide);
     var slide = pres.Slides.Last();
 
@@ -67,7 +67,7 @@ foreach(var layout in layouts)
     {
         notes.Add($"Version: {options.Version}");
     }    
-    notes.Add($"Logo count: {layout.Sum(x=>x.Logos.Count(y=>y.Logo != null))}");
+    notes.Add($"Logo count: {layout.Boxes.Sum(x=>x.Logos.Count(y=>y.Logo != null))}");
     slide.AddNotes(notes);
 
     renderer.Render(layout, slide.Shapes);
