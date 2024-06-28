@@ -109,11 +109,17 @@ public class LayoutEngine(Definition definition, Variant variant)
     /// </param>
     private IEnumerable<LogoLayout> LayoutBox(Box box, decimal YPosition)
     {
-        return box.Logos
-            .OrderBy(x=>x.Key)
-            .Select(x=>x.Value)
+        var logos = box.Logos
+            .OrderBy(x => x.Key)
+            .Select(x => x.Value);
+
+        var flow = box.AutoFlow ? AutoFlow(box,logos) : logos;
+
+        var layouts = flow
             .Select(MakeRow(box,YPosition))
             .SelectMany(x => LayoutRow(x));
+
+        return layouts;
     }
 
     /// <summary>
@@ -163,7 +169,6 @@ public class LayoutEngine(Definition definition, Variant variant)
 
         return result;
     }
-
 
     private Func<List<string>,int,Row> MakeRow(Box box, decimal YPosition)
     {

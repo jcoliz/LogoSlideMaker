@@ -98,8 +98,8 @@ public class LayoutBoxTests
         var layout = engine.CreateSlideLayout();
 
         // Then: Logos are evenly distributed amongst rows
-        Assert.That(layout.Logos[0..2], Has.All.Property("Y").EqualTo(0));
-        Assert.That(layout.Logos[3..], Has.All.Property("Y").EqualTo(10));
+        Assert.That(layout.Logos[0..3], Has.All.Property("Y").EqualTo(0));
+        Assert.That(layout.Logos[3..6], Has.All.Property("Y").EqualTo(10));
     }
 
     [Test]
@@ -110,14 +110,15 @@ public class LayoutBoxTests
         var definition = Load("auto-flow.toml");
 
         // When: Creating and populating these into a layout
-        var layout = new Layout.Layout(definition, new Variant());
-        layout.Populate();
+        var variant = new Variant();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
-        // Then: First min_columns logos on first line 
-        Assert.That(layout[1].Logos[0..4], Has.All.Property("Y").EqualTo(20));
+        // Then: First min_columns (4) logos on first line 
+        Assert.That(layout.Logos[6..10], Has.All.Property("Y").EqualTo(20));
 
-        // And: Remaining logos on second line 
-        Assert.That(layout[1].Logos[4..], Has.All.Property("Y").EqualTo(30));
+        // And: Remaining logos are on second line 
+        Assert.That(layout.Logos[10..12], Has.All.Property("Y").EqualTo(30));
     }
 
     [Test]
@@ -129,14 +130,15 @@ public class LayoutBoxTests
         var definition = Load("auto-flow.toml");
 
         // When: Creating and populating these into a layout
-        var layout = new Layout.Layout(definition, new Variant());
-        layout.Populate();
+        var variant = new Variant();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
-        // Then: First min_columns logos on first line 
-        Assert.That(layout[2].Logos[0..6], Has.All.Property("Y").EqualTo(40));
+        // Then: First min_columns (6) logos on first line 
+        Assert.That(layout.Logos[12..18], Has.All.Property("Y").EqualTo(40));
 
         // And: Second min_columns logos on second line 
-        Assert.That(layout[2].Logos[6..12], Has.All.Property("Y").EqualTo(50));
+        Assert.That(layout.Logos[18..24], Has.All.Property("Y").EqualTo(50));
     }
 
     [Test]
@@ -147,11 +149,12 @@ public class LayoutBoxTests
         definition.Boxes[0].AutoFlow = false;
 
         // When: Creating and populating these into a layout
-        var layout = new Layout.Layout(definition, new Variant());
-        layout.Populate();
+        var variant = new Variant();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
 
         // Then: First row of logos all on same line
-        Assert.That(layout.First().Logos[0..^1], Has.All.Property("Y").EqualTo(0));
+        Assert.That(layout.Logos[0..5], Has.All.Property("Y").EqualTo(0));
     }
 
     private static Definition Load(string filename)
