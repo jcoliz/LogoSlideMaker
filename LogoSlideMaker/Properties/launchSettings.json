@@ -2,7 +2,7 @@
   "profiles": {
     "LogoSlideMaker": {
       "commandName": "Project",
-      "commandLineArgs": "--input=sample.toml",
+      "commandLineArgs": "--input=sample.toml --list",
       "workingDirectory": "C:\\Source\\jcoliz\\LogoSlideMaker\\LogoSlideMaker.WinUi\\Sample\\"
     }
   }

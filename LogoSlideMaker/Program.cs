@@ -66,11 +66,6 @@ if (string.IsNullOrWhiteSpace(definitions.Files.Output))
     return -1;
 }
 
-if (definitions.Render.Listing)
-{
-    // TODO: In the case of "listing", render the listing as a separate pass.
-    Console.WriteLine($"# {definitions.Layout.Title}");
-}
 
 // Open template or create new presentation
 var pres = !string.IsNullOrWhiteSpace(options.Template) ? new Presentation(options.Template) : new Presentation();
@@ -108,5 +103,21 @@ foreach(var layout in slides)
 }
 
 pres.SaveAs(definitions.Files.Output);
+
+//
+// LISTING
+//
+
+if (definitions.Render.Listing)
+{
+    var markdown = new List<string>([$"# {definitions.Layout.Title}"]);
+
+    markdown.AddRange(definitions.Variants.SelectMany(x => new LayoutEngine(definitions, x).AsMarkdown()));
+
+    foreach(var line in markdown)
+    {
+        Console.WriteLine(line);
+    }
+}
 
 return 0;
