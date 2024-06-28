@@ -44,7 +44,7 @@ public class LayoutEngine(Definition definition, Variant variant)
                 .ToList();
 
         // Add loose rows into an "Others" box, only if pages are not specified
-        if (variant.Pages.Count == 0)
+        if (variant.Pages.Count == 0 && definition.Rows.Count > 0)
         {
             boxes.Add
             (
@@ -58,10 +58,8 @@ public class LayoutEngine(Definition definition, Variant variant)
 
         // Render them into text
 
-        var result = new List<string>([string.Empty, $"### {variant.Name}"]);
+        var result = new List<string>([string.Empty, $"## {variant.Name}"]);
         result.AddRange(variant.Description);
-        result.Add(string.Empty);
-
         result.AddRange(boxes.SelectMany(x =>
         {
             var result = new List<string>([string.Empty, $"### {x.Heading}", string.Empty]);
