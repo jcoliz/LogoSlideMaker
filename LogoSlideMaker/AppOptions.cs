@@ -32,11 +32,6 @@ public class AppOptions: OptionSet
             error = "Must specify input file";
         }
 
-        if (string.IsNullOrWhiteSpace(Output))
-        {
-            error = "Must specify output file";
-        }
-
         if (Help || error is not null)
         {
             Console.WriteLine($"{AppName} {AppVersion}");

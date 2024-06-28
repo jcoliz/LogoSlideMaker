@@ -1,5 +1,6 @@
 ﻿[files]
 template.bitmaps = [ "Slide1.PNG" ]
+output = "out/sample.pptx"
 
 [layout]
 line_spacing = 1.45

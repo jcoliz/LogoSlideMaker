@@ -3,9 +3,20 @@ using LogoSlideMaker.Layout;
 
 namespace LogoSlideMaker.Primitives;
 
+/// <summary>
+/// Provides the size of an image by path
+/// </summary>
+/// <remarks>
+/// Would be more correct to return aspect ratio here, that's what we really care about
+/// </remarks>
 public interface IGetImageSize
 {
     public bool Contains(string imagePath);
+    /// <summary>
+    /// Get the size of a given image
+    /// </summary>
+    /// <param name="imagePath"></param>
+    /// <returns>Size of given image, in arbitrary units</returns>
     public Size GetSize(string imagePath);
 }
 
