@@ -3,6 +3,9 @@ using Tomlyn;
 using LogoSlideMaker.Configure;
 using LogoSlideMaker.Layout;
 using LogoSlideMaker.Render;
+using LogoSlideMaker.Cli.Services;
+using LogoSlideMaker.Primitives;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 //
 // OPTIONS
@@ -28,7 +31,8 @@ var definitions = Toml.ToModel<Definition>(toml);
 // LOAD IMAGES
 //
 
-// TODO
+var images = new ImageCache() { BaseDirectory = Path.GetDirectoryName(options.Input) };
+await images.LoadAsync(definitions.Logos.Select(x => x.Value.Path));
 
 //
 // LAYOUT
@@ -50,6 +54,18 @@ if (options.Listing)
     definitions.Render.Listing = true;
 }
 
+if (options.Output is not null)
+{
+    definitions.Files.Output = options.Output;
+}
+
+if (string.IsNullOrWhiteSpace(definitions.Files.Output))
+{
+    Console.WriteLine();
+    Console.WriteLine($"ERROR: Must specify output file");
+    return -1;
+}
+
 if (definitions.Render.Listing)
 {
     // TODO: In the case of "listing", render the listing as a separate pass.
@@ -65,6 +81,13 @@ var renderer = new Renderer(definitions.Render);
 // Render each slide
 foreach(var layout in slides)
 {
+    //
+    // PRIMITIVES
+    //
+
+    var gp = new GeneratePrimitives(definitions.Render, images);
+    var primitives = layout.Logos.SelectMany(gp.ToPrimitives);
+
     var copyingSlide = pres.Slides[layout.Variant.Source];
     pres.Slides.Add(copyingSlide);
     var slide = pres.Slides.Last();
@@ -78,21 +101,12 @@ foreach(var layout in slides)
     slide.AddNotes(notes);
 
     //
-    // Generate primitives
+    // RENDER TO PPTX
     //
 
-    // TODO
-
-    //
-    // Render slide
-    //
-
-    // TODO: Don't send the layout, just send the primitives, plus whatevrer
-    // else the slide renderer needs for metadata
-
-    renderer.Render(layout, slide.Shapes);
+    renderer.Render(primitives, slide.Shapes);
 }
 
-pres.SaveAs(options.Output!);
+pres.SaveAs(definitions.Files.Output);
 
 return 0;

@@ -17,6 +17,8 @@ public class Renderer(RenderConfig config)
     /// <param name="target"></param>
     public void Render(IEnumerable<Primitive> primitives, ISlideShapes target)
     {
+        // TODO: Still need to fill in description fields
+
         foreach (var p in primitives)
         {
             Draw(p, target);
