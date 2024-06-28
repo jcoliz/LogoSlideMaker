@@ -1,6 +1,7 @@
 using ShapeCrawler;
 using LogoSlideMaker.Configure;
 using LogoSlideMaker.Layout;
+using LogoSlideMaker.Primitives;
 
 namespace LogoSlideMaker.Render;
 
@@ -9,6 +10,98 @@ namespace LogoSlideMaker.Render;
 /// </summary>
 public class Renderer(RenderConfig config)
 {
+    /// <summary>
+    /// New rendering algorithm
+    /// </summary>
+    /// <param name="primitives"></param>
+    /// <param name="target"></param>
+    public void Render(IEnumerable<Primitive> primitives, ISlideShapes target)
+    {
+        foreach (var p in primitives)
+        {
+            Draw(p, target);
+        }
+    }
+
+    private void Draw(Primitive primitive, ISlideShapes target)
+    {
+        switch (primitive)
+        {
+            case TextPrimitive text:
+                Draw(text, target);
+                break;
+
+            case ImagePrimitive image:
+                Draw(image, target);
+                break;
+
+            case RectanglePrimitive rect:
+                Draw(rect, target);
+                break;
+
+            default:
+                throw new NotImplementedException();
+        }
+    }
+    private void Draw(TextPrimitive primitive, ISlideShapes target)
+    {
+        target.AddRectangle(100, 100, 100, 100);
+        var shape = target.Last();
+
+        shape.X = primitive.Rectangle.X;
+        shape.Y = primitive.Rectangle.Y ?? 0;
+        shape.Width = primitive.Rectangle.Width;
+        shape.Height = primitive.Rectangle.Height ?? primitive.Rectangle.Width;
+
+        var tf = shape.TextFrame;
+        tf.Text = primitive.Text;
+        tf.LeftMargin = 0;
+        tf.RightMargin = 0;
+        var font = tf.Paragraphs.First().Portions.First().Font;
+
+        font.Size = config.FontSize;
+        font.LatinName = config.FontName;
+        font.Color.Update(config.FontColor);
+        shape.Fill.SetNoFill();
+        shape.Outline.SetNoOutline();
+    }
+
+    private void Draw(ImagePrimitive primitive, ISlideShapes target)
+    {
+        // TODO: Really should cache the images so don't have to keep loading them!
+        using var stream = new FileStream(primitive.Path, FileMode.Open);
+        target.AddPicture(stream);
+        var pic = target.OfType<IPicture>().Last();
+        pic.X = primitive.Rectangle.X;
+        pic.Y = primitive.Rectangle.Y ?? 0;
+        pic.Width = primitive.Rectangle.Width;
+        pic.Height = primitive.Rectangle.Height ?? primitive.Rectangle.Width;
+    }
+
+    private void Draw(RectanglePrimitive primitive, ISlideShapes target)
+    {
+        target.AddRectangle(100, 100, 100, 100);
+        var shape = target.Last();
+
+        shape.X = primitive.Rectangle.X;
+        shape.Y = primitive.Rectangle.Y ?? 0;
+        shape.Width = primitive.Rectangle.Width;
+        shape.Height = primitive.Rectangle.Height ?? primitive.Rectangle.Width;
+
+        if (! primitive.Fill)
+        {
+            shape.Fill.SetNoFill();
+        }
+    }
+
+    /// <summary>
+    /// Original rendering algorithm
+    /// </summary>
+    /// <remarks>
+    /// Most of this has been moved to GeneratePrimitives class
+    /// </remarks>
+    /// <param name="source"></param>
+    /// <param name="target"></param>
     public void Render(SlideLayout source, ISlideShapes target)
     {
         // Fill in description field

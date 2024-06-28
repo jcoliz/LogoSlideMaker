@@ -25,11 +25,17 @@ var toml = sr.ReadToEnd();
 var definitions = Toml.ToModel<Definition>(toml);
 
 //
+// LOAD IMAGES
+//
+
+// TODO
+
+//
 // LAYOUT
 //
 
-// Compose each layout
-var layouts = definitions.Variants.Select(x=> {
+// Compose each slide
+var slides = definitions.Variants.Select(x=> {
     var engine = new LayoutEngine(definitions, x);
     var layout = engine.CreateSlideLayout();
     return layout;
@@ -56,8 +62,8 @@ var pres = !string.IsNullOrWhiteSpace(options.Template) ? new Presentation(optio
 // Renderer we will use for the slides
 var renderer = new Renderer(definitions.Render);
 
-// Render each layout
-foreach(var layout in layouts)
+// Render each slide
+foreach(var layout in slides)
 {
     var copyingSlide = pres.Slides[layout.Variant.Source];
     pres.Slides.Add(copyingSlide);
@@ -70,6 +76,19 @@ foreach(var layout in layouts)
     }    
     notes.Add($"Logo count: {layout.Logos.Count(y=>y.Logo != null)}");
     slide.AddNotes(notes);
+
+    //
+    // Generate primitives
+    //
+
+    // TODO
+
+    //
+    // Render slide
+    //
+
+    // TODO: Don't send the layout, just send the primitives, plus whatevrer
+    // else the slide renderer needs for metadata
 
     renderer.Render(layout, slide.Shapes);
 }
