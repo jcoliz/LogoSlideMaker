@@ -57,11 +57,18 @@ internal class ImageCache : IGetImageSize
     /// <param name="path">Path to resource file</param>
     public async Task LoadAsync(string path)
     {
-        if (!bitmaps.ContainsKey(path))
+        try
         {
-            var buffer = await LoadImageAsync(path);
-            bitmaps[path] = buffer;
-            bitmapSizes[path] = MeasureImage(isSvg:Path.GetExtension(path).ToLowerInvariant() == ".svg",buffer);
+            if (!bitmaps.ContainsKey(path))
+            {
+                var buffer = await LoadImageAsync(path);
+                bitmaps[path] = buffer;
+                bitmapSizes[path] = MeasureImage(isSvg: Path.GetExtension(path).ToLowerInvariant() == ".svg", buffer);
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException($"Unable to load image {path}", ex);
         }
     }
 
@@ -90,6 +97,7 @@ internal class ImageCache : IGetImageSize
     /// <returns>Memory stream for this file</returns>
     private async Task<byte[]> LoadImageAsync(string filename)
     {
+
         Stream? stream = null;
         if (BaseDirectory is null)
         {
