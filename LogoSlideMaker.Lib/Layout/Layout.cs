@@ -3,7 +3,7 @@ using LogoSlideMaker.Configure;
 namespace LogoSlideMaker.Layout;
 
 /// <summary>
-/// A collection of icons which have already been chosen and placed
+/// Creates slide layouts for a specified slide definition (i.e. variant)
 /// </summary>
 public class LayoutEngine(Definition definition, Variant variant)
 {
