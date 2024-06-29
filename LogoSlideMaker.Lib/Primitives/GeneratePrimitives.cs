@@ -28,7 +28,7 @@ public interface IGetImageSize
 /// </remarks>
 /// <param name="config">Rendering configuration to covern detailed sizing</param>
 /// <param name="getLogoSize">Provides image size for any given image path</param>
-public class GeneratePrimitives(RenderConfig config, IGetImageSize getLogoSize)
+public class PrimitivesEngine(RenderConfig config, IGetImageSize getLogoSize)
 {
     /// <summary>
     /// Breakdown a single logolayout into drawing primitives

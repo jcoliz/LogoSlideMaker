@@ -125,7 +125,7 @@ namespace LogoSlideMaker.WinUi.ViewModels
             }
 
             // Add needed primitives for each logo
-            var generator = new GeneratePrimitives(config, bitmaps);
+            var generator = new PrimitivesEngine(config, bitmaps);
             _primitives.AddRange(_layout.Logos.SelectMany(generator.ToPrimitives));
 
             // Add bounding boxes for any boxes with explicit outer dimensions
