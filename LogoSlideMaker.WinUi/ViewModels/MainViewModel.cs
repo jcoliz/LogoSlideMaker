@@ -105,12 +105,13 @@ namespace LogoSlideMaker.WinUi.ViewModels
 
             // If there is a bitmap template, draw that
             var definedBitmaps = _definition.Files.Template.Bitmaps;
-            if (definedBitmaps is not null && definedBitmaps.Count > 0 && bitmaps.Contains(definedBitmaps[0]))
+            var sourceBitmap = _layout.Variant.Source;
+            if (definedBitmaps is not null && definedBitmaps.Count > sourceBitmap && bitmaps.Contains(definedBitmaps[sourceBitmap]))
             {
                 _primitives.Add(new ImagePrimitive()
                 {
                     Rectangle = bgRect,
-                    Path = definedBitmaps[0]
+                    Path = definedBitmaps[sourceBitmap]
                 });
             }
             else
