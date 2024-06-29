@@ -3,6 +3,10 @@ namespace LogoSlideMaker.Configure;
 /// <summary>
 /// Details about a particular logo glyph
 /// </summary>
+/// <remarks>
+/// Specify each logo once. Refer to it in as many rows, boxes, and/or
+/// variants as needed.
+/// </remarks>
 public record Logo
 {
     /// <summary>

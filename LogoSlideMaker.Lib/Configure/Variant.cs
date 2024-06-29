@@ -3,6 +3,10 @@ namespace LogoSlideMaker.Configure;
 /// <summary>
 /// Describes a variation of logos. One variant will be rendered on each slide.
 /// </summary>
+/// <remarks>
+/// I've now been referring to `Variant` interchangeabley with `Slide`. In
+/// the future, I'll rename this to `Slide`, as it describes a single slide.
+/// </remarks>
 public record Variant
 {
     /// <summary>

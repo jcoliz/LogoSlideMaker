@@ -1,8 +1,11 @@
 namespace LogoSlideMaker.Configure;
 
 /// <summary>
-/// A method to specify multiple rows in one declaration
+/// A Collection of logos on one visual line
 /// </summary>
+/// <remarks>
+/// This is largely obsolete now. Use Box instead.
+/// </remarks>
 public record Row
 {
     public decimal XPosition { get; set; }
