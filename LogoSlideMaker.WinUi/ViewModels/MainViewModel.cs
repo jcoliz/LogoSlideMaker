@@ -6,10 +6,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Tomlyn;
+using Windows.Storage;
 
 namespace LogoSlideMaker.WinUi.ViewModels;
 
@@ -104,15 +106,14 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
     public ICommand PreviousSlide => _PreviousSlide ??= new RelayCommand(_ => BackToPreviousSlide());
     private ICommand? _PreviousSlide = null;
 
-
     #endregion
 
     #region Methods
 
-    public async Task LoadDefinitionAsync(string path)
+    public async Task LoadDefinitionAsync(string? path)
     {
         lastOpenedFilePath = path;
-        using var stream = File.OpenRead(path);
+        using var stream = path is null ? OpenEmbeddedDefinition() : File.OpenRead(path);
         await Task.Run(() => { LoadDefinition(stream); });
     }
 
@@ -135,10 +136,7 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
 
     public async Task ReloadDefinitionAsync()
     {
-        if (!string.IsNullOrEmpty(lastOpenedFilePath))
-        {
-            await LoadDefinitionAsync(lastOpenedFilePath);
-        }
+        await LoadDefinitionAsync(lastOpenedFilePath);
     }
 
     public void AdvanceToNextSlide()
@@ -238,6 +236,17 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
     #endregion
 
     #region Internals
+
+    private Stream OpenEmbeddedDefinition()
+    {
+        var filename = "sample.toml";
+        var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
+        var resource = names.Where(x => x.Contains($".{filename}")).Single();
+        var stream = Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource)!;
+
+        return stream;
+    }
+
     private void PopulateLayout()
     {
         if (_definition is null)
@@ -251,7 +260,6 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
         _layout = engine.CreateSlideLayout();
     }
 
-
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         // Raise the PropertyChanged event, passing the name of the property whose value has changed.
@@ -260,12 +268,26 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
     }
     #endregion
 
+    #region Internal Properties
+
+    private string? lastOpenedFilePath
+    {
+        get => (string?)ApplicationData.Current.LocalSettings.Values[nameof(lastOpenedFilePath)];
+        set
+        {
+            if (value != (string?)ApplicationData.Current.LocalSettings.Values[nameof(lastOpenedFilePath)])
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(lastOpenedFilePath)] = value;
+            }
+        }
+    }
+    #endregion
+
     #region Fields
 
     private Definition? _definition;
     private SlideLayout? _layout;
     private readonly List<Primitive> _primitives = [];
-    private string? lastOpenedFilePath;
 
     #endregion
 }

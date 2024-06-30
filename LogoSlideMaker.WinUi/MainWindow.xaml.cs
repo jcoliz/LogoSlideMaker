@@ -11,10 +11,7 @@ using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using Windows.Foundation;
 using WinRT;
 
@@ -38,40 +35,21 @@ public sealed partial class MainWindow : Window
 
     public MainWindow()
     {
+        this.InitializeComponent();
+
         viewModel = new(bitmapCache)
         {
             UIAction = x => this.DispatcherQueue.TryEnqueue(() => x())
         };
-
         viewModel.PropertyChanged += ViewModel_PropertyChanged;
-
-        this.InitializeComponent();
-        this.AppWindow.SetIcon("Assets/app-icon.ico");
-
         this.Root.DataContext = viewModel;
+
+        this.AppWindow.SetIcon("Assets/app-icon.ico");
 
         var dpi = GetDpiForWindow(hWnd);
         this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32(dpi*1280/96, dpi*(720+64)/96));
 
-        this.canvas.CreateResources += Canvas_CreateResources;
-
-        this.LoadDefinition_Embedded();
-    }
-
-    #endregion
-
-    #region Embedded resource management
-
-    private async void LoadDefinition_Embedded()
-    {
-        var filename = "sample.toml";
-        var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
-        var resource = names.Where(x => x.Contains($".{filename}")).Single();
-        var stream = Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource)!;
-
-        bitmapCache.BaseDirectory = null;
-
-        await Task.Run(() => { viewModel.LoadDefinition(stream); });
+        this.viewModel.ReloadDefinitionAsync().ContinueWith(_ => { });
     }
 
     #endregion
