@@ -9,6 +9,7 @@ using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -35,16 +36,40 @@ public sealed partial class MainWindow : Window
 
     public MainWindow()
     {
-        viewModel = new(bitmapCache);
+        viewModel = new(bitmapCache)
+        {
+            UIAction = x => this.DispatcherQueue.TryEnqueue(() => x())
+        };
+
+        viewModel.PropertyChanged += ViewModel_PropertyChanged;
 
         this.InitializeComponent();
-        this.LoadDefinition_Embedded();
         this.AppWindow.SetIcon("Assets/app-icon.ico");
+
+        this.Root.DataContext = viewModel;
 
         var dpi = GetDpiForWindow(hWnd);
         this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32(dpi*1280/96, dpi*(720+64)/96));
 
         this.canvas.CreateResources += Canvas_CreateResources;
+
+        this.LoadDefinition_Embedded();
+    }
+
+    private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MainViewModel.IsLoading))
+        {
+            if (viewModel.IsLoading)
+            {
+                canvas.Invalidate();
+            }
+            else
+            {
+                // TODO: https://microsoft.github.io/Win2D/WinUI2/html/LoadingResourcesOutsideCreateResources.htm
+                Canvas_CreateResources(this.canvas, new CanvasCreateResourcesEventArgs(CanvasCreateResourcesReason.NewDevice));
+            }
+        }
     }
 
     [LibraryImport("User32.dll", SetLastError = true)]
@@ -59,7 +84,12 @@ public sealed partial class MainWindow : Window
     {
         // Create some static resource we'll use as part of drawing
         // TODO: Probably should be in viewmodel
-        var config = viewModel.RenderConfig!;
+        var config = viewModel.RenderConfig;
+        if (config is null)
+        {
+            Trace.WriteLine("No config, skipping");
+            return;
+        }
         tf = new() { FontSize = config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
         solidBlack = new CanvasSolidColorBrush(sender, Microsoft.UI.Colors.Black);
 
@@ -70,19 +100,20 @@ public sealed partial class MainWindow : Window
         // generate the drawing primitives so we can render them.
         viewModel.GeneratePrimitives();
 
-        // Much has been updated, redraw!!
+        // All has changed, redraw!
         canvas.Invalidate();
     }
 
-    private void LoadDefinition_Embedded()
+    private async void LoadDefinition_Embedded()
     {
         var filename = "sample.toml";
         var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
         var resource = names.Where(x => x.Contains($".{filename}")).Single();
-        var stream = Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource);
+        var stream = Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource)!;
 
         bitmapCache.BaseDirectory = null;
-        viewModel.LoadDefinition(stream!);
+
+        await Task.Run(() => { viewModel.LoadDefinition(stream); });
     }
 
     private async Task LoadDefinitionAsync(StorageFile storageFile)
@@ -92,10 +123,8 @@ public sealed partial class MainWindow : Window
         using var stream = await storageFile.OpenStreamForReadAsync();
 
         bitmapCache.BaseDirectory = Path.GetDirectoryName(currentFile);
-        viewModel.LoadDefinition(stream);
 
-        // TODO: https://microsoft.github.io/Win2D/WinUI2/html/LoadingResourcesOutsideCreateResources.htm
-        Canvas_CreateResources(this.canvas, new CanvasCreateResourcesEventArgs( CanvasCreateResourcesReason.NewDevice));
+        await Task.Run(() => { viewModel.LoadDefinition(stream); });
     }
 
     /// <summary>
@@ -124,7 +153,6 @@ public sealed partial class MainWindow : Window
         {
             Draw(p, args.DrawingSession);
         }
-
     }
 
     private async void OpenFile_Click(object sender, RoutedEventArgs e)

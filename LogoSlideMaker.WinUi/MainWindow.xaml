@@ -11,7 +11,7 @@
     Title="Logo Slide Maker"
     >
 
-    <Grid>
+    <Grid x:Name="Root">
         <Grid.RowDefinitions>
             <RowDefinition Height="64" />
             <RowDefinition Height="*" />
@@ -23,5 +23,6 @@
             <AppBarButton Icon="Download" Label="Export" Click="DoExport_Click"/>
         </CommandBar>
         <win2dcanvas:CanvasControl Grid.Row="1" x:Name="canvas" Draw="CanvasControl_Draw" ClearColor="CornflowerBlue"/>
+        <ProgressRing Grid.Row="1" IsActive="{Binding IsLoading}" Foreground="Black"/>
     </Grid>
 </Window>

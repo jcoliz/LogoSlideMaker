@@ -1,15 +1,26 @@
 ﻿using LogoSlideMaker.Configure;
 using LogoSlideMaker.Layout;
 using LogoSlideMaker.Primitives;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Tomlyn;
 
 namespace LogoSlideMaker.WinUi.ViewModels;
 
-internal class MainViewModel(IGetImageAspectRatio bitmaps)
+internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChanged
 {
+    public event PropertyChangedEventHandler? PropertyChanged = delegate { };
+
+    /// <summary>
+    /// View needs to give us a way to dispatch onto the UI Thread
+    /// </summary>
+    public Action<Action> UIAction { get; set; } = (x => x());
+
     public IReadOnlyList<Primitive> Primitives => _primitives;
 
     public IEnumerable<string> ImagePaths =>
@@ -37,6 +48,20 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps)
     }
     private int _slideNumber = 0;
 
+    public bool IsLoading
+    {
+        get => _IsLoading;
+        set
+        {
+            if (value != _IsLoading)
+            {
+                _IsLoading = value;
+                OnPropertyChanged();            
+            }        
+        }    
+    }
+    private bool _IsLoading = true;
+
     /// <summary>
     /// Display names of the slides
     /// </summary>
@@ -58,13 +83,19 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps)
 
     public void LoadDefinition(Stream stream)
     {
+        _primitives.Clear();
+        IsLoading = true;
+
         var sr = new StreamReader(stream);
         var toml = sr.ReadToEnd();
         _definition = Toml.ToModel<Definition>(toml);
 
         PopulateLayout();
 
-        GeneratePrimitives();
+        // Note that the view listens for this, and does its
+        // part after we're done loading, including a call back to
+        // GeneratePrimitives()
+        IsLoading = false;
     }
 
     private void PopulateLayout()
@@ -141,6 +172,13 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps)
                 }
             )
         );
+    }
+
+    public void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        // Raise the PropertyChanged event, passing the name of the property whose value has changed.
+        // And be sure to do it on UI thread, because we may be running on a BG thread
+        UIAction(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)));
     }
 
     private Definition? _definition;
