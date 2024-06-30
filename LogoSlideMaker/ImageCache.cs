@@ -69,11 +69,13 @@ public class ImageCache : IGetImageAspectRatio
         }
     }
 
+    /// <inheritdoc/>
     public bool Contains(string imagePath)
     {
         return imageAspectRatios.ContainsKey(imagePath);
     }
 
+    /// <inheritdoc/>
     public decimal GetAspectRatio(string imagePath)
     {
         if (!imageAspectRatios.TryGetValue(imagePath, out var result))
@@ -83,6 +85,11 @@ public class ImageCache : IGetImageAspectRatio
         return result;
     }
 
+    /// <summary>
+    /// Get the buffer associated with this path, or null if we don't have it
+    /// </summary>
+    /// <param name="imagePath"></param>
+    /// <returns></returns>
     public byte[]? GetOrDefault(string imagePath)
     {
         return imageBuffers.GetValueOrDefault(imagePath);
