@@ -8,7 +8,7 @@ using Tomlyn;
 
 namespace LogoSlideMaker.WinUi.ViewModels
 {
-    internal class MainViewModel(IGetImageSize bitmaps)
+    internal class MainViewModel(IGetImageAspectRatio bitmaps)
     {
         public IReadOnlyList<Primitive> Primitives => _primitives;
 

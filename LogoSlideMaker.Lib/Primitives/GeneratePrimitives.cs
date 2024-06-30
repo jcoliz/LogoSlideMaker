@@ -9,15 +9,15 @@ namespace LogoSlideMaker.Primitives;
 /// <remarks>
 /// Would be more correct to return aspect ratio here, that's what we really care about
 /// </remarks>
-public interface IGetImageSize
+public interface IGetImageAspectRatio
 {
     public bool Contains(string imagePath);
     /// <summary>
-    /// Get the size of a given image
+    /// Get the aspect ratio of a given image (width/height)
     /// </summary>
-    /// <param name="imagePath"></param>
+    /// <param name="imagePath">Path to image, as specified in logo</param>
     /// <returns>Size of given image, in arbitrary units</returns>
-    public Size GetSize(string imagePath);
+    public decimal GetAspectRatio(string imagePath);
 }
 
 /// <summary>
@@ -27,8 +27,8 @@ public interface IGetImageSize
 /// These primitives could be drawn by any renderer
 /// </remarks>
 /// <param name="config">Rendering configuration to covern detailed sizing</param>
-/// <param name="getLogoSize">Provides image size for any given image path</param>
-public class PrimitivesEngine(RenderConfig config, IGetImageSize getLogoSize)
+/// <param name="getLogoAspect">Provides image size for any given image path</param>
+public class PrimitivesEngine(RenderConfig config, IGetImageAspectRatio getLogoAspect)
 {
     /// <summary>
     /// Breakdown a single logolayout into drawing primitives
@@ -41,13 +41,12 @@ public class PrimitivesEngine(RenderConfig config, IGetImageSize getLogoSize)
 
         var logo = logolayout.Logo;
 
-        if (logo is null || ! getLogoSize.Contains(logo.Path))
+        if (logo is null || ! getLogoAspect.Contains(logo.Path))
         {
             return [];
         }
 
-        var size = getLogoSize.GetSize(logo.Path);
-        var aspect = size.Width! / size.Height!;
+        var aspect = getLogoAspect.GetAspectRatio(logo.Path);
         var width_factor = (decimal)Math.Sqrt((double)aspect);
         var height_factor = 1.0m / width_factor;
         var icon_width = config.IconSize * width_factor * logo.Scale;

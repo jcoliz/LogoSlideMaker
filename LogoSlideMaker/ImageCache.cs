@@ -9,7 +9,7 @@ namespace LogoSlideMaker.Export;
 /// Contains ready-to-draw image data for images we may want to add to PowerPoint
 /// slides.
 /// </summary>
-public class ImageCache : IGetImageSize
+public class ImageCache : IGetImageAspectRatio
 {
     /// <summary>
     /// Base directory where files are located, or null for embedded storage
@@ -56,11 +56,11 @@ public class ImageCache : IGetImageSize
     {
         try
         {
-            if (!bitmaps.ContainsKey(path))
+            if (!imageBuffers.ContainsKey(path))
             {
                 var buffer = await LoadImageAsync(path);
-                bitmaps[path] = buffer;
-                bitmapSizes[path] = MeasureImage(isSvg: Path.GetExtension(path).ToLowerInvariant() == ".svg", buffer);
+                imageBuffers[path] = buffer;
+                imageAspectRatios[path] = MeasureImage(isSvg: Path.GetExtension(path).ToLowerInvariant() == ".svg", buffer);
             }
         }
         catch (Exception ex)
@@ -71,21 +71,25 @@ public class ImageCache : IGetImageSize
 
     public bool Contains(string imagePath)
     {
-        return bitmapSizes.ContainsKey(imagePath);
+        return imageAspectRatios.ContainsKey(imagePath);
     }
 
-    public Configure.Size GetSize(string imagePath)
+    public decimal GetAspectRatio(string imagePath)
     {
-        return bitmapSizes.GetValueOrDefault(imagePath) ?? throw new KeyNotFoundException();
+        if (!imageAspectRatios.TryGetValue(imagePath, out var result))
+        {
+            throw new KeyNotFoundException($"No aspect ratio available for {imagePath}");
+        }
+        return result;
     }
 
     public byte[]? GetOrDefault(string imagePath)
     {
-        return bitmaps.GetValueOrDefault(imagePath);
+        return imageBuffers.GetValueOrDefault(imagePath);
     }
 
-    private readonly Dictionary<string, byte[]> bitmaps = new();
-    private readonly Dictionary<string, Configure.Size> bitmapSizes = new();
+    private readonly Dictionary<string, byte[]> imageBuffers = new();
+    private readonly Dictionary<string, decimal> imageAspectRatios = new();
 
     /// <summary>
     /// Load a single image from embedded or external storage as a memory stream
@@ -116,18 +120,18 @@ public class ImageCache : IGetImageSize
         return result.GetBuffer();
     }
 
-    private Configure.Size MeasureImage(bool isSvg, byte[] buffer)
+    private decimal MeasureImage(bool isSvg, byte[] buffer)
     {
         using var stream = new MemoryStream(buffer);
         if (isSvg)
         {
             var svg = SvgDocument.Open<SvgDocument>(stream);
-            return new() { Width = (decimal)svg.Width.Value, Height = (decimal)svg.Height.Value };
+            return (decimal)svg.Width.Value / (decimal)svg.Height.Value;
         }
         else
         {
             var bitmap = SKBitmap.Decode(stream);
-            return new() { Width = bitmap.Width, Height = bitmap.Height };
+            return (decimal)bitmap.Width / bitmap.Height;
         }
     }
 }

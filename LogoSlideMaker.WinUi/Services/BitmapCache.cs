@@ -3,11 +3,9 @@ using Microsoft.Graphics.Canvas;
 using Svg;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace LogoSlideMaker.WinUi.Services
@@ -15,7 +13,7 @@ namespace LogoSlideMaker.WinUi.Services
     /// <summary>
     /// Contains ready-to-draw canvas bitmaps for all images we may want to draw
     /// </summary>
-    internal class BitmapCache : IGetImageSize
+    internal class BitmapCache : IGetImageAspectRatio
     {
         /// <summary>
         /// Base directory where files are located, or null for embedded storage
@@ -47,18 +45,22 @@ namespace LogoSlideMaker.WinUi.Services
                 bitmaps[path] = cb;
 
                 var bounds = cb.GetBounds(resourceCreator);
-                bitmapSizes[path] = new Configure.Size() { Width = (decimal)bounds.Width, Height = (decimal)bounds.Height };
+                bitmapAspectRatios[path] = (decimal)bounds.Width / (decimal)bounds.Height;
             }
         }
 
         public bool Contains(string imagePath)
         {
-            return bitmapSizes.ContainsKey(imagePath);
+            return bitmapAspectRatios.ContainsKey(imagePath);
         }
 
-        public Configure.Size GetSize(string imagePath)
+        public decimal GetAspectRatio(string imagePath)
         {
-            return bitmapSizes.GetValueOrDefault(imagePath) ?? throw new KeyNotFoundException();
+            if (!bitmapAspectRatios.TryGetValue(imagePath, out var result))
+            {
+                throw new KeyNotFoundException($"No aspect ratio available for {imagePath}");
+            }
+            return result;
         }
 
         public CanvasBitmap? GetOrDefault(string imagePath)
@@ -67,7 +69,7 @@ namespace LogoSlideMaker.WinUi.Services
         }
 
         private readonly Dictionary<string, CanvasBitmap> bitmaps = new();
-        private readonly Dictionary<string, Configure.Size> bitmapSizes = new();
+        private readonly Dictionary<string, decimal> bitmapAspectRatios = new();
 
         /// <summary>
         /// Load a single bitmap from embedded storage
