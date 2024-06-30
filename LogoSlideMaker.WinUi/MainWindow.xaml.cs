@@ -16,7 +16,6 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Windows.Storage;
 using WinRT;
 
 namespace LogoSlideMaker.WinUi;
@@ -26,12 +25,16 @@ namespace LogoSlideMaker.WinUi;
 /// </summary>
 public sealed partial class MainWindow : Window
 {
-    private readonly MainViewModel viewModel;
+    #region Fields
 
+    private readonly MainViewModel viewModel;
     private CanvasTextFormat? defaultTextFormat;
     private ICanvasBrush? solidBlack;
-
     private readonly BitmapCache bitmapCache = new();
+
+    #endregion
+
+    #region Constructor
 
     public MainWindow()
     {
@@ -55,6 +58,26 @@ public sealed partial class MainWindow : Window
         this.LoadDefinition_Embedded();
     }
 
+    #endregion
+
+    #region Embedded resource management
+
+    private async void LoadDefinition_Embedded()
+    {
+        var filename = "sample.toml";
+        var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
+        var resource = names.Where(x => x.Contains($".{filename}")).Single();
+        var stream = Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource)!;
+
+        bitmapCache.BaseDirectory = null;
+
+        await Task.Run(() => { viewModel.LoadDefinition(stream); });
+    }
+
+    #endregion
+
+    #region Event handlers
+
     private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(MainViewModel.IsLoading))
@@ -72,65 +95,23 @@ public sealed partial class MainWindow : Window
                 Canvas_CreateResources(this.canvas, new CanvasCreateResourcesEventArgs(CanvasCreateResourcesReason.NewDevice));
             }
         }
-    }
 
-    [LibraryImport("User32.dll", SetLastError = true)]
-    private static partial int GetDpiForWindow(IntPtr hwnd);
-
-    /// <summary>
-    /// Get the current window's HWND by passing in the Window object
-    /// </summary>
-    private IntPtr hWnd => WinRT.Interop.WindowNative.GetWindowHandle(this);
-
-    private async void Canvas_CreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs args)
-    {
-        // Create some static resource we'll use as part of drawing
-        // TODO: Probably should be in viewmodel
-        var config = viewModel.RenderConfig;
-        if (config is null)
+        if (e.PropertyName == nameof(MainViewModel.SlideNumber))
         {
-            Trace.WriteLine("No config, skipping");
-            return;
-        }
-        defaultTextFormat = new() { FontSize = config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
-        solidBlack = new CanvasSolidColorBrush(sender, Microsoft.UI.Colors.Black);
-
-        // Load (and measure) all the bitmaps
-        // NOTE: If multiple TOML files share the same path, we will re-use the previously
-        // created canvas bitmap. This could be a problem if two different TOMLs are in 
-        // different directories, and use the same relative path to refer to two different
-        // images.
-        await bitmapCache.LoadAsync(sender, viewModel.ImagePaths);
-
-        // Now that all the bitmaps are loaded, we now have enough information to
-        // generate the drawing primitives so we can render them.
-        viewModel.GeneratePrimitives();
-
-        // All has changed, redraw!
-        canvas.Invalidate();
-    }
-
-    private async void LoadDefinition_Embedded()
-    {
-        var filename = "sample.toml";
-        var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
-        var resource = names.Where(x => x.Contains($".{filename}")).Single();
-        var stream = Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource)!;
-
-        bitmapCache.BaseDirectory = null;
-
-        await Task.Run(() => { viewModel.LoadDefinition(stream); });
-    }
-
-    private void CanvasControl_Draw(
-        Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender,
-        Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs args)
-    {
-        foreach (var p in viewModel.Primitives)
-        {
-            Draw(p, args.DrawingSession);
+            // New slide, redraw
+            canvas.Invalidate();
         }
     }
+
+    private void CommandBar_Closing(object sender, object e)
+    {
+        // Never close the command bar! We always want it open
+        sender.As<CommandBar>().IsOpen = true;
+    }
+
+    #endregion
+
+    #region Command handlers
 
     private async void OpenFile_Click(object sender, RoutedEventArgs e)
     {
@@ -162,29 +143,46 @@ public sealed partial class MainWindow : Window
         // Give user option to launch the ppt (would be nice)
     }
 
-    private void PickView_Click(object sender, RoutedEventArgs e)
+    #endregion
+
+    #region Canvas management & drawing
+
+    private async void Canvas_CreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs args)
     {
-        // Will let us choose which variant to display
-        // Note that this will not require reloading resources, just invalidate the canvas and redraw
-
-        // What I'd LIKE to do is have a menu dynamically created based on the slides (variants)
-        // available. Sadly tht's not possible
-        // https://github.com/microsoft/microsoft-ui-xaml/issues/1087
-
-        // So, what I'll ultimately do is need to bring up a picker dialog.
-        // For now, we'll simply cycle through the available slides
-
-        var current = viewModel.SlideNumber++;
-        if (viewModel.SlideNumber == current)
+        // Create some static resource we'll use as part of drawing
+        // Not in view model because we don't want any UI namespaces in there
+        var config = viewModel.RenderConfig;
+        if (config is null)
         {
-            viewModel.SlideNumber = 0;
+            Trace.WriteLine("No config, skipping");
+            return;
         }
+        defaultTextFormat = new() { FontSize = config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
+        solidBlack = new CanvasSolidColorBrush(sender, Microsoft.UI.Colors.Black);
+
+        // Load (and measure) all the bitmaps
+        // NOTE: If multiple TOML files share the same path, we will re-use the previously
+        // created canvas bitmap. This could be a problem if two different TOMLs are in 
+        // different directories, and use the same relative path to refer to two different
+        // images.
+        await bitmapCache.LoadAsync(sender, viewModel.ImagePaths);
+
+        // Now that all the bitmaps are loaded, we now have enough information to
+        // generate the drawing primitives so we can render them.
+        viewModel.GeneratePrimitives();
+
+        // All has changed, redraw!
         canvas.Invalidate();
     }
 
-    private void CommandBar_Closing(object sender, object e)
+    private void CanvasControl_Draw(
+        Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender,
+        Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs args)
     {
-        sender.As<CommandBar>().IsOpen = true;
+        foreach (var p in viewModel.Primitives)
+        {
+            Draw(p, args.DrawingSession);
+        }
     }
 
     private void Draw(Primitive primitive, CanvasDrawingSession session)
@@ -242,6 +240,20 @@ public sealed partial class MainWindow : Window
             session.DrawRectangle(primitive.Rectangle.AsWindowsRect(), Microsoft.UI.Colors.Purple, 1);
         }
     }
+
+    #endregion
+
+    #region Windows Internals
+
+    [LibraryImport("User32.dll", SetLastError = true)]
+    private static partial int GetDpiForWindow(IntPtr hwnd);
+
+    /// <summary>
+    /// Get the current window's HWND by passing in the Window object
+    /// </summary>
+    private IntPtr hWnd => WinRT.Interop.WindowNative.GetWindowHandle(this);
+
+    #endregion
 }
 
 internal static class Converters

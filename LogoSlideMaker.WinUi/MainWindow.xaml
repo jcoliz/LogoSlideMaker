@@ -19,7 +19,7 @@
         <CommandBar x:Name="appBar" IsOpen="True" IsSticky="True" OverflowButtonVisibility="Collapsed" HorizontalAlignment="Left" Closing="CommandBar_Closing">
             <AppBarButton Icon="OpenFile" Label="Open" Click="OpenFile_Click"/>
             <AppBarButton Icon="Refresh" Label="Reload" Command="{Binding Reload}" />
-            <AppBarButton Icon="View" Label="View" Click="PickView_Click"/>
+            <AppBarButton Icon="Forward" Label="Next" Command="{Binding NextSlide}" />
             <AppBarButton Icon="Download" Label="Export" Click="DoExport_Click"/>
         </CommandBar>
         <win2dcanvas:CanvasControl Grid.Row="1" x:Name="canvas" Draw="CanvasControl_Draw" ClearColor="CornflowerBlue"/>

@@ -10,7 +10,6 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Tomlyn;
-using Windows.Storage;
 
 namespace LogoSlideMaker.WinUi.ViewModels;
 
@@ -48,6 +47,7 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
 
                 PopulateLayout();
                 GeneratePrimitives();
+                OnPropertyChanged();
             }
         }
     }
@@ -61,7 +61,7 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
             if (value != _IsLoading)
             {
                 _IsLoading = value;
-                OnPropertyChanged();            
+                OnPropertyChanged();
             }        
         }    
     }
@@ -91,6 +91,12 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
     /// </summary>
     public ICommand Reload => _Reload ??= new RelayCommand(_ => ReloadDefinitionAsync().ContinueWith(_ => { }));
     private ICommand? _Reload = null;
+
+    /// <summary>
+    /// [User Can] Advance the preview to the next available slide
+    /// </summary>
+    public ICommand NextSlide => _NextSlide ??= new RelayCommand(_ => AdvanceToNextSlide());
+    private ICommand? _NextSlide = null;
 
     #endregion
 
@@ -125,6 +131,22 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
         if (!string.IsNullOrEmpty(lastOpenedFilePath))
         {
             await LoadDefinitionAsync(lastOpenedFilePath);
+        }
+    }
+
+    public void AdvanceToNextSlide()
+    {
+        if (_definition is null)
+        {
+            return;        
+        }
+        if (SlideNumber >= _definition.Variants.Count - 1)
+        {
+            SlideNumber = 0;
+        }
+        else
+        {
+            ++SlideNumber;
         }
     }
 
