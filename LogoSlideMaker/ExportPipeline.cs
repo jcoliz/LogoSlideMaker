@@ -1,8 +1,6 @@
-﻿using LogoSlideMaker.Cli.Services;
-using LogoSlideMaker.Configure;
+﻿using LogoSlideMaker.Configure;
 using LogoSlideMaker.Layout;
 using LogoSlideMaker.Primitives;
-using LogoSlideMaker.Render;
 using ShapeCrawler;
 
 namespace LogoSlideMaker.Export;
@@ -22,7 +20,7 @@ public class ExportPipeline
         definition = __definition;
         imageCache = new();
         primitivesEngine = new(definition.Render, imageCache);
-        renderEngine = new(definition.Render);
+        renderEngine = new(definition.Render, imageCache);
     }
 
     public async Task LoadAndMeasureAsync(string basePath)

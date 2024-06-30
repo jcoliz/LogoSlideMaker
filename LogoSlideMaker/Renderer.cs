@@ -3,7 +3,7 @@ using LogoSlideMaker.Configure;
 using LogoSlideMaker.Layout;
 using LogoSlideMaker.Primitives;
 
-namespace LogoSlideMaker.Render;
+namespace LogoSlideMaker.Export;
 
 /// <summary>
 /// Render to a presentation slide
@@ -13,7 +13,7 @@ namespace LogoSlideMaker.Render;
 /// Not to be confused with the "preview" renderer, which renders to a Win2d canvas 
 /// so user can preview before exporting.
 /// </remarks>
-public class ExportRenderEngine(RenderConfig config)
+public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
 {
     public void Render(Presentation pres, SlideLayout layout, string? dataVersion, IEnumerable<Primitive> primitives)
     {
@@ -81,8 +81,13 @@ public class ExportRenderEngine(RenderConfig config)
 
     private void Draw(ImagePrimitive primitive, ISlideShapes target)
     {
-        // TODO: Really should cache the images so don't have to keep loading them!
-        using var stream = new FileStream(primitive.Path, FileMode.Open);
+        var buffer = imageCache.GetOrDefault(primitive.Path);
+        if (buffer is null) 
+        {
+            throw new KeyNotFoundException($"No image data found for {primitive.Path}");
+        }
+
+        using var stream = new MemoryStream(buffer);
         target.AddPicture(stream);
         var pic = target.OfType<IPicture>().Last();
         pic.X = primitive.Rectangle.X;

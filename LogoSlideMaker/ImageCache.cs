@@ -4,12 +4,12 @@ using SkiaSharp;
 using Svg;
 using System.Reflection;
 
-namespace LogoSlideMaker.Cli.Services;
+namespace LogoSlideMaker.Export;
 
 /// <summary>
 /// Contains ready-to-draw canvas bitmaps for all images we may want to draw
 /// </summary>
-internal class ImageCache : IGetImageSize
+public class ImageCache : IGetImageSize
 {
     /// <summary>
     /// Base directory where files are located, or null for embedded storage
