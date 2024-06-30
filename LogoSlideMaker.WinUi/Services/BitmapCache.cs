@@ -68,8 +68,8 @@ namespace LogoSlideMaker.WinUi.Services
             return bitmaps.GetValueOrDefault(imagePath);
         }
 
-        private readonly Dictionary<string, CanvasBitmap> bitmaps = new();
-        private readonly Dictionary<string, decimal> bitmapAspectRatios = new();
+        private readonly Dictionary<string, CanvasBitmap> bitmaps = [];
+        private readonly Dictionary<string, decimal> bitmapAspectRatios = [];
 
         /// <summary>
         /// Load a single bitmap from embedded storage

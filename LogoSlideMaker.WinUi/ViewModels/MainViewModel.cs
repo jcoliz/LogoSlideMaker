@@ -148,6 +148,6 @@ namespace LogoSlideMaker.WinUi.ViewModels
 
         private Definition? _definition;
         private SlideLayout? _layout;
-        private readonly List<Primitive> _primitives = new();
+        private readonly List<Primitive> _primitives = [];
     }
 }

@@ -42,7 +42,7 @@ public sealed partial class MainWindow : Window
         this.AppWindow.SetIcon("Assets/app-icon.ico");
 
         var dpi = GetDpiForWindow(hWnd);
-        this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32((Int32)(dpi*1280/96), (Int32)(dpi*(720+64)/96)));
+        this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32(dpi*1280/96, dpi*(720+64)/96));
 
         this.canvas.CreateResources += Canvas_CreateResources;
     }
@@ -116,7 +116,7 @@ public sealed partial class MainWindow : Window
         await LoadDefinitionAsync(storageFile);
     }
 
-    void CanvasControl_Draw(
+    private void CanvasControl_Draw(
         Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender,
         Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs args)
     {
