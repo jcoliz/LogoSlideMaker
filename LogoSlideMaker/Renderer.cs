@@ -19,7 +19,7 @@ public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
     {
         var copyingSlide = pres.Slides[layout.Variant.Source];
         pres.Slides.Add(copyingSlide);
-        var slide = pres.Slides.Last();
+        var slide = pres.Slides[^1];
 
         // TODO: Does this belong here? Or should be it done higher up?
         List<string> notes = [$"Updated: {DateTime.Now:M/dd/yyyy h:mm tt K}"];
@@ -59,7 +59,7 @@ public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
     private void Draw(TextPrimitive primitive, ISlideShapes target)
     {
         target.AddRectangle(100, 100, 100, 100);
-        var shape = target.Last();
+        var shape = target[^1];
 
         shape.X = primitive.Rectangle.X;
         shape.Y = primitive.Rectangle.Y ?? 0;
@@ -70,7 +70,7 @@ public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
         tf.Text = primitive.Text;
         tf.LeftMargin = 0;
         tf.RightMargin = 0;
-        var font = tf.Paragraphs.First().Portions.First().Font;
+        var font = tf.Paragraphs[0].Portions[0].Font;
 
         font.Size = config.FontSize;
         font.LatinName = config.FontName;
@@ -81,11 +81,7 @@ public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
 
     private void Draw(ImagePrimitive primitive, ISlideShapes target)
     {
-        var buffer = imageCache.GetOrDefault(primitive.Path);
-        if (buffer is null) 
-        {
-            throw new KeyNotFoundException($"No image data found for {primitive.Path}");
-        }
+        var buffer = imageCache.GetOrDefault(primitive.Path) ?? throw new KeyNotFoundException($"No image data found for {primitive.Path}");
 
         using var stream = new MemoryStream(buffer);
         target.AddPicture(stream);
@@ -96,10 +92,10 @@ public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
         pic.Height = primitive.Rectangle.Height ?? primitive.Rectangle.Width;
     }
 
-    private void Draw(RectanglePrimitive primitive, ISlideShapes target)
+    private static void Draw(RectanglePrimitive primitive, ISlideShapes target)
     {
         target.AddRectangle(100, 100, 100, 100);
-        var shape = target.Last();
+        var shape = target[^1];
 
         shape.X = primitive.Rectangle.X;
         shape.Y = primitive.Rectangle.Y ?? 0;

@@ -1,7 +1,8 @@
-﻿using Tomlyn;
+﻿using LogoSlideMaker.Cli;
 using LogoSlideMaker.Configure;
 using LogoSlideMaker.Layout;
 using LogoSlideMaker.Export;
+using Tomlyn;
 
 //
 // OPTIONS

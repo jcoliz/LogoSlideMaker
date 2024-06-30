@@ -95,8 +95,8 @@ public class ImageCache : IGetImageAspectRatio
         return imageBuffers.GetValueOrDefault(imagePath);
     }
 
-    private readonly Dictionary<string, byte[]> imageBuffers = new();
-    private readonly Dictionary<string, decimal> imageAspectRatios = new();
+    private readonly Dictionary<string, byte[]> imageBuffers = [];
+    private readonly Dictionary<string, decimal> imageAspectRatios = [];
 
     /// <summary>
     /// Load a single image from embedded or external storage as a memory stream
@@ -127,7 +127,7 @@ public class ImageCache : IGetImageAspectRatio
         return result.GetBuffer();
     }
 
-    private decimal MeasureImage(bool isSvg, byte[] buffer)
+    private static decimal MeasureImage(bool isSvg, byte[] buffer)
     {
         using var stream = new MemoryStream(buffer);
         if (isSvg)

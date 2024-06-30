@@ -1,5 +1,7 @@
 ﻿using Mono.Options;
 
+namespace LogoSlideMaker.Cli;
+
 public class AppOptions: OptionSet
 {
 
@@ -25,7 +27,7 @@ public class AppOptions: OptionSet
     {
         var result = base.Parse(args);
 
-        String? error = null;
+        string? error = null;
 
         if (string.IsNullOrWhiteSpace(Input))
         {
@@ -49,6 +51,6 @@ public class AppOptions: OptionSet
         return result;
     }
 
-    static public string AppName => typeof(AppOptions).Assembly.GetName().Name ?? string.Empty;
-    static private string AppVersion => typeof(AppOptions).Assembly.GetName().Version?.ToString() ?? string.Empty;
+    public static string AppName => typeof(AppOptions).Assembly.GetName().Name ?? string.Empty;
+    private static string AppVersion => typeof(AppOptions).Assembly.GetName().Version?.ToString() ?? string.Empty;
 }
