@@ -12,6 +12,7 @@
     <EnableMsixTooling>true</EnableMsixTooling>
 	<Nullable>enable</Nullable>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<AssemblyTitle>Logo Slide Maker</AssemblyTitle>
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="Assets\icons8-picture-48.png" />
