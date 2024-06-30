@@ -81,13 +81,6 @@ public sealed partial class MainWindow : Window
             canvas.Invalidate();
         }
     }
-
-    private void CommandBar_Closing(object sender, object e)
-    {
-        // Never close the command bar! We always want it open
-        sender.As<CommandBar>().IsOpen = true;
-    }
-
     #endregion
 
     #region Command handlers

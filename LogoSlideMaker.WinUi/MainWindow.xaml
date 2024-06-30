@@ -16,14 +16,14 @@
             <RowDefinition Height="64" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <CommandBar x:Name="appBar" IsOpen="True" IsSticky="True" OverflowButtonVisibility="Collapsed" HorizontalAlignment="Left" Closing="CommandBar_Closing">
+        <StackPanel Orientation="Horizontal" Background="#333333">
             <AppBarButton Icon="OpenFile" Label="Open" Click="OpenFile_Click"/>
             <AppBarButton Icon="Refresh" Label="Reload" Command="{Binding Reload}" />
             <AppBarButton Icon="Back" Label="Previous" Command="{Binding PreviousSlide}" />
             <AppBarButton Icon="Forward" Label="Next" Command="{Binding NextSlide}" />
             <AppBarButton Icon="Download" Label="Export" Click="DoExport_Click"/>
-        </CommandBar>
-        <win2dcanvas:CanvasControl Grid.Row="1" x:Name="canvas" Draw="CanvasControl_Draw" ClearColor="CornflowerBlue"/>
-        <ProgressRing Grid.Row="1" IsActive="{Binding IsLoading}" Foreground="Black"/>
+        </StackPanel>
+        <win2dcanvas:CanvasControl Grid.Row="1" x:Name="canvas" Draw="CanvasControl_Draw" ClearColor="#333333"/>
+        <ProgressRing Grid.Row="1" IsActive="{Binding IsLoading}" Foreground="White"/>
     </Grid>
 </Window>
