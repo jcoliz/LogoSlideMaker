@@ -1,6 +1,4 @@
-﻿using DocumentFormat.OpenXml.InkML;
-using DocumentFormat.OpenXml.Wordprocessing;
-using LogoSlideMaker.Configure;
+﻿using LogoSlideMaker.Configure;
 using LogoSlideMaker.Export;
 using LogoSlideMaker.Layout;
 using LogoSlideMaker.Primitives;
@@ -263,6 +261,10 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
         );
     }
 
+    /// <summary>
+    /// Export current definition to presentation at <paramref name="outPath"/>
+    /// </summary>
+    /// <param name="outPath">Fully-qualified location of output presentation</param>
     public async Task ExportToAsync(string outPath)
     {
         if (_definition is null)
