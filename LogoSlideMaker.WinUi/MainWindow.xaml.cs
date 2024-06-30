@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using Windows.Foundation;
+using Windows.Storage.Pickers;
 using WinRT;
 
 namespace LogoSlideMaker.WinUi;
@@ -93,15 +94,17 @@ public sealed partial class MainWindow : Window
 
     private async void OpenFile_Click(object sender, RoutedEventArgs e)
     {
-        var picker = new Windows.Storage.Pickers.FileOpenPicker();
+        var picker = new FileOpenPicker()
+        {
+            ViewMode = PickerViewMode.List,
+            SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
+            SettingsIdentifier = "Common"
+        };
+        picker.FileTypeFilter.Add(".toml");
 
         // https://github.com/microsoft/WindowsAppSDK/issues/1188
         // Associate the HWND with the file picker
         WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
-
-        picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.List;
-        picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
-        picker.FileTypeFilter.Add(".toml");
 
         var file = await picker.PickSingleFileAsync();
         if (file != null)
@@ -112,12 +115,37 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void DoExport_Click(object sender, RoutedEventArgs e)
+    private async void DoExport_Click(object sender, RoutedEventArgs e)
     {
         // Will save this out as powerpoint file
-        // Get the default output file from the definition
+        // Get the default output file from the viewmodel
+        var path = viewModel.OutputPath;
+        if (path is null)
+        {
+            // Can't save the sample file
+            return;        
+        }
+
         // Bring up a save picker to let user have ultimate decision on file
-        // Render to slide
+        var picker = new FileSavePicker()
+        {
+            SuggestedFileName = Path.GetFileName(path),
+            DefaultFileExtension = Path.GetExtension(path),
+            SettingsIdentifier = "Common"
+        };
+        picker.FileTypeChoices.Add("PowerPoint Files", [ ".pptx" ] );
+
+        // Associate the HWND with the file picker
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
+
+        var file = await picker.PickSaveFileAsync();
+        if (file != null)
+        {
+            // Render to slide
+            var outPath = file.Path;
+            //await viewModel.ExportTo(outPath);
+        }
+
         // Give user option to launch the ppt (would be nice)
     }
 

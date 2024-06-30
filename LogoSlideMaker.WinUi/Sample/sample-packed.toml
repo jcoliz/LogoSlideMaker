@@ -1,5 +1,4 @@
 ﻿[files]
-output = "out/sample-packed.pptx"
 template.bitmaps = [ "Slide1.PNG" ]
 
 [layout]

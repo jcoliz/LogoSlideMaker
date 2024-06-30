@@ -88,6 +88,32 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
         }
     }
 
+    public string? OutputPath
+    {
+        get
+        {
+            if (_definition is null)
+            {
+                return null;            
+            }
+            if (_definition.Files?.Output is not null)
+            {
+                // output path is relative to the current definition file
+                var directory = Path.GetDirectoryName(lastOpenedFilePath) ?? "./";
+                var result = Path.Combine(directory, _definition.Files.Output);
+                return result;
+            }
+            else
+            {
+                // output path is exactly the input path, with the extension replaced to pptx
+                var directory = Path.GetDirectoryName(lastOpenedFilePath) ?? "./";
+                var file = Path.GetFileNameWithoutExtension(lastOpenedFilePath) ?? Path.GetRandomFileName();
+                var result = Path.Combine(directory, file + ".pptx");
+                return result;
+            }
+        }    
+    }
+
     /// <summary>
     /// [User Can] Reload changes made in TOML file since last (re)load
     /// </summary>
