@@ -158,6 +158,11 @@ public sealed partial class MainWindow : Window
             Trace.WriteLine("No config, skipping");
             return;
         }
+        if (!canvas.IsLoaded)
+        {
+            Trace.WriteLine("Canvas not loaded, skipping");
+            return;
+        }
         defaultTextFormat = new() { FontSize = config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
         solidBlack = new CanvasSolidColorBrush(sender, Microsoft.UI.Colors.Black);
 
