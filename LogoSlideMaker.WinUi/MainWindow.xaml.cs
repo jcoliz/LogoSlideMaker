@@ -29,7 +29,7 @@ public sealed partial class MainWindow : Window
     private readonly MainViewModel viewModel;
 
     private string? currentFile;
-    private CanvasTextFormat? tf;
+    private CanvasTextFormat? defaultTextFormat;
     private ICanvasBrush? solidBlack;
 
     private readonly BitmapCache bitmapCache = new();
@@ -62,10 +62,13 @@ public sealed partial class MainWindow : Window
         {
             if (viewModel.IsLoading)
             {
+                // When starting loading, canvas needs to redraw to blank
                 canvas.Invalidate();
             }
             else
             {
+                // When finished loading, need to load resources back in
+
                 // TODO: https://microsoft.github.io/Win2D/WinUI2/html/LoadingResourcesOutsideCreateResources.htm
                 Canvas_CreateResources(this.canvas, new CanvasCreateResourcesEventArgs(CanvasCreateResourcesReason.NewDevice));
             }
@@ -90,10 +93,14 @@ public sealed partial class MainWindow : Window
             Trace.WriteLine("No config, skipping");
             return;
         }
-        tf = new() { FontSize = config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
+        defaultTextFormat = new() { FontSize = config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
         solidBlack = new CanvasSolidColorBrush(sender, Microsoft.UI.Colors.Black);
 
         // Load (and measure) all the bitmaps
+        // NOTE: If multiple TOML files share the same path, we will re-use the previously
+        // created canvas bitmap. This could be a problem if two different TOMLs are in 
+        // different directories, and use the same relative path to refer to two different
+        // images.
         await bitmapCache.LoadAsync(sender, viewModel.ImagePaths);
 
         // Now that all the bitmaps are loaded, we now have enough information to
@@ -240,7 +247,7 @@ public sealed partial class MainWindow : Window
         session.DrawRectangle(primitive.Rectangle.AsWindowsRect(), Microsoft.UI.Colors.Blue, 1);
 #endif
         // Draw the actual text
-        session.DrawText(primitive.Text, primitive.Rectangle.AsWindowsRect(), solidBlack, tf);
+        session.DrawText(primitive.Text, primitive.Rectangle.AsWindowsRect(), solidBlack, defaultTextFormat);
     }
 
     private void Draw(ImagePrimitive primitive, CanvasDrawingSession session)
