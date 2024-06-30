@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Linq;
-using LogoSlideMaker.Primitives;
+﻿using LogoSlideMaker.Primitives;
 using SkiaSharp;
 using Svg;
 using System.Reflection;
@@ -7,19 +6,17 @@ using System.Reflection;
 namespace LogoSlideMaker.Export;
 
 /// <summary>
-/// Contains ready-to-draw canvas bitmaps for all images we may want to draw
+/// Contains ready-to-draw image data for images we may want to add to PowerPoint
+/// slides.
 /// </summary>
 public class ImageCache : IGetImageSize
 {
     /// <summary>
     /// Base directory where files are located, or null for embedded storage
     /// </summary>
-    public string? BaseDirectory 
+    public string? BaseDirectory
     {
-        get
-        {
-            return _BaseDirectory;
-        }
+        get => _BaseDirectory;
 
         set
         {
@@ -28,7 +25,7 @@ public class ImageCache : IGetImageSize
                 _BaseDirectory = ".";
             }
             else
-            {                
+            {
                 _BaseDirectory = value;
             }
         }
@@ -97,7 +94,6 @@ public class ImageCache : IGetImageSize
     /// <returns>Memory stream for this file</returns>
     private async Task<byte[]> LoadImageAsync(string filename)
     {
-
         Stream? stream = null;
         if (BaseDirectory is null)
         {
