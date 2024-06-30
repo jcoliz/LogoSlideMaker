@@ -19,6 +19,7 @@
         <CommandBar x:Name="appBar" IsOpen="True" IsSticky="True" OverflowButtonVisibility="Collapsed" HorizontalAlignment="Left" Closing="CommandBar_Closing">
             <AppBarButton Icon="OpenFile" Label="Open" Click="OpenFile_Click"/>
             <AppBarButton Icon="Refresh" Label="Reload" Command="{Binding Reload}" />
+            <AppBarButton Icon="Back" Label="Previous" Command="{Binding PreviousSlide}" />
             <AppBarButton Icon="Forward" Label="Next" Command="{Binding NextSlide}" />
             <AppBarButton Icon="Download" Label="Export" Click="DoExport_Click"/>
         </CommandBar>

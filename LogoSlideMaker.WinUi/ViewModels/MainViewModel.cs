@@ -98,6 +98,13 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
     public ICommand NextSlide => _NextSlide ??= new RelayCommand(_ => AdvanceToNextSlide());
     private ICommand? _NextSlide = null;
 
+    /// <summary>
+    /// [User Can] Rewind the preview to the previous slide
+    /// </summary>
+    public ICommand PreviousSlide => _PreviousSlide ??= new RelayCommand(_ => BackToPreviousSlide());
+    private ICommand? _PreviousSlide = null;
+
+
     #endregion
 
     #region Methods
@@ -147,6 +154,22 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
         else
         {
             ++SlideNumber;
+        }
+    }
+
+    public void BackToPreviousSlide()
+    {
+        if (_definition is null)
+        {
+            return;
+        }
+        if (SlideNumber <= 0)
+        {
+            SlideNumber = _definition.Variants.Count - 1;
+        }
+        else
+        {
+            --SlideNumber;
         }
     }
 
