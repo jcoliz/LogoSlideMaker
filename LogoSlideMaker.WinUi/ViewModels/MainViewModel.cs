@@ -7,14 +7,20 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using Tomlyn;
+using Windows.Storage;
 
 namespace LogoSlideMaker.WinUi.ViewModels;
 
 internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChanged
 {
+    #region Events
     public event PropertyChangedEventHandler? PropertyChanged = delegate { };
+    #endregion
 
+    #region Properties
     /// <summary>
     /// View needs to give us a way to dispatch onto the UI Thread
     /// </summary>
@@ -80,6 +86,23 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
         }
     }
 
+    /// <summary>
+    /// [User Can] Reload changes made in TOML file since last (re)load
+    /// </summary>
+    public ICommand Reload => _Reload ??= new RelayCommand(_ => ReloadDefinitionAsync().ContinueWith(_ => { }));
+    private ICommand? _Reload = null;
+
+    #endregion
+
+    #region Methods
+
+    public async Task LoadDefinitionAsync(string path)
+    {
+        lastOpenedFilePath = path;
+        using var stream = File.OpenRead(path);
+        await Task.Run(() => { LoadDefinition(stream); });
+    }
+
     public void LoadDefinition(Stream stream)
     {
         _primitives.Clear();
@@ -97,17 +120,12 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
         IsLoading = false;
     }
 
-    private void PopulateLayout()
+    public async Task ReloadDefinitionAsync()
     {
-        if (_definition is null)
+        if (!string.IsNullOrEmpty(lastOpenedFilePath))
         {
-            return;
+            await LoadDefinitionAsync(lastOpenedFilePath);
         }
-
-        var variant = _definition.Variants.Count > 0 ? _definition.Variants[_slideNumber] : new Variant();
-
-        var engine = new LayoutEngine(_definition, variant);
-        _layout = engine.CreateSlideLayout();
     }
 
     /// <summary>
@@ -172,15 +190,37 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
             )
         );
     }
+    #endregion
 
-    public void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    #region Internals
+    private void PopulateLayout()
+    {
+        if (_definition is null)
+        {
+            return;
+        }
+
+        var variant = _definition.Variants.Count > 0 ? _definition.Variants[_slideNumber] : new Variant();
+
+        var engine = new LayoutEngine(_definition, variant);
+        _layout = engine.CreateSlideLayout();
+    }
+
+
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         // Raise the PropertyChanged event, passing the name of the property whose value has changed.
         // And be sure to do it on UI thread, because we may be running on a BG thread
         UIAction(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)));
     }
+    #endregion
+
+    #region Fields
 
     private Definition? _definition;
     private SlideLayout? _layout;
     private readonly List<Primitive> _primitives = [];
+    private string? lastOpenedFilePath;
+
+    #endregion
 }

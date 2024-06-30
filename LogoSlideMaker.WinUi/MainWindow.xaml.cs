@@ -28,7 +28,6 @@ public sealed partial class MainWindow : Window
 {
     private readonly MainViewModel viewModel;
 
-    private string? currentFile;
     private CanvasTextFormat? defaultTextFormat;
     private ICanvasBrush? solidBlack;
 
@@ -123,35 +122,6 @@ public sealed partial class MainWindow : Window
         await Task.Run(() => { viewModel.LoadDefinition(stream); });
     }
 
-    private async Task LoadDefinitionAsync(StorageFile storageFile)
-    {
-        currentFile = storageFile.Path;
-
-        using var stream = await storageFile.OpenStreamForReadAsync();
-
-        bitmapCache.BaseDirectory = Path.GetDirectoryName(currentFile);
-
-        await Task.Run(() => { viewModel.LoadDefinition(stream); });
-    }
-
-    /// <summary>
-    /// [User Can] Reload changes made in TOML file since last (re)load
-    /// </summary>
-    /// <remarks>
-    /// This should be moved to ViewModel and use an ICommand
-    /// </remarks>
-    private async Task ReloadAsync()
-    {
-        if (currentFile is null)
-        {
-            return;        
-        }
-
-        var storageFile = await StorageFile.GetFileFromPathAsync(currentFile);
-
-        await LoadDefinitionAsync(storageFile);
-    }
-
     private void CanvasControl_Draw(
         Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender,
         Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs args)
@@ -177,13 +147,10 @@ public sealed partial class MainWindow : Window
         var file = await picker.PickSingleFileAsync();
         if (file != null)
         {
-            await LoadDefinitionAsync(file);
+            var path = file.Path;
+            bitmapCache.BaseDirectory = Path.GetDirectoryName(path);
+            await viewModel.LoadDefinitionAsync(path);
         }
-    }
-
-    private async void Reload_Click(object sender, RoutedEventArgs e)
-    {
-        await ReloadAsync();
     }
 
     private void DoExport_Click(object sender, RoutedEventArgs e)

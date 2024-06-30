@@ -46,6 +46,6 @@ auto_flow = true
 [[boxes]]
 logos.1 = [ "wine", "wine", "wine", "wine", "wine", "wine" ]
 logos.2 = [ "wine", "wine", "wine", "wine", "wine", "wine" ]
-outer = { x = 6.85, y = 3.91, width = 6.15, height = 3.26 }
+outer = { x = 6.85, y = 4.91, width = 6.15, height = 3.26 }
 min_columns = 4
 auto_flow = true
