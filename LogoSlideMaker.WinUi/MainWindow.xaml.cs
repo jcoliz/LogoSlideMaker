@@ -172,7 +172,7 @@ public sealed partial class MainWindow : Window
         // So, what I'll ultimately do is need to bring up a picker dialog.
         // For now, we'll simply cycle through the available slides
 
-        int current = viewModel.SlideNumber++;
+        var current = viewModel.SlideNumber++;
         if (viewModel.SlideNumber == current)
         {
             viewModel.SlideNumber = 0;
