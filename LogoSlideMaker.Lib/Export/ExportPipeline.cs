@@ -34,7 +34,12 @@ public class ExportPipeline
         // Open template or create new presentation
         var pres = !string.IsNullOrWhiteSpace(templatePath) ? new Presentation(templatePath) : new Presentation();
 
-        foreach (var variant in definition.Variants)
+        // If there isn't a specified variant, default to an EMPTY one
+        // TODO: Perhaps better to do this on LOAD
+        var variants = definition.Variants.Count > 0 ? definition.Variants : [new()];
+
+        // RUn each variant through pipeline
+        foreach (var variant in variants)
         {
             // Layout
             var layout = new LayoutEngine(definition, variant).CreateSlideLayout();

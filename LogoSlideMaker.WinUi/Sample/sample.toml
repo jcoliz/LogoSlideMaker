@@ -1,5 +1,6 @@
 ﻿[files]
 template.bitmaps = [ "Slide1.PNG" ]
+template.slides = "template.pptx"
 output = "out/sample-out.pptx"
 
 [layout]

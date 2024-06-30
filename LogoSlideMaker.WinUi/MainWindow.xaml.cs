@@ -143,7 +143,9 @@ public sealed partial class MainWindow : Window
         {
             // Render to slide
             var outPath = file.Path;
-            //await viewModel.ExportTo(outPath);
+
+            // TODO: Loading affordance would be nice
+            await viewModel.ExportToAsync(outPath);
         }
 
         // Give user option to launch the ppt (would be nice)

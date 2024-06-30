@@ -1,4 +1,7 @@
-﻿using LogoSlideMaker.Configure;
+﻿using DocumentFormat.OpenXml.InkML;
+using DocumentFormat.OpenXml.Wordprocessing;
+using LogoSlideMaker.Configure;
+using LogoSlideMaker.Export;
 using LogoSlideMaker.Layout;
 using LogoSlideMaker.Primitives;
 using System;
@@ -256,9 +259,34 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
                         Height = x.Outer.Height * 96m
                     }
                 }
-            )
+        )
         );
     }
+
+    public async Task ExportToAsync(string outPath)
+    {
+        if (_definition is null)
+        {
+            return;        
+        }
+        var exportPipeline = new ExportPipeline(_definition);
+
+        var directory = Path.GetDirectoryName(lastOpenedFilePath)!;
+
+        // TODO: Would be much better to do this when the definition is LOADED, because we'll
+        // already be on a loading screen at that point!
+        await exportPipeline.LoadAndMeasureAsync(directory);
+
+        var templatePath = _definition.Files?.Template?.Slides;
+        if (templatePath is not null) 
+        { 
+            templatePath = Path.Combine(directory, templatePath);
+        }
+
+        // TODO: Need a way to inject version (How are we even going to GET it??)
+        exportPipeline.Save(templatePath, outPath, null);
+    }
+
     #endregion
 
     #region Internals
