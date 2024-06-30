@@ -72,6 +72,9 @@ public sealed partial class MainWindow : Window
 
                 // TODO: https://microsoft.github.io/Win2D/WinUI2/html/LoadingResourcesOutsideCreateResources.htm
                 Canvas_CreateResources(this.canvas, new CanvasCreateResourcesEventArgs(CanvasCreateResourcesReason.NewDevice));
+
+                // TODO: I think this is actually incorrect. If the canvas_createresources is the thing that takes too long,
+                // the loading wheel will not still be up
             }
         }
 
@@ -141,7 +144,7 @@ public sealed partial class MainWindow : Window
             await viewModel.ExportToAsync(outPath);
         }
 
-        // Give user option to launch the ppt (would be nice)
+        // TODO: Give user option to launch the ppt (would be nice)
     }
 
     #endregion
