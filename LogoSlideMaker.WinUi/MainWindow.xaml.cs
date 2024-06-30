@@ -47,8 +47,8 @@ public sealed partial class MainWindow : Window
         this.canvas.CreateResources += Canvas_CreateResources;
     }
 
-    [DllImport("User32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-    private static extern int GetDpiForWindow(IntPtr hwnd);
+    [LibraryImport("User32.dll", SetLastError = true)]
+    private static partial int GetDpiForWindow(IntPtr hwnd);
 
     /// <summary>
     /// Get the current window's HWND by passing in the Window object
@@ -229,7 +229,7 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void Draw(RectanglePrimitive primitive, CanvasDrawingSession session)
+    private static void Draw(RectanglePrimitive primitive, CanvasDrawingSession session)
     {
         if (primitive.Fill)
         {
