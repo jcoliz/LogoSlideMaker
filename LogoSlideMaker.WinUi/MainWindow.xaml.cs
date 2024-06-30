@@ -21,7 +21,7 @@ using WinRT;
 namespace LogoSlideMaker.WinUi;
 
 /// <summary>
-/// An empty window that can be used on its own or navigated to within a Frame.
+/// Logo slide layout previewer
 /// </summary>
 public sealed partial class MainWindow : Window
 {
@@ -39,9 +39,7 @@ public sealed partial class MainWindow : Window
 
         this.InitializeComponent();
         this.LoadDefinition_Embedded();
-
-        // TODO: Would be nice to have a better icon, but that's a pain. Will come back to it!
-        // https://github.com/microsoft/microsoft-ui-xaml/issues/4056
+        this.AppWindow.SetIcon("Assets/app-icon.ico");
 
         var dpi = GetDpiForWindow(hWnd);
         this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32((Int32)(dpi*1280/96), (Int32)(dpi*(720+64)/96)));
@@ -59,10 +57,13 @@ public sealed partial class MainWindow : Window
 
     private async void Canvas_CreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs args)
     {
+        // Create some static resource we'll use as part of drawing
+        // TODO: Probably should be in viewmodel
         var config = viewModel.RenderConfig!;
         tf = new() { FontSize = config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
         solidBlack = new CanvasSolidColorBrush(sender, Microsoft.UI.Colors.Black);
 
+        // Load (and measure) all the bitmaps
         await bitmapCache.LoadAsync(sender, viewModel.ImagePaths);
 
         // Now that all the bitmaps are loaded, we now have enough information to
@@ -97,7 +98,12 @@ public sealed partial class MainWindow : Window
         Canvas_CreateResources(this.canvas, new CanvasCreateResourcesEventArgs( CanvasCreateResourcesReason.NewDevice));
     }
 
-
+    /// <summary>
+    /// [User Can] Reload changes made in TOML file since last (re)load
+    /// </summary>
+    /// <remarks>
+    /// This should be moved to ViewModel and use an ICommand
+    /// </remarks>
     private async Task ReloadAsync()
     {
         if (currentFile is null)
