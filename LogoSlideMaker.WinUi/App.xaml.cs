@@ -25,6 +25,14 @@ public partial class App : Application
         this.InitializeComponent();
 
         //
+        // Set up a console window
+        //
+        // Useful to observe logs
+        // Remove this if you don't want to see a console window with logs
+        //
+        ConsoleAllocator.ShowConsoleWindow();
+
+        //
         // Set up .NET generic host
         //
         // https://learn.microsoft.com/en-us/dotnet/core/extensions/generic-host
@@ -71,7 +79,7 @@ public partial class App : Application
     /// Invoked when the application is launched.
     /// </summary>
     /// <param name="args">Details about the launch request and process.</param>
-    protected override async void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+    protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
         await _host.StartAsync();
         
