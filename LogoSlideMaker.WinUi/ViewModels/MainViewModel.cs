@@ -37,11 +37,20 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
     /// </summary>
     public Action<Action> UIAction { get; set; } = (x => x());
 
+    /// <summary>
+    /// Drawing primitives needed to render the current slide
+    /// </summary>
     public IReadOnlyList<Primitive> Primitives => _primitives;
 
+    /// <summary>
+    /// All the image paths we would need to render
+    /// </summary>
     public IEnumerable<string> ImagePaths =>
         _definition?.Logos.Select(x => x.Value.Path).Concat(_definition.Files.Template.Bitmaps) ?? [];
 
+    /// <summary>
+    /// Current rendering configuration
+    /// </summary>
     public RenderConfig? RenderConfig => _definition?.Render;
 
     /// <summary>
@@ -53,19 +62,30 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
         get => _slideNumber;
         set
         {
-            if (_definition is not null && value < _definition.Variants.Count && value != _slideNumber)
+            try
             {
-                _slideNumber = value;
+                if (_definition is not null && value < _definition.Variants.Count && value != _slideNumber)
+                {
+                    _slideNumber = value;
 
-                PopulateLayout();
-                GeneratePrimitives();
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(DocumentSubtitle));
+                    PopulateLayout();
+                    GeneratePrimitives();
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(DocumentSubtitle));
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "SlideNumber: Failed to advance to {value}", value);
+
             }
         }
     }
     private int _slideNumber = 0;
 
+    /// <summary>
+    /// Whether we are undergoing a loading operation
+    /// </summary>
     public bool IsLoading
     {
         get => _IsLoading;
@@ -99,6 +119,9 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
         }
     }
 
+    /// <summary>
+    /// Default file to which exported slides should be output
+    /// </summary>
     public string? OutputPath
     {
         get
@@ -125,6 +148,9 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
         }    
     }
 
+    /// <summary>
+    /// Name of the overall document (definition) being shown
+    /// </summary>
     public string DocumentTitle
     {
         get
@@ -140,6 +166,10 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
             return _definition.Layout.Title;
         }
     }
+
+    /// <summary>
+    /// Subtitle of the overall document (definition) being shown
+    /// </summary>
 
     public string DocumentSubtitle
     {
@@ -189,6 +219,10 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
 
     #region Methods
 
+    /// <summary>
+    /// Load a definition from the specified <paramref name="path"/>
+    /// </summary>
+    /// <param name="path">Where to look for a definition file</param>
     public async Task LoadDefinitionAsync(string? path)
     {
         try
@@ -196,48 +230,29 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
             lastOpenedFilePath = path;
             using var stream = path is null ? OpenEmbeddedDefinition() : File.OpenRead(path);
             await Task.Run(() => { LoadDefinition(stream); });
+            logger.LogInformation("LoadDefinitionAsync: OK");
         }
         catch (Exception ex)
         {
             // TODO: Actually need to surface these to user. But for now, just dont crash
 
             lastOpenedFilePath = null;
-            logger.LogError("LoadDefinitionAsync: Failed");
+            logger.LogError(ex,"LoadDefinitionAsync: Failed");
         }
     }
 
-    public void LoadDefinition(Stream stream)
-    {
-        try
-        {
-            _primitives.Clear();
-            IsLoading = true;
-
-            var sr = new StreamReader(stream);
-            var toml = sr.ReadToEnd();
-            _definition = Toml.ToModel<Definition>(toml);
-            SlideNumber = 0;
-
-            PopulateLayout();
-
-            UIAction(() => DefinitionLoaded?.Invoke(this, new EventArgs()));
-            OnPropertyChanged(nameof(DocumentTitle));
-            OnPropertyChanged(nameof(DocumentSubtitle));
-
-            logger.LogInformation("LoadDefinition: OK {title}", DocumentTitle);
-        }
-        catch (Exception ex)
-        {
-            lastOpenedFilePath = null;
-            logger.LogError("LoadDefinition: Failed");
-        }
-    }
-
+    /// <summary>
+    /// Reload the last opened definition
+    /// </summary>
+    /// <returns></returns>
     public async Task ReloadDefinitionAsync()
     {
         await LoadDefinitionAsync(lastOpenedFilePath);
     }
 
+    /// <summary>
+    /// Show the next slide in sequence
+    /// </summary>
     public void AdvanceToNextSlide()
     {
         if (_definition is null)
@@ -254,6 +269,9 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
         }
     }
 
+    /// <summary>
+    /// Show the previous slide in sequence
+    /// </summary>
     public void BackToPreviousSlide()
     {
         if (_definition is null)
@@ -365,6 +383,10 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
 
     #region Internals
 
+    /// <summary>
+    /// Open the default definition embedded into the app
+    /// </summary>
+    /// <returns>Stream to emdedded definition</returns>
     private Stream OpenEmbeddedDefinition()
     {
         var filename = "sample.toml";
@@ -375,6 +397,40 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
         return stream;
     }
 
+    /// <summary>
+    /// Load a definition from the specified <paramref name="stream"/>
+    /// </summary>
+    /// <param name="stream">Stream of definition file</param>
+    private void LoadDefinition(Stream stream)
+    {
+        try
+        {
+            _primitives.Clear();
+            IsLoading = true;
+
+            var sr = new StreamReader(stream);
+            var toml = sr.ReadToEnd();
+            _definition = Toml.ToModel<Definition>(toml);
+            SlideNumber = 0;
+
+            PopulateLayout();
+
+            UIAction(() => DefinitionLoaded?.Invoke(this, new EventArgs()));
+            OnPropertyChanged(nameof(DocumentTitle));
+            OnPropertyChanged(nameof(DocumentSubtitle));
+
+            logger.LogInformation("LoadDefinition: OK {title}", DocumentTitle);
+        }
+        catch (Exception ex)
+        {
+            lastOpenedFilePath = null;
+            logger.LogError(ex, "LoadDefinition: Failed");
+        }
+    }
+
+    /// <summary>
+    /// Create a slide layout for the current slide
+    /// </summary>
     private void PopulateLayout()
     {
         if (_definition is null)
@@ -388,6 +444,10 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
         _layout = engine.CreateSlideLayout();
     }
 
+    /// <summary>
+    /// Raise the property changed event for <paramref name="propertyName"/>
+    /// </summary>
+    /// <param name="propertyName">Name of property that changed</param>
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         // Raise the PropertyChanged event, passing the name of the property whose value has changed.

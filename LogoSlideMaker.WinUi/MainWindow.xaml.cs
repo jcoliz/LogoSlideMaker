@@ -56,11 +56,16 @@ public sealed partial class MainWindow : Window
             this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32(dpi * 1280 / 96, dpi * (720 + 64) / 96));
 
             bitmapCache.BaseDirectory = Path.GetDirectoryName(viewModel.lastOpenedFilePath);
-            this.viewModel.ReloadDefinitionAsync().ContinueWith(_ => { });
+            this.viewModel.ReloadDefinitionAsync().ContinueWith(_ => 
+            {
+                logger.LogInformation("Main Window: Reload OK");
+            });
+
+            _logger.LogInformation("Main Window: OK");
         }
         catch (Exception ex)
         {
-            _logger.LogCritical(ex, "Failed to start up");
+            _logger.LogCritical(ex, "Main Window: Failed to start up");
         }
     }
 
@@ -206,6 +211,8 @@ public sealed partial class MainWindow : Window
             defaultTextFormat = new() { FontSize = config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
             solidBlack = new CanvasSolidColorBrush(sender, Microsoft.UI.Colors.Black);
 
+            logger.LogInformation("Create Resources: Loading...");
+
             // Load (and measure) all the bitmaps
             // NOTE: If multiple TOML files share the same path, we will re-use the previously
             // created canvas bitmap. This could be a problem if two different TOMLs are in 
@@ -221,7 +228,6 @@ public sealed partial class MainWindow : Window
             viewModel.IsLoading = false;
 
             logger.LogInformation("Create Resources: OK");
-
         }
         catch (Exception ex)
         {
