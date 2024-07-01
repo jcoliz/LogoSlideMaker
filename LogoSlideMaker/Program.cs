@@ -24,6 +24,28 @@ var sr = new StreamReader(options.Input!);
 var toml = sr.ReadToEnd();
 var definitions = Toml.ToModel<Definition>(toml);
 
+if (!string.IsNullOrWhiteSpace(options.Template))
+{
+    definitions.Files.Template.Slides = options.Template;
+}
+
+if (options.Listing)
+{
+    definitions.Render.Listing = true;
+}
+
+if (!string.IsNullOrWhiteSpace(options.Output))
+{
+    definitions.Files.Output = options.Output;
+}
+
+if (string.IsNullOrWhiteSpace(definitions.Files.Output))
+{
+    Console.WriteLine();
+    Console.WriteLine($"ERROR: Must specify output file");
+    return -1;
+}
+
 //
 // LOAD IMAGES
 //
@@ -35,14 +57,7 @@ await exportPipeline.LoadAndMeasureAsync(Path.GetDirectoryName(options.Input)!);
 // EXPORT
 //
 
-if (string.IsNullOrWhiteSpace(definitions.Files.Output))
-{
-    Console.WriteLine();
-    Console.WriteLine($"ERROR: Must specify output file");
-    return -1;
-}
-
-exportPipeline.Save(options.Template, definitions.Files.Output, options.Version);
+exportPipeline.Save(definitions.Files.Template.Slides, definitions.Files.Output, options.Version);
 
 //
 // LISTING
