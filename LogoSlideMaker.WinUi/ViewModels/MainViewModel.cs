@@ -326,7 +326,7 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
 
     #region Internal Properties
 
-    private string? lastOpenedFilePath
+    public string? lastOpenedFilePath
     {
         get => (string?)ApplicationData.Current.LocalSettings.Values[nameof(lastOpenedFilePath)];
         set

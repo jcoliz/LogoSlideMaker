@@ -50,6 +50,7 @@ public sealed partial class MainWindow : Window
         var dpi = GetDpiForWindow(hWnd);
         this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32(dpi*1280/96, dpi*(720+64)/96));
 
+        bitmapCache.BaseDirectory = Path.GetDirectoryName(viewModel.lastOpenedFilePath);
         this.viewModel.ReloadDefinitionAsync().ContinueWith(_ => { });
     }
 
