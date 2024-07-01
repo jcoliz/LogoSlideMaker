@@ -21,7 +21,16 @@ public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
         pres.Slides.Add(copyingSlide);
         var slide = pres.Slides[^1];
 
-        // TODO: Does this belong here? Or should be it done higher up?
+        //
+        // Update Description Field
+        //
+
+        SetDescription(layout,slide.Shapes);
+
+        //
+        // Set Slide Notes
+        //
+
         List<string> notes = [$"Updated: {DateTime.Now:M/dd/yyyy h:mm tt K}"];
         if (dataVersion is not null)
         {
@@ -30,10 +39,44 @@ public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
         notes.Add($"Logo count: {layout.Logos.Count(y => y.Logo != null)}");
         slide.AddNotes(notes);
 
+        //
+        // Draw primitives
+        //
+
         foreach (var p in primitives)
         {
             Draw(p, slide.Shapes);
         }
+    }
+
+    private void SetDescription(SlideLayout layout, ISlideShapes target)
+    {
+        // Fill in description field
+        var num_description_lines = layout.Variant.Description.Count();
+        if (num_description_lines > 0)
+        {
+            var description_box = target.TryGetByName<IShape>("Description");
+            if (description_box is not null)
+            {
+                var tf = description_box.TextFrame;
+
+                // Ensure there are enough paragraphs to insert text
+                while (tf.Paragraphs.Count < num_description_lines)
+                {
+                    tf.Paragraphs.Add();
+                }
+
+                var queue = new Queue<string>(layout.Variant.Description);
+                foreach(var para in tf.Paragraphs)
+                {
+                    if (queue.Count == 0)
+                    {
+                        break;
+                    }
+                    para.Text = queue.Dequeue();
+                }
+            }
+        }        
     }
 
     private void Draw(Primitive primitive, ISlideShapes target)
