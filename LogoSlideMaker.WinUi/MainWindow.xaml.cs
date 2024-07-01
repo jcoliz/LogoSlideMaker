@@ -88,6 +88,12 @@ public sealed partial class MainWindow : Window
             canvas.Invalidate();
         }
     }
+
+    private void Window_Closed(object sender, WindowEventArgs args)
+    {
+        Application.Current.Exit();
+    }
+
     #endregion
 
     #region Command handlers
@@ -214,10 +220,12 @@ public sealed partial class MainWindow : Window
             // Now we are really done loading
             viewModel.IsLoading = false;
 
+            logger.LogInformation("Create Resources: OK");
+
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Create Resources failed");
+            logger.LogError(ex, "Create Resources: failed");
         }
     }
 

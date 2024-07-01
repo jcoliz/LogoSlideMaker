@@ -9,6 +9,7 @@
     xmlns:win2dcanvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
     mc:Ignorable="d"
     Title="Logo Slide Maker"
+    Closed="Window_Closed"
     >
 
     <Grid x:Name="Root">

@@ -2,6 +2,7 @@
 using LogoSlideMaker.Export;
 using LogoSlideMaker.Layout;
 using LogoSlideMaker.Primitives;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,7 +17,7 @@ using Windows.Storage;
 
 namespace LogoSlideMaker.WinUi.ViewModels;
 
-public class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChanged
+public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> logger): INotifyPropertyChanged
 {
     #region Events
     /// <summary>
@@ -190,26 +191,46 @@ public class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChanged
 
     public async Task LoadDefinitionAsync(string? path)
     {
-        lastOpenedFilePath = path;
-        using var stream = path is null ? OpenEmbeddedDefinition() : File.OpenRead(path);
-        await Task.Run(() => { LoadDefinition(stream); });
+        try
+        {
+            lastOpenedFilePath = path;
+            using var stream = path is null ? OpenEmbeddedDefinition() : File.OpenRead(path);
+            await Task.Run(() => { LoadDefinition(stream); });
+        }
+        catch (Exception ex)
+        {
+            // TODO: Actually need to surface these to user. But for now, just dont crash
+
+            lastOpenedFilePath = null;
+            logger.LogError("LoadDefinitionAsync: Failed");
+        }
     }
 
     public void LoadDefinition(Stream stream)
     {
-        _primitives.Clear();
-        IsLoading = true;
+        try
+        {
+            _primitives.Clear();
+            IsLoading = true;
 
-        var sr = new StreamReader(stream);
-        var toml = sr.ReadToEnd();
-        _definition = Toml.ToModel<Definition>(toml);
-        SlideNumber = 0;
+            var sr = new StreamReader(stream);
+            var toml = sr.ReadToEnd();
+            _definition = Toml.ToModel<Definition>(toml);
+            SlideNumber = 0;
 
-        PopulateLayout();
+            PopulateLayout();
 
-        UIAction(() => DefinitionLoaded?.Invoke(this, new EventArgs()));
-        OnPropertyChanged(nameof(DocumentTitle));
-        OnPropertyChanged(nameof(DocumentSubtitle));
+            UIAction(() => DefinitionLoaded?.Invoke(this, new EventArgs()));
+            OnPropertyChanged(nameof(DocumentTitle));
+            OnPropertyChanged(nameof(DocumentSubtitle));
+
+            logger.LogInformation("LoadDefinition: OK {title}", DocumentTitle);
+        }
+        catch (Exception ex)
+        {
+            lastOpenedFilePath = null;
+            logger.LogError("LoadDefinition: Failed");
+        }
     }
 
     public async Task ReloadDefinitionAsync()
