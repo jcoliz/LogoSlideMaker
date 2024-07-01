@@ -19,7 +19,15 @@ namespace LogoSlideMaker.WinUi.ViewModels;
 internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChanged
 {
     #region Events
+    /// <summary>
+    /// One of our properties has changed
+    /// </summary>
     public event PropertyChangedEventHandler? PropertyChanged = delegate { };
+
+    /// <summary>
+    /// A new definition has been loaded
+    /// </summary>
+    public event EventHandler<EventArgs>? DefinitionLoaded = delegate { }; 
     #endregion
 
     #region Properties
@@ -155,10 +163,7 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
 
         PopulateLayout();
 
-        // Note that the view listens for this, and does its
-        // part after we're done loading, including a call back to
-        // GeneratePrimitives()
-        IsLoading = false;
+        UIAction(() => DefinitionLoaded?.Invoke(this, new EventArgs()));
     }
 
     public async Task ReloadDefinitionAsync()

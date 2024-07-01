@@ -43,6 +43,8 @@ public sealed partial class MainWindow : Window
             UIAction = x => this.DispatcherQueue.TryEnqueue(() => x())
         };
         viewModel.PropertyChanged += ViewModel_PropertyChanged;
+        viewModel.DefinitionLoaded += ViewModel_DefinitionLoaded;
+
         this.Root.DataContext = viewModel;
 
         this.AppWindow.SetIcon("Assets/app-icon.ico");
@@ -58,25 +60,18 @@ public sealed partial class MainWindow : Window
 
     #region Event handlers
 
+    private void ViewModel_DefinitionLoaded(object? sender, EventArgs e)
+    {
+        // TODO: https://microsoft.github.io/Win2D/WinUI2/html/LoadingResourcesOutsideCreateResources.htm
+        this.Canvas_CreateResources(this.canvas, new CanvasCreateResourcesEventArgs(CanvasCreateResourcesReason.NewDevice));
+    }
+
     private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(MainViewModel.IsLoading))
         {
-            if (viewModel.IsLoading)
-            {
-                // When starting loading, canvas needs to redraw to blank
-                canvas.Invalidate();
-            }
-            else
-            {
-                // When finished loading, need to load resources back in
-
-                // TODO: https://microsoft.github.io/Win2D/WinUI2/html/LoadingResourcesOutsideCreateResources.htm
-                Canvas_CreateResources(this.canvas, new CanvasCreateResourcesEventArgs(CanvasCreateResourcesReason.NewDevice));
-
-                // TODO: I think this is actually incorrect. If the canvas_createresources is the thing that takes too long,
-                // the loading wheel will not still be up
-            }
+            // When starting loading, canvas needs to redraw to blank
+            canvas.Invalidate();
         }
 
         if (e.PropertyName == nameof(MainViewModel.SlideNumber))
@@ -181,8 +176,8 @@ public sealed partial class MainWindow : Window
         // generate the drawing primitives so we can render them.
         viewModel.GeneratePrimitives();
 
-        // All has changed, redraw!
-        canvas.Invalidate();
+        // Now we are really done loading
+        viewModel.IsLoading = false;
     }
 
     private void CanvasControl_Draw(
