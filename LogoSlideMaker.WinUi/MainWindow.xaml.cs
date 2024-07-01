@@ -1,6 +1,7 @@
 using LogoSlideMaker.Primitives;
 using LogoSlideMaker.WinUi.Services;
 using LogoSlideMaker.WinUi.ViewModels;
+using Microsoft.Extensions.Logging;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
 using Microsoft.Graphics.Canvas.Text;
@@ -28,29 +29,39 @@ public sealed partial class MainWindow : Window
     private CanvasTextFormat? defaultTextFormat;
     private ICanvasBrush? solidBlack;
     private readonly BitmapCache bitmapCache;
+    private readonly ILogger<MainWindow> logger;
 
     #endregion
 
     #region Constructor
 
-    public MainWindow(MainViewModel _viewModel, BitmapCache _bitmapCache)
+    public MainWindow(MainViewModel _viewModel, BitmapCache _bitmapCache, ILogger<MainWindow> _logger)
     {
-        this.InitializeComponent();
+        try
+        {
+            viewModel = _viewModel;
+            bitmapCache = _bitmapCache;
+            logger = _logger;
 
-        viewModel = _viewModel;
-        viewModel.UIAction = x => this.DispatcherQueue.TryEnqueue(() => x());
-        viewModel.PropertyChanged += ViewModel_PropertyChanged;
-        viewModel.DefinitionLoaded += ViewModel_DefinitionLoaded;
-        this.Root.DataContext = viewModel;
+            this.InitializeComponent();
 
-        this.AppWindow.SetIcon("Assets/app-icon.ico");
+            viewModel.UIAction = x => this.DispatcherQueue.TryEnqueue(() => x());
+            viewModel.PropertyChanged += ViewModel_PropertyChanged;
+            viewModel.DefinitionLoaded += ViewModel_DefinitionLoaded;
+            this.Root.DataContext = viewModel;
 
-        var dpi = GetDpiForWindow(hWnd);
-        this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32(dpi*1280/96, dpi*(720+64)/96));
+            this.AppWindow.SetIcon("Assets/app-icon.ico");
 
-        bitmapCache = _bitmapCache;
-        bitmapCache.BaseDirectory = Path.GetDirectoryName(viewModel.lastOpenedFilePath);
-        this.viewModel.ReloadDefinitionAsync().ContinueWith(_ => { });
+            var dpi = GetDpiForWindow(hWnd);
+            this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32(dpi * 1280 / 96, dpi * (720 + 64) / 96));
+
+            bitmapCache.BaseDirectory = Path.GetDirectoryName(viewModel.lastOpenedFilePath);
+            this.viewModel.ReloadDefinitionAsync().ContinueWith(_ => { });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical(ex, "Failed to start up");
+        }
     }
 
     #endregion
@@ -83,61 +94,86 @@ public sealed partial class MainWindow : Window
 
     private async void OpenFile_Click(object sender, RoutedEventArgs e)
     {
-        var picker = new FileOpenPicker()
+        try
         {
-            ViewMode = PickerViewMode.List,
-            SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
-            SettingsIdentifier = "Common"
-        };
-        picker.FileTypeFilter.Add(".toml");
+            var picker = new FileOpenPicker()
+            {
+                ViewMode = PickerViewMode.List,
+                SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
+                SettingsIdentifier = "Common"
+            };
+            picker.FileTypeFilter.Add(".toml");
 
-        // https://github.com/microsoft/WindowsAppSDK/issues/1188
-        // Associate the HWND with the file picker
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
+            // https://github.com/microsoft/WindowsAppSDK/issues/1188
+            // Associate the HWND with the file picker
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
 
-        var file = await picker.PickSingleFileAsync();
-        if (file != null)
+            var file = await picker.PickSingleFileAsync();
+            if (file != null)
+            {
+                var path = file.Path;
+                bitmapCache.BaseDirectory = Path.GetDirectoryName(path);
+                await viewModel.LoadDefinitionAsync(path);
+                logger.LogInformation("OpenFile: OK loaded chosen file {path}", path);
+            }
+            else
+            {
+                logger.LogInformation("OpenFile: No file chosen");
+            }
+        }
+        catch (Exception ex)
         {
-            var path = file.Path;
-            bitmapCache.BaseDirectory = Path.GetDirectoryName(path);
-            await viewModel.LoadDefinitionAsync(path);
+            logger.LogError(ex, "OpenFile failed");
         }
     }
 
     private async void DoExport_Click(object sender, RoutedEventArgs e)
     {
-        // Will save this out as powerpoint file
-        // Get the default output file from the viewmodel
-        var path = viewModel.OutputPath;
-        if (path is null)
+        try
         {
-            // Can't save the sample file
-            return;        
+            // Will save this out as powerpoint file
+            // Get the default output file from the viewmodel
+            var path = viewModel.OutputPath;
+            if (path is null)
+            {
+                // Can't save the sample file
+                return;
+            }
+
+            // Bring up a save picker to let user have ultimate decision on file
+            var picker = new FileSavePicker()
+            {
+                SuggestedFileName = Path.GetFileName(path),
+                DefaultFileExtension = Path.GetExtension(path),
+                SettingsIdentifier = "Common"
+            };
+            picker.FileTypeChoices.Add("PowerPoint Files", [".pptx"]);
+
+            // Associate the HWND with the file picker
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
+
+            var file = await picker.PickSaveFileAsync();
+            if (file != null)
+            {
+                // Render to slide
+                var outPath = file.Path;
+
+                // TODO: Loading affordance would be nice
+                await viewModel.ExportToAsync(outPath);
+
+                logger.LogInformation("OpenFile: OK exported {path}", path);
+            }
+            else
+            {
+                logger.LogInformation("OpenFile: No file chosen");
+            }
+
+            // TODO: Give user option to launch the ppt (would be nice)
         }
-
-        // Bring up a save picker to let user have ultimate decision on file
-        var picker = new FileSavePicker()
+        catch (Exception ex)
         {
-            SuggestedFileName = Path.GetFileName(path),
-            DefaultFileExtension = Path.GetExtension(path),
-            SettingsIdentifier = "Common"
-        };
-        picker.FileTypeChoices.Add("PowerPoint Files", [ ".pptx" ] );
-
-        // Associate the HWND with the file picker
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
-
-        var file = await picker.PickSaveFileAsync();
-        if (file != null)
-        {
-            // Render to slide
-            var outPath = file.Path;
-
-            // TODO: Loading affordance would be nice
-            await viewModel.ExportToAsync(outPath);
+            logger.LogError(ex, "Export failed");
         }
-
-        // TODO: Give user option to launch the ppt (would be nice)
     }
 
     #endregion
@@ -146,44 +182,59 @@ public sealed partial class MainWindow : Window
 
     private async void Canvas_CreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs args)
     {
-        // Create some static resource we'll use as part of drawing
-        // Not in view model because we don't want any UI namespaces in there
-        var config = viewModel.RenderConfig;
-        if (config is null)
+        try
         {
-            Trace.WriteLine("No config, skipping");
-            return;
+            // Create some static resource we'll use as part of drawing
+            // Not in view model because we don't want any UI namespaces in there
+            var config = viewModel.RenderConfig;
+            if (config is null)
+            {
+                logger.LogInformation("Create Resources failed");
+                return;
+            }
+            if (!canvas.IsLoaded)
+            {
+                logger.LogInformation("Canvas not loaded, skipping");
+                return;
+            }
+            defaultTextFormat = new() { FontSize = config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
+            solidBlack = new CanvasSolidColorBrush(sender, Microsoft.UI.Colors.Black);
+
+            // Load (and measure) all the bitmaps
+            // NOTE: If multiple TOML files share the same path, we will re-use the previously
+            // created canvas bitmap. This could be a problem if two different TOMLs are in 
+            // different directories, and use the same relative path to refer to two different
+            // images.
+            await bitmapCache.LoadAsync(sender, viewModel.ImagePaths);
+
+            // Now that all the bitmaps are loaded, we now have enough information to
+            // generate the drawing primitives so we can render them.
+            viewModel.GeneratePrimitives();
+
+            // Now we are really done loading
+            viewModel.IsLoading = false;
+
         }
-        if (!canvas.IsLoaded)
+        catch (Exception ex)
         {
-            Trace.WriteLine("Canvas not loaded, skipping");
-            return;
+            logger.LogError(ex, "Create Resources failed");
         }
-        defaultTextFormat = new() { FontSize = config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
-        solidBlack = new CanvasSolidColorBrush(sender, Microsoft.UI.Colors.Black);
-
-        // Load (and measure) all the bitmaps
-        // NOTE: If multiple TOML files share the same path, we will re-use the previously
-        // created canvas bitmap. This could be a problem if two different TOMLs are in 
-        // different directories, and use the same relative path to refer to two different
-        // images.
-        await bitmapCache.LoadAsync(sender, viewModel.ImagePaths);
-
-        // Now that all the bitmaps are loaded, we now have enough information to
-        // generate the drawing primitives so we can render them.
-        viewModel.GeneratePrimitives();
-
-        // Now we are really done loading
-        viewModel.IsLoading = false;
     }
 
     private void CanvasControl_Draw(
         CanvasControl sender,
         CanvasDrawEventArgs args)
     {
-        foreach (var p in viewModel.Primitives)
+        try
         {
-            Draw(p, args.DrawingSession);
+            foreach (var p in viewModel.Primitives)
+            {
+                Draw(p, args.DrawingSession);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Canvas Draw failed");
         }
     }
 
