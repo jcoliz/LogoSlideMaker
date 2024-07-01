@@ -1,4 +1,6 @@
-﻿using LogoSlideMaker.WinUi.ViewModels;
+﻿using LogoSlideMaker.Primitives;
+using LogoSlideMaker.WinUi.Services;
+using LogoSlideMaker.WinUi.ViewModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -44,6 +46,10 @@ public partial class App : Application
                 // Including both here so it's easy to switch between them
                 services.AddSingleton<MainWindow>();
                 services.AddSingleton<MainViewModel>();
+
+                var bitmaps = new BitmapCache();
+                services.AddSingleton<IGetImageAspectRatio>(bitmaps);
+                services.AddSingleton(bitmaps);
             })
             .ConfigureLogging((context, logging) =>
             {
@@ -65,10 +71,12 @@ public partial class App : Application
     /// Invoked when the application is launched.
     /// </summary>
     /// <param name="args">Details about the launch request and process.</param>
-    protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+    protected override async void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
-        m_window = new MainWindow();
-        m_window.Activate();
+        await _host.StartAsync();
+        
+        m_window = _host.Services.GetService<MainWindow>();
+        m_window!.Activate();
     }
 
     private Window? m_window;

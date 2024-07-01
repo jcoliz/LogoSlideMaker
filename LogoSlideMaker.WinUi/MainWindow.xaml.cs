@@ -7,14 +7,13 @@ using Microsoft.Graphics.Canvas.Text;
 using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using Windows.Foundation;
 using Windows.Storage.Pickers;
-using WinRT;
+using WinRT.Interop;
 
 namespace LogoSlideMaker.WinUi;
 
@@ -28,23 +27,20 @@ public sealed partial class MainWindow : Window
     private readonly MainViewModel viewModel;
     private CanvasTextFormat? defaultTextFormat;
     private ICanvasBrush? solidBlack;
-    private readonly BitmapCache bitmapCache = new();
+    private readonly BitmapCache bitmapCache;
 
     #endregion
 
     #region Constructor
 
-    public MainWindow()
+    public MainWindow(MainViewModel _viewModel, BitmapCache _bitmapCache)
     {
         this.InitializeComponent();
 
-        viewModel = new(bitmapCache)
-        {
-            UIAction = x => this.DispatcherQueue.TryEnqueue(() => x())
-        };
+        viewModel = _viewModel;
+        viewModel.UIAction = x => this.DispatcherQueue.TryEnqueue(() => x());
         viewModel.PropertyChanged += ViewModel_PropertyChanged;
         viewModel.DefinitionLoaded += ViewModel_DefinitionLoaded;
-
         this.Root.DataContext = viewModel;
 
         this.AppWindow.SetIcon("Assets/app-icon.ico");
@@ -52,6 +48,7 @@ public sealed partial class MainWindow : Window
         var dpi = GetDpiForWindow(hWnd);
         this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32(dpi*1280/96, dpi*(720+64)/96));
 
+        bitmapCache = _bitmapCache;
         bitmapCache.BaseDirectory = Path.GetDirectoryName(viewModel.lastOpenedFilePath);
         this.viewModel.ReloadDefinitionAsync().ContinueWith(_ => { });
     }
@@ -181,8 +178,8 @@ public sealed partial class MainWindow : Window
     }
 
     private void CanvasControl_Draw(
-        Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender,
-        Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs args)
+        CanvasControl sender,
+        CanvasDrawEventArgs args)
     {
         foreach (var p in viewModel.Primitives)
         {
@@ -256,7 +253,7 @@ public sealed partial class MainWindow : Window
     /// <summary>
     /// Get the current window's HWND by passing in the Window object
     /// </summary>
-    private IntPtr hWnd => WinRT.Interop.WindowNative.GetWindowHandle(this);
+    private IntPtr hWnd => WindowNative.GetWindowHandle(this);
 
     #endregion
 }

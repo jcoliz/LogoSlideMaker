@@ -16,7 +16,7 @@ using Windows.Storage;
 
 namespace LogoSlideMaker.WinUi.ViewModels;
 
-internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChanged
+public class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChanged
 {
     #region Events
     /// <summary>

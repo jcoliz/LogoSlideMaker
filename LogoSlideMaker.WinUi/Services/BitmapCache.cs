@@ -14,7 +14,7 @@ namespace LogoSlideMaker.WinUi.Services;
 /// <summary>
 /// Contains ready-to-draw canvas bitmaps for all images we may want to draw
 /// </summary>
-internal class BitmapCache : IGetImageAspectRatio
+public class BitmapCache : IGetImageAspectRatio
 {
     /// <summary>
     /// Base directory where files are located, or null for embedded storage
