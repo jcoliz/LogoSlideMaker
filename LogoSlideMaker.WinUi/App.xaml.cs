@@ -1,20 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
+﻿using LogoSlideMaker.WinUi.ViewModels;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using Microsoft.UI.Xaml.Shapes;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -32,6 +21,44 @@ public partial class App : Application
     public App()
     {
         this.InitializeComponent();
+
+        //
+        // Set up .NET generic host
+        //
+        // https://learn.microsoft.com/en-us/dotnet/core/extensions/generic-host
+        //
+        _host = new HostBuilder()
+            .ConfigureAppConfiguration((context, configurationBuilder) =>
+            {
+                // Config files will be found in the content root path
+                configurationBuilder.SetBasePath(context.HostingEnvironment.ContentRootPath);
+
+                configurationBuilder.AddJsonFile("appsettings.json", optional:true);
+
+                // Enable picking up configuration from the environment vars
+                configurationBuilder.AddEnvironmentVariables();
+            })
+            .ConfigureServices((context, services) =>
+            {
+                // Only really need ONE of these main window implementations.
+                // Including both here so it's easy to switch between them
+                services.AddSingleton<MainWindow>();
+                services.AddSingleton<MainViewModel>();
+            })
+            .ConfigureLogging((context, logging) =>
+            {
+                // Get log configuration out of `Logging` section in configuration
+                logging.AddConfiguration(context.Configuration.GetSection("Logging"));
+
+                // Send logs to the console window
+                // (Only useful if console window has been created)
+                logging.AddConsole();
+
+                // Send logs to debug console
+                // (Only useful if running in Visual Studio)
+                logging.AddDebug();
+            })
+            .Build();
     }
 
     /// <summary>
@@ -45,4 +72,5 @@ public partial class App : Application
     }
 
     private Window? m_window;
+    private readonly IHost _host;
 }
