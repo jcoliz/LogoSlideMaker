@@ -59,6 +59,7 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
                 PopulateLayout();
                 GeneratePrimitives();
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(DocumentSubtitle));
             }
         }
     }
@@ -139,6 +140,32 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
         }
     }
 
+    public string DocumentSubtitle
+    {
+        get
+        {
+            if (_definition is null)
+            {
+                return string.Empty;
+            }
+            if (_definition.Variants.Count == 0)
+            {
+                return "Only slide";
+            }
+            var variant = _definition.Variants[SlideNumber];
+            var result = $"Slide {SlideNumber + 1} of {_definition.Variants.Count}";
+            if (!string.IsNullOrWhiteSpace(variant.Name))
+            {
+                result += ": " + variant.Name;
+            }
+            if (variant.Description.Count > 0)
+            {
+                result += Environment.NewLine + string.Join(" / ", variant.Description);
+            }
+            return result;
+        }
+    }
+
     /// <summary>
     /// [User Can] Reload changes made in TOML file since last (re)load
     /// </summary>
@@ -176,11 +203,13 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
         var sr = new StreamReader(stream);
         var toml = sr.ReadToEnd();
         _definition = Toml.ToModel<Definition>(toml);
+        SlideNumber = 0;
 
         PopulateLayout();
 
         UIAction(() => DefinitionLoaded?.Invoke(this, new EventArgs()));
         OnPropertyChanged(nameof(DocumentTitle));
+        OnPropertyChanged(nameof(DocumentSubtitle));
     }
 
     public async Task ReloadDefinitionAsync()

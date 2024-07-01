@@ -31,9 +31,7 @@
             <TextBlock Foreground="White" Height="64" FontFamily="Segoe UI" FontSize="14" HorizontalTextAlignment="Right" Margin="20,3,20,0">
                 <Run FontWeight="Bold" Text="{Binding DocumentTitle}"/>
                 <LineBreak/>
-                <Run>Slide 1/5: Variant Name</Run>
-                <LineBreak/>
-                <Run>Variant Description</Run>
+                <Run Text="{Binding DocumentSubtitle}"/>
             </TextBlock>
         </Border>
         <win2dcanvas:CanvasControl Grid.Row="1" Grid.ColumnSpan="2" x:Name="canvas" Draw="CanvasControl_Draw" ClearColor="#333333"/>
