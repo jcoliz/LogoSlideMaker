@@ -133,7 +133,14 @@ public class ImageCache : IGetImageAspectRatio
         if (isSvg)
         {
             var svg = SvgDocument.Open<SvgDocument>(stream);
-            return (decimal)svg.Width.Value / (decimal)svg.Height.Value;
+            var width = svg.Width.Value;
+            var height = svg.Height.Value;
+            if (svg.Width.Type == SvgUnitType.Percentage)
+            {
+                width *= svg.ViewBox.Width;
+                height *= svg.ViewBox.Height;
+            }
+            return (decimal)(width/height);
         }
         else
         {
