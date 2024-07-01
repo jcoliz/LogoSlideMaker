@@ -16,6 +16,10 @@
             <RowDefinition Height="64" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
         <StackPanel Orientation="Horizontal" Background="#333333">
             <AppBarButton Icon="OpenFile" Label="Open" Click="OpenFile_Click"/>
             <AppBarButton Icon="Refresh" Label="Reload" Command="{Binding Reload}" />
@@ -23,14 +27,16 @@
             <AppBarButton Icon="Forward" Label="Next" Command="{Binding NextSlide}" />
             <AppBarButton Icon="Download" Label="Export" Click="DoExport_Click"/>
         </StackPanel>
-        <TextBlock Foreground="White" FontFamily="Segoe UI" FontSize="14" HorizontalTextAlignment="Right" Margin="0,3,20,0">
-            <Run FontWeight="Bold">Definition Title</Run>
-            <LineBreak/>
-            <Run>Slide 1/5: Variant Name</Run>
-            <LineBreak/>
-            <Run>Variant Description</Run>
-        </TextBlock>
-        <win2dcanvas:CanvasControl Grid.Row="1" x:Name="canvas" Draw="CanvasControl_Draw" ClearColor="#333333"/>
-        <ProgressRing Grid.Row="1" IsActive="{Binding IsLoading}" Foreground="White"/>
+        <Border Grid.Column="1" Background="#333333" Height="64">
+            <TextBlock Foreground="White" Height="64" FontFamily="Segoe UI" FontSize="14" HorizontalTextAlignment="Right" Margin="20,3,20,0">
+                <Run FontWeight="Bold" Text="{Binding DocumentTitle}"/>
+                <LineBreak/>
+                <Run>Slide 1/5: Variant Name</Run>
+                <LineBreak/>
+                <Run>Variant Description</Run>
+            </TextBlock>
+        </Border>
+        <win2dcanvas:CanvasControl Grid.Row="1" Grid.ColumnSpan="2" x:Name="canvas" Draw="CanvasControl_Draw" ClearColor="#333333"/>
+        <ProgressRing Grid.Row="1" Grid.ColumnSpan="2" IsActive="{Binding IsLoading}" Foreground="White"/>
     </Grid>
 </Window>

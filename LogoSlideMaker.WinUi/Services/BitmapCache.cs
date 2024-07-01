@@ -3,6 +3,7 @@ using Microsoft.Graphics.Canvas;
 using Svg;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -42,10 +43,13 @@ internal class BitmapCache : IGetImageAspectRatio
         if (!bitmaps.ContainsKey(path))
         {
             var cb = await LoadBitmapAsync(resourceCreator, path);
-            bitmaps[path] = cb;
+            if (cb is not null)
+            {
+                bitmaps[path] = cb;
 
-            var bounds = cb.GetBounds(resourceCreator);
-            bitmapAspectRatios[path] = (decimal)bounds.Width / (decimal)bounds.Height;
+                var bounds = cb.GetBounds(resourceCreator);
+                bitmapAspectRatios[path] = (decimal)bounds.Width / (decimal)bounds.Height;
+            }
         }
     }
 
@@ -77,40 +81,48 @@ internal class BitmapCache : IGetImageAspectRatio
     /// <param name="resourceCreator">Where to create bitmaps</param>
     /// <param name="filename">Name of source file</param>
     /// <returns>Created bitmap in this canvas</returns>
-    private async Task<CanvasBitmap> LoadBitmapAsync(ICanvasResourceCreator resourceCreator, string filename)
+    private async Task<CanvasBitmap?> LoadBitmapAsync(ICanvasResourceCreator resourceCreator, string filename)
     {
-        Stream? stream = null;
-        if (BaseDirectory is null)
+        try
         {
-            var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
-            var resource = names.Where(x => x.Contains($".{filename}")).Single();
-            stream = Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource);
-        }
-        else
-        {
-            var fullPath = Path.GetFullPath(BaseDirectory + Path.DirectorySeparatorChar + filename);
-            stream = File.OpenRead(fullPath);
-        }
+            Stream? stream = null;
+            if (BaseDirectory is null)
+            {
+                var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
+                var resource = names.Where(x => x.Contains($".{filename}")).Single();
+                stream = Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource);
+            }
+            else
+            {
+                var fullPath = Path.GetFullPath(BaseDirectory + Path.DirectorySeparatorChar + filename);
+                stream = File.OpenRead(fullPath);
+            }
 
-        if (filename.ToLowerInvariant().EndsWith(".svg"))
-        {
-            var svg = SvgDocument.Open<SvgDocument>(stream);
-            var bitmap = svg.Draw();
-            var pngStream = new MemoryStream();
-            bitmap.Save(pngStream, System.Drawing.Imaging.ImageFormat.Png);
-            pngStream.Seek(0, SeekOrigin.Begin);
-            var randomAccessStream = pngStream.AsRandomAccessStream();
-            var result = await CanvasBitmap.LoadAsync(resourceCreator, randomAccessStream);
+            if (filename.ToLowerInvariant().EndsWith(".svg"))
+            {
+                var svg = SvgDocument.Open<SvgDocument>(stream);
+                var bitmap = svg.Draw();
+                var pngStream = new MemoryStream();
+                bitmap.Save(pngStream, System.Drawing.Imaging.ImageFormat.Png);
+                pngStream.Seek(0, SeekOrigin.Begin);
+                var randomAccessStream = pngStream.AsRandomAccessStream();
+                var result = await CanvasBitmap.LoadAsync(resourceCreator, randomAccessStream);
 
-            return result;
+                return result;
+            }
+            else
+            {
+                var randomAccessStream = stream.AsRandomAccessStream();
+                var result = await CanvasBitmap.LoadAsync(resourceCreator, randomAccessStream);
+
+                return result;
+            }
+
         }
-        else
+        catch (Exception ex)
         {
-            var randomAccessStream = stream.AsRandomAccessStream();
-            var result = await CanvasBitmap.LoadAsync(resourceCreator, randomAccessStream);
-
-            return result;
+            Trace.WriteLine(ex.Message);
+            return null;
         }
     }
-
 }

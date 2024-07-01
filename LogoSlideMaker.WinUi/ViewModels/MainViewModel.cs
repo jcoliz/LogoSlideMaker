@@ -123,6 +123,22 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
         }    
     }
 
+    public string DocumentTitle
+    {
+        get
+        {
+            if (_definition?.Layout.Title == null && lastOpenedFilePath == null)
+            {
+                return string.Empty;
+            }
+            if (_definition?.Layout.Title == null)
+            {
+                return Path.GetFileName(lastOpenedFilePath!);
+            }
+            return _definition.Layout.Title;
+        }
+    }
+
     /// <summary>
     /// [User Can] Reload changes made in TOML file since last (re)load
     /// </summary>
@@ -164,6 +180,7 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
         PopulateLayout();
 
         UIAction(() => DefinitionLoaded?.Invoke(this, new EventArgs()));
+        OnPropertyChanged(nameof(DocumentTitle));
     }
 
     public async Task ReloadDefinitionAsync()
@@ -339,6 +356,7 @@ internal class MainViewModel(IGetImageAspectRatio bitmaps): INotifyPropertyChang
             if (value != (string?)ApplicationData.Current.LocalSettings.Values[nameof(lastOpenedFilePath)])
             {
                 ApplicationData.Current.LocalSettings.Values[nameof(lastOpenedFilePath)] = value;
+                OnPropertyChanged(nameof(DocumentTitle));
             }
         }
     }
