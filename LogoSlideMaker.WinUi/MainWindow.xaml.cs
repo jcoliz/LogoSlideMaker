@@ -59,7 +59,7 @@ public sealed partial class MainWindow : Window
             this.AppWindow.SetIcon("Assets/app-icon.ico");
 
             // Set up bitmap cache
-            bitmapCache.BaseDirectory = Path.GetDirectoryName(viewModel.lastOpenedFilePath);
+            bitmapCache.BaseDirectory = Path.GetDirectoryName(viewModel.LastOpenedFilePath);
 
             // Reload last-used definition
             this.viewModel.ReloadDefinitionAsync().ContinueWith(task => 
@@ -89,7 +89,7 @@ public sealed partial class MainWindow : Window
     private void ViewModel_DefinitionLoaded(object? sender, EventArgs e)
     {
         // TODO: https://microsoft.github.io/Win2D/WinUI2/html/LoadingResourcesOutsideCreateResources.htm
-        this.Canvas_CreateResources(this.canvas, new CanvasCreateResourcesEventArgs(CanvasCreateResourcesReason.NewDevice));
+        this.Canvas_CreateResources(this.canvas);
     }
 
     private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -107,7 +107,7 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void Window_Closed(object sender, WindowEventArgs args)
+    private void Window_Closed(object _, WindowEventArgs __)
     {
         Application.Current.Exit();
     }
@@ -116,7 +116,7 @@ public sealed partial class MainWindow : Window
 
     #region Command handlers
 
-    private async void OpenFile_Click(object sender, RoutedEventArgs e)
+    private async void OpenFile_Click(object _, RoutedEventArgs __)
     {
         try
         {
@@ -151,7 +151,7 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private async void DoExport_Click(object sender, RoutedEventArgs e)
+    private async void DoExport_Click(object _, RoutedEventArgs __)
     {
         try
         {
@@ -208,7 +208,7 @@ public sealed partial class MainWindow : Window
 
     #region Canvas management & drawing
 
-    private async void Canvas_CreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs args)
+    private async void Canvas_CreateResources(CanvasControl sender)
     {
         try
         {
@@ -252,7 +252,7 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void CanvasControl_Draw(CanvasControl sender, CanvasDrawEventArgs args)
+    private void CanvasControl_Draw(CanvasControl _, CanvasDrawEventArgs args)
     {
         try
         {

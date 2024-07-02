@@ -120,6 +120,22 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
     }
 
     /// <summary>
+    /// Path to input file, last time we opened a file from file system
+    /// </summary>
+    public string? LastOpenedFilePath
+    {
+        get => (string?)ApplicationData.Current.LocalSettings.Values[nameof(LastOpenedFilePath)];
+        set
+        {
+            if (value != (string?)ApplicationData.Current.LocalSettings.Values[nameof(LastOpenedFilePath)])
+            {
+                ApplicationData.Current.LocalSettings.Values[nameof(LastOpenedFilePath)] = value;
+                OnPropertyChanged(nameof(DocumentTitle));
+            }
+        }
+    }
+
+    /// <summary>
     /// Default file to which exported slides should be output
     /// </summary>
     public string? OutputPath
@@ -133,15 +149,15 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
             if (_definition.Files?.Output is not null)
             {
                 // output path is relative to the current definition file
-                var directory = Path.GetDirectoryName(lastOpenedFilePath) ?? "./";
+                var directory = Path.GetDirectoryName(LastOpenedFilePath) ?? "./";
                 var result = Path.Combine(directory, _definition.Files.Output);
                 return result;
             }
             else
             {
                 // output path is exactly the input path, with the extension replaced to pptx
-                var directory = Path.GetDirectoryName(lastOpenedFilePath) ?? "./";
-                var file = Path.GetFileNameWithoutExtension(lastOpenedFilePath) ?? Path.GetRandomFileName();
+                var directory = Path.GetDirectoryName(LastOpenedFilePath) ?? "./";
+                var file = Path.GetFileNameWithoutExtension(LastOpenedFilePath) ?? Path.GetRandomFileName();
                 var result = Path.Combine(directory, file + ".pptx");
                 return result;
             }
@@ -155,13 +171,13 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
     {
         get
         {
-            if (_definition?.Layout.Title == null && lastOpenedFilePath == null)
+            if (_definition?.Layout.Title == null && LastOpenedFilePath == null)
             {
                 return string.Empty;
             }
             if (_definition?.Layout.Title == null)
             {
-                return Path.GetFileName(lastOpenedFilePath!);
+                return Path.GetFileName(LastOpenedFilePath!);
             }
             return _definition.Layout.Title;
         }
@@ -227,7 +243,7 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
     {
         try
         {
-            lastOpenedFilePath = path;
+            LastOpenedFilePath = path;
             using var stream = path is null ? OpenEmbeddedDefinition() : File.OpenRead(path);
             await Task.Run(() => { LoadDefinition(stream); });
             logger.LogInformation("LoadDefinitionAsync: OK");
@@ -236,7 +252,7 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
         {
             // TODO: Actually need to surface these to user. But for now, just dont crash
 
-            lastOpenedFilePath = null;
+            LastOpenedFilePath = null;
             logger.LogError(ex,"LoadDefinitionAsync: Failed");
         }
     }
@@ -247,7 +263,7 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
     /// <returns></returns>
     public async Task ReloadDefinitionAsync()
     {
-        await LoadDefinitionAsync(lastOpenedFilePath);
+        await LoadDefinitionAsync(LastOpenedFilePath);
     }
 
     /// <summary>
@@ -363,7 +379,7 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
         }
         var exportPipeline = new ExportPipeline(_definition);
 
-        var directory = Path.GetDirectoryName(lastOpenedFilePath)!;
+        var directory = Path.GetDirectoryName(LastOpenedFilePath)!;
 
         // TODO: Would be much better to do this when the definition is LOADED, because we'll
         // already be on a loading screen at that point!
@@ -387,7 +403,7 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
     /// Open the default definition embedded into the app
     /// </summary>
     /// <returns>Stream to emdedded definition</returns>
-    private Stream OpenEmbeddedDefinition()
+    private static Stream OpenEmbeddedDefinition()
     {
         var filename = "sample.toml";
         var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
@@ -423,7 +439,7 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
         }
         catch (Exception ex)
         {
-            lastOpenedFilePath = null;
+            LastOpenedFilePath = null;
             logger.LogError(ex, "LoadDefinition: Failed");
         }
     }
@@ -453,22 +469,6 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
         // Raise the PropertyChanged event, passing the name of the property whose value has changed.
         // And be sure to do it on UI thread, because we may be running on a BG thread
         UIAction(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)));
-    }
-    #endregion
-
-    #region Internal Properties
-
-    public string? lastOpenedFilePath
-    {
-        get => (string?)ApplicationData.Current.LocalSettings.Values[nameof(lastOpenedFilePath)];
-        set
-        {
-            if (value != (string?)ApplicationData.Current.LocalSettings.Values[nameof(lastOpenedFilePath)])
-            {
-                ApplicationData.Current.LocalSettings.Values[nameof(lastOpenedFilePath)] = value;
-                OnPropertyChanged(nameof(DocumentTitle));
-            }
-        }
     }
     #endregion
 
