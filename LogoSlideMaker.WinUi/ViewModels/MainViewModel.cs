@@ -349,6 +349,8 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
         var generator = new PrimitivesEngine(config, bitmaps);
         _primitives.AddRange(_layout.Logos.SelectMany(generator.ToPrimitives));
 
+#if false
+        // TODO: This will be user-configurable
         // Add bounding boxes for any boxes with explicit outer dimensions
         _primitives.AddRange(
             _definition.Boxes
@@ -365,6 +367,7 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
                 }
         )
         );
+#endif
     }
 
     /// <summary>
@@ -395,7 +398,7 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
         exportPipeline.Save(templatePath, outPath, null);
     }
 
-    #endregion
+#endregion
 
     #region Internals
 
