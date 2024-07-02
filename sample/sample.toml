@@ -9,22 +9,77 @@ padding = 0.3
 
 [render]
 text_distace = 0.5
-text_width = 0.9
+text_width = 1.27
 text_height = 0.5
 icon_size = 0.55
 dpi = 96.0
-font_size = 10
+font_size = 9
 font_name = "Segoe UI"
 font_color = "595959"
 
+[[variants]]
+name = "Sample Slide"
+description = [ "Cloud Native Projects", "Windows OSS Apps" ]
+
 [[boxes]]
 title = "Cloud Native Projects"
-outer = { x = 1.02, y = 2.51, width = 5.41, height = 4 }
-logos.1 = [ "one", "one", "one", "one", "one" ]
-logos.2 = [ "one", "one", "one", "one", "one" ]
-logos.3 = [ "one", "one", "one", "one", "one" ]
-min_columns = 5
+outer = { x = 0.87, y = 2.51, width = 5.71, height = 4 }
+logos.1 = [ "k8s", "prometheus", "spire", "helm", "flux" ]
+logos.2 = [ "etcd", "istio", "coredns", "envoy", "crio" ]
+logos.3 = [ "vitess", "linkerd" ]
+min_columns = 4
 auto_flow = true
+
+[logos.k8s]
+title = "Scheduling & Orchestration"
+path = "cloud/k8s.svg"
+scale = 1.4
+
+[logos.prometheus]
+title = "Observability"
+path = "cloud/prometheus.svg"
+
+[logos.spire]
+title = "Key Management"
+path = "cloud/spire.svg"
+
+[logos.helm]
+title = "Application Definition & Image Build"
+path = "cloud/helm.svg"
+
+[logos.flux]
+title = "Continuous Integration & Delivery"
+path = "cloud/flux.svg"
+
+[logos.etcd]
+title = "Coordination & Service Discovery"
+path = "cloud/etcd.svg"
+scale = 0.85
+
+[logos.istio]
+title = "Service Mesh"
+path = "cloud/istio.svg"
+
+[logos.coredns]
+title = "Coordination & Service Discovery"
+path = "cloud/coredns.svg"
+
+[logos.crio]
+title = "Container Runtime"
+path = "cloud/crio.svg"
+scale = 0.9
+
+[logos.envoy]
+title = "Service Proxy"
+path = "cloud/envoy.svg"
+
+[logos.vitess]
+title = "Database"
+path = "cloud/vitess.svg"
+
+[logos.linkerd]
+title = "Service Mesh"
+path = "cloud/linkerd.svg"
 
 [logos.one]
 title = "1x1 Square"
