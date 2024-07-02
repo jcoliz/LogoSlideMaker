@@ -89,8 +89,61 @@ text_width = 0.5
 [[boxes]]
 title = "Windows OSS Apps"
 outer = { x = 6.93, y = 2.51, width = 5.41, height = 4 }
-logos.1 = [ "one", "one", "one", "one", "one" ]
-logos.2 = [ "one", "one", "one", "one", "one" ]
-logos.3 = [ "one", "one", "one", "one", "one" ]
-min_columns = 5
+logos.1 = [ "gimp", "blender", "audacity", "inkscape", "shotcut" ]
+logos.2 = [ "libreoffice", "kodi", "vlc", "freecad", "sweethome" ]
+logos.3 = [ "scribus", "tor" ]
+min_columns = 4
 auto_flow = true
+
+[logos.gimp]
+title = "Gimp"
+path = "1x1.svg"
+
+[logos.blender]
+title = "Blender"
+path = "1x1.svg"
+
+[logos.audacity]
+title = "Audacity"
+path = "1x1.svg"
+
+[logos.inkscape]
+title = "Inkscape"
+path = "1x1.svg"
+
+#
+
+[logos.shotcut]
+title = "Shotcut"
+path = "1x1.svg"
+
+[logos.libreoffice]
+title = "LibreOffice"
+path = "1x1.svg"
+
+[logos.kodi]
+title = "Kodi"
+path = "1x1.svg"
+
+[logos.vlc]
+title = "VLC Media Player"
+path = "1x1.svg"
+
+#
+
+[logos.freecad]
+title = "FreeCAD"
+path = "1x1.svg"
+
+[logos.sweethome]
+title = "Sweet Home 3D"
+path = "1x1.svg"
+
+[logos.scribus]
+title = "Scribus"
+path = "1x1.svg"
+
+[logos.tor]
+title = "Tor Browser"
+path = "1x1.svg"
+
