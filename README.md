@@ -26,4 +26,4 @@ The app is extremely useful as-is, however it's not totally complete yet. Of not
 * Errors are not surfaced to the user. This is why a log window pops up. Have a look at the log window if things aren't quite working right
 * Only source is available. For now, the only way to use the tool is to clone this repo and build it yourself. In the future, fully built versions will be available for download here, and ultimately it will show up in the Microsoft Store.
 
-For more details, please see the Issues section of this repo for a full list of functionality envisioned for the future.
+For more details, please see the [Issues](https://github.com/jcoliz/LogoSlideMaker/issues) section of this repo for a full list of functionality envisioned for the future.
