@@ -24,9 +24,9 @@ description = [ "Cloud Native Projects", "Windows OSS Apps" ]
 [[boxes]]
 title = "Cloud Native Projects"
 outer = { x = 0.87, y = 2.51, width = 5.71, height = 4 }
-logos.1 = [ "k8s", "prometheus", "spire", "helm", "flux" ]
-logos.2 = [ "etcd", "istio", "coredns", "envoy", "crio" ]
-logos.3 = [ "vitess", "linkerd" ]
+logos.1 = [ "crio", "coredns", "envoy", "etcd", "flux" ]
+logos.2 = [ "helm", "istio", "k8s", "linkerd" ]
+logos.3 = [ "prometheus", "spire", "vitess" ]
 min_columns = 4
 auto_flow = true
 
@@ -89,9 +89,9 @@ text_width = 0.5
 [[boxes]]
 title = "Windows OSS Apps"
 outer = { x = 6.78, y = 2.51, width = 5.71, height = 4 }
-logos.1 = [ "gimp", "blender", "audacity", "inkscape", "shotcut" ]
-logos.2 = [ "libreoffice", "kodi", "vlc", "freecad", "sweethome" ]
-logos.3 = [ "scribus", "tor" ]
+logos.1 = [ "audacity", "blender", "freecad", "gimp", "inkscape" ]
+logos.2 = [ "kodi", "libreoffice", "scribus", "shotcut", "sweethome" ]
+logos.3 = [ "tor", "vlc" ]
 min_columns = 4
 auto_flow = true
 
@@ -111,8 +111,6 @@ path = "desktop/audacity.svg"
 title = "Inkscape"
 path = "desktop/inkscape.svg"
 
-#
-
 [logos.shotcut]
 title = "Shotcut"
 path = "desktop/shotcut.svg"
@@ -128,8 +126,6 @@ path = "desktop/kodi.svg"
 [logos.vlc]
 title = "VLC Media Player"
 path = "desktop/vlc.svg"
-
-#
 
 [logos.freecad]
 title = "FreeCAD"
