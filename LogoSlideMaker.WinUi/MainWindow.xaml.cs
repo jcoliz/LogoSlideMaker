@@ -70,11 +70,11 @@ public sealed partial class MainWindow : Window
                 }
                 else
                 {
-                    logger.LogInformation("Main Window: Reload OK");
+                    logger.LogDebug("Main Window: Reload OK");
                 }
             });
 
-            _logger.LogInformation("Main Window: OK");
+            _logger.LogDebug("Main Window: OK");
         }
         catch (Exception ex)
         {
@@ -142,7 +142,7 @@ public sealed partial class MainWindow : Window
             }
             else
             {
-                logger.LogInformation("OpenFile: No file chosen");
+                logger.LogDebug("OpenFile: No file chosen");
             }
         }
         catch (Exception ex)
@@ -193,7 +193,7 @@ public sealed partial class MainWindow : Window
             }
             else
             {
-                logger.LogInformation("OpenFile: No file chosen");
+                logger.LogDebug("OpenFile: No file chosen");
             }
 
             // TODO: Give user option to launch the ppt (would be nice)
@@ -228,7 +228,7 @@ public sealed partial class MainWindow : Window
             defaultTextFormat = new() { FontSize = config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
             solidBlack = new CanvasSolidColorBrush(sender, Microsoft.UI.Colors.Black);
 
-            logger.LogInformation("Create Resources: Loading...");
+            logger.LogDebug("Create Resources: Loading...");
 
             // Load (and measure) all the bitmaps
             // NOTE: If multiple TOML files share the same path, we will re-use the previously

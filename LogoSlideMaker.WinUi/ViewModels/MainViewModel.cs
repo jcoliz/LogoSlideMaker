@@ -246,7 +246,7 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
             LastOpenedFilePath = path;
             using var stream = path is null ? OpenEmbeddedDefinition() : File.OpenRead(path);
             await Task.Run(() => { LoadDefinition(stream); });
-            logger.LogInformation("LoadDefinitionAsync: OK");
+            logger.LogDebug("LoadDefinitionAsync: OK");
         }
         catch (Exception ex)
         {
