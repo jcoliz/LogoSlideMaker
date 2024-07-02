@@ -4,16 +4,16 @@ template.bitmaps = "template.png"
 
 [layout]
 title = "Logo Slide Maker Sample"
-line_spacing = 1.25
-padding = 0.3
+line_spacing = 1.28
+padding = 0.25
 
 [render]
-text_distace = 0.5
+text_distace = 0.6
 text_width = 1.27
 text_height = 0.5
 icon_size = 0.55
 dpi = 96.0
-font_size = 9
+font_size = 10.5
 font_name = "Segoe UI"
 font_color = "595959"
 
@@ -88,7 +88,7 @@ text_width = 0.5
 
 [[boxes]]
 title = "Windows OSS Apps"
-outer = { x = 6.93, y = 2.51, width = 5.41, height = 4 }
+outer = { x = 6.78, y = 2.51, width = 5.71, height = 4 }
 logos.1 = [ "gimp", "blender", "audacity", "inkscape", "shotcut" ]
 logos.2 = [ "libreoffice", "kodi", "vlc", "freecad", "sweethome" ]
 logos.3 = [ "scribus", "tor" ]
@@ -97,53 +97,53 @@ auto_flow = true
 
 [logos.gimp]
 title = "Gimp"
-path = "1x1.svg"
+path = "desktop/gimp.svg"
 
 [logos.blender]
 title = "Blender"
-path = "1x1.svg"
+path = "desktop/blender.svg"
 
 [logos.audacity]
 title = "Audacity"
-path = "1x1.svg"
+path = "desktop/audacity.svg"
 
 [logos.inkscape]
 title = "Inkscape"
-path = "1x1.svg"
+path = "desktop/inkscape.svg"
 
 #
 
 [logos.shotcut]
 title = "Shotcut"
-path = "1x1.svg"
+path = "desktop/shotcut.svg"
 
 [logos.libreoffice]
 title = "LibreOffice"
-path = "1x1.svg"
+path = "desktop/libre-office.svg"
 
 [logos.kodi]
 title = "Kodi"
-path = "1x1.svg"
+path = "desktop/kodi.svg"
 
 [logos.vlc]
 title = "VLC Media Player"
-path = "1x1.svg"
+path = "desktop/vlc.svg"
 
 #
 
 [logos.freecad]
 title = "FreeCAD"
-path = "1x1.svg"
+path = "desktop/freecad.svg"
 
 [logos.sweethome]
 title = "Sweet Home 3D"
-path = "1x1.svg"
+path = "desktop/sweethome.png"
 
 [logos.scribus]
 title = "Scribus"
-path = "1x1.svg"
+path = "desktop/scribus.svg"
 
 [logos.tor]
 title = "Tor Browser"
-path = "1x1.svg"
+path = "desktop/tor-browser.svg"
 
