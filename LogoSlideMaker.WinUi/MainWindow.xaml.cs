@@ -307,7 +307,7 @@ public sealed partial class MainWindow : Window
         var bitmap = bitmapCache.GetOrDefault(primitive.Path);
         if (bitmap is not null)
         {
-            session.DrawImage(bitmap, primitive.Rectangle.AsWindowsRect());
+            session.DrawImage(bitmap, primitive.Rectangle.AsWindowsRect(), bitmap.Bounds, 1.0f, CanvasImageInterpolation.HighQualityCubic );
         }
     }
 
