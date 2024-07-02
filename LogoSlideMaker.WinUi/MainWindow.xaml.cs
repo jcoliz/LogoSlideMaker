@@ -9,7 +9,6 @@ using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI.Xaml;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using Windows.Foundation;
@@ -25,11 +24,14 @@ public sealed partial class MainWindow : Window
 {
     #region Fields
 
+    // Injected dependencies
     private readonly MainViewModel viewModel;
-    private CanvasTextFormat? defaultTextFormat;
-    private ICanvasBrush? solidBlack;
     private readonly BitmapCache bitmapCache;
     private readonly ILogger<MainWindow> logger;
+
+    // Cached canvas resources
+    private CanvasTextFormat? defaultTextFormat;
+    private ICanvasBrush? solidBlack;
 
     #endregion
 
@@ -37,28 +39,39 @@ public sealed partial class MainWindow : Window
 
     public MainWindow(MainViewModel _viewModel, BitmapCache _bitmapCache, ILogger<MainWindow> _logger)
     {
+        viewModel = _viewModel;
+        bitmapCache = _bitmapCache;
+        logger = _logger;
+
         try
         {
-            viewModel = _viewModel;
-            bitmapCache = _bitmapCache;
-            logger = _logger;
-
             this.InitializeComponent();
 
+            // Set up view model
             viewModel.UIAction = x => this.DispatcherQueue.TryEnqueue(() => x());
             viewModel.PropertyChanged += ViewModel_PropertyChanged;
             viewModel.DefinitionLoaded += ViewModel_DefinitionLoaded;
             this.Root.DataContext = viewModel;
 
-            this.AppWindow.SetIcon("Assets/app-icon.ico");
-
+            // Set up app window
             var dpi = GetDpiForWindow(hWnd);
             this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32(dpi * 1280 / 96, dpi * (720 + 64) / 96));
+            this.AppWindow.SetIcon("Assets/app-icon.ico");
 
+            // Set up bitmap cache
             bitmapCache.BaseDirectory = Path.GetDirectoryName(viewModel.lastOpenedFilePath);
-            this.viewModel.ReloadDefinitionAsync().ContinueWith(_ => 
+
+            // Reload last-used definition
+            this.viewModel.ReloadDefinitionAsync().ContinueWith(task => 
             {
-                logger.LogInformation("Main Window: Reload OK");
+                if (task.Exception != null)
+                {
+                    logger.LogError(task.Exception, "Main Window: Reload failed");
+                }
+                else
+                {
+                    logger.LogInformation("Main Window: Reload OK");
+                }
             });
 
             _logger.LogInformation("Main Window: OK");
@@ -83,7 +96,7 @@ public sealed partial class MainWindow : Window
     {
         if (e.PropertyName == nameof(MainViewModel.IsLoading))
         {
-            // When starting loading, canvas needs to redraw to blank
+            // During and after loading, canvas needs to redraw to blank
             canvas.Invalidate();
         }
 
@@ -117,7 +130,7 @@ public sealed partial class MainWindow : Window
 
             // https://github.com/microsoft/WindowsAppSDK/issues/1188
             // Associate the HWND with the file picker
-            WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
+            InitializeWithWindow.Initialize(picker, hWnd);
 
             var file = await picker.PickSingleFileAsync();
             if (file != null)
@@ -147,7 +160,10 @@ public sealed partial class MainWindow : Window
             var path = viewModel.OutputPath;
             if (path is null)
             {
-                // Can't save the sample file
+                // TODO: Should disable 'Export' app button when output path is null
+
+                logger.LogError("Unable to export to empty path");
+
                 return;
             }
 
@@ -170,6 +186,7 @@ public sealed partial class MainWindow : Window
                 var outPath = file.Path;
 
                 // TODO: Loading affordance would be nice
+                // TODO: Also should get this off the UI thread! :(
                 await viewModel.ExportToAsync(outPath);
 
                 logger.LogInformation("OpenFile: OK exported {path}", path);
@@ -200,12 +217,12 @@ public sealed partial class MainWindow : Window
             var config = viewModel.RenderConfig;
             if (config is null)
             {
-                logger.LogInformation("Create Resources failed");
+                logger.LogInformation("Create Resources: Render config not populated");
                 return;
             }
             if (!canvas.IsLoaded)
             {
-                logger.LogInformation("Canvas not loaded, skipping");
+                logger.LogInformation("Create Resources: Canvas not loaded, skipping");
                 return;
             }
             defaultTextFormat = new() { FontSize = config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
@@ -235,9 +252,7 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void CanvasControl_Draw(
-        CanvasControl sender,
-        CanvasDrawEventArgs args)
+    private void CanvasControl_Draw(CanvasControl sender, CanvasDrawEventArgs args)
     {
         try
         {
@@ -325,7 +340,7 @@ public sealed partial class MainWindow : Window
 
 internal static class Converters
 {
-    internal static Windows.Foundation.Rect AsWindowsRect(this Configure.Rectangle source)
+    internal static Rect AsWindowsRect(this Configure.Rectangle source)
     {
         return new Rect() { X = (double)source.X, Y = (double)(source.Y ?? 0), Width = (double)source.Width, Height = (double)(source.Height ?? 0)};
     }
