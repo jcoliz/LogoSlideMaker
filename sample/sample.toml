@@ -1,0 +1,41 @@
+[files]
+template.slides = "template.pptx"
+template.bitmaps = "template.png"
+
+[layout]
+title = "Logo Slide Maker Sample"
+line_spacing = 1.25
+padding = 0.3
+
+[render]
+text_distace = 0.5
+text_width = 0.9
+text_height = 0.5
+icon_size = 0.55
+dpi = 96.0
+font_size = 10
+font_name = "Segoe UI"
+font_color = "595959"
+
+[[boxes]]
+title = "Cloud Native Projects"
+outer = { x = 1.02, y = 2.51, width = 5.41, height = 4 }
+logos.1 = [ "one", "one", "one", "one", "one" ]
+logos.2 = [ "one", "one", "one", "one", "one" ]
+logos.3 = [ "one", "one", "one", "one", "one" ]
+min_columns = 5
+auto_flow = true
+
+[logos.one]
+title = "1x1 Square"
+path = "1x1.svg"
+text_width = 0.5
+
+[[boxes]]
+title = "Windows OSS Apps"
+outer = { x = 6.93, y = 2.51, width = 5.41, height = 4 }
+logos.1 = [ "one", "one", "one", "one", "one" ]
+logos.2 = [ "one", "one", "one", "one", "one" ]
+logos.3 = [ "one", "one", "one", "one", "one" ]
+min_columns = 5
+auto_flow = true
