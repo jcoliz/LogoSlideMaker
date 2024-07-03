@@ -430,7 +430,10 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
             var sr = new StreamReader(stream);
             var toml = sr.ReadToEnd();
             _definition = Toml.ToModel<Definition>(toml);
-            SlideNumber = 0;
+            if (SlideNumber >= _definition.Variants.Count)
+            {
+                SlideNumber = 0;
+            }
 
             PopulateLayout();
 
