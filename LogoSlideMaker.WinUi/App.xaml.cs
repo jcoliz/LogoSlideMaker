@@ -1,11 +1,14 @@
-﻿using LogoSlideMaker.Primitives;
+﻿using System;
+using LogoSlideMaker.Primitives;
 using LogoSlideMaker.WinUi.Services;
 using LogoSlideMaker.WinUi.ViewModels;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
+using Serilog;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -22,56 +25,42 @@ public partial class App : Application
     /// </summary>
     public App()
     {
-        this.InitializeComponent();
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .WriteTo.Debug()
+            .WriteTo.File(System.IO.Path.GetTempPath()+"/LogoSlideMaker/log-.txt", rollingInterval: RollingInterval.Day)
+            .CreateLogger();
 
-        //
-        // Set up a console window
-        //
-        // Useful to observe logs
-        // Remove this if you don't want to see a console window with logs
-        //
-        ConsoleAllocator.ShowConsoleWindow();
+        try
+        {
+            Log.Information("----------------------------------");
 
-        //
-        // Set up .NET generic host
-        //
-        // https://learn.microsoft.com/en-us/dotnet/core/extensions/generic-host
-        //
-        _host = new HostBuilder()
-            .ConfigureAppConfiguration((context, configurationBuilder) =>
-            {
-                // Config files will be found in the content root path
-                configurationBuilder.SetBasePath(context.HostingEnvironment.ContentRootPath);
+            this.InitializeComponent();
 
-                configurationBuilder.AddJsonFile("appsettings.json", optional:true);
+            //
+            // Set up .NET generic host
+            //
+            // https://learn.microsoft.com/en-us/dotnet/core/extensions/generic-host
+            //
+            _host = new HostBuilder()
+                .ConfigureServices((context, services) =>
+                {
+                    services.AddSerilog();
 
-                // Enable picking up configuration from the environment vars
-                // TODO: Probably do NOT want to do this in production
-                configurationBuilder.AddEnvironmentVariables();
-            })
-            .ConfigureServices((context, services) =>
-            {
-                services.AddSingleton<MainWindow>();
-                services.AddSingleton<MainViewModel>();
+                    services.AddSingleton<MainWindow>();
+                    services.AddSingleton<MainViewModel>();
 
-                var bitmaps = new BitmapCache();
-                services.AddSingleton<IGetImageAspectRatio>(bitmaps);
-                services.AddSingleton(bitmaps);
-            })
-            .ConfigureLogging((context, logging) =>
-            {
-                // Get log configuration out of `Logging` section in configuration
-                logging.AddConfiguration(context.Configuration.GetSection("Logging"));
+                    var bitmaps = new BitmapCache();
+                    services.AddSingleton<IGetImageAspectRatio>(bitmaps);
+                    services.AddSingleton(bitmaps);
+                })
 
-                // Send logs to the console window
-                // (Only useful if console window has been created)
-                logging.AddConsole();
-
-                // Send logs to debug console
-                // (Only useful if running in Visual Studio)
-                logging.AddDebug();
-            })
-            .Build();
+                .Build();
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "Startup failed");
+        }
     }
 
     /// <summary>
@@ -80,12 +69,28 @@ public partial class App : Application
     /// <param name="args">Details about the launch request and process.</param>
     protected async override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        await _host.StartAsync();
-        
-        m_window = _host.Services.GetService<MainWindow>();
-        m_window!.Activate();
+        try
+        {
+            Log.Information("Starting");
+
+            if (_host is null)
+            {
+                throw new Exception("Host not found");            
+            }
+
+            await _host.StartAsync();
+
+            m_window = _host.Services.GetService<MainWindow>();
+            m_window!.Activate();
+
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "Startup failed");
+            Log.CloseAndFlush();
+        }
     }
 
     private Window? m_window;
-    private readonly IHost _host;
+    private readonly IHost? _host;
 }

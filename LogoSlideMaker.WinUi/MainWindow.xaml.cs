@@ -63,6 +63,7 @@ public sealed partial class MainWindow : Window
             var dpi = GetDpiForWindow(hWnd);
             this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32(dpi * 1280 / 96, dpi * (720 + 64) / 96));
             this.AppWindow.SetIcon("Assets/app-icon.ico");
+            this.AppWindow.Closing += AppWindow_Closing;
 
             // Set up bitmap cache
             bitmapCache.BaseDirectory = Path.GetDirectoryName(viewModel.LastOpenedFilePath);
@@ -164,6 +165,11 @@ public sealed partial class MainWindow : Window
     private void Window_Closed(object _, WindowEventArgs __)
     {
         Application.Current.Exit();
+    }
+
+    private void AppWindow_Closing(Microsoft.UI.Windowing.AppWindow sender, Microsoft.UI.Windowing.AppWindowClosingEventArgs args)
+    {
+        logger.LogInformation("Closing");
     }
 
     #endregion
