@@ -8,29 +8,30 @@ public record RenderConfig
     /// <summary>
     /// Vertical distance from middle of icon to top of text, in inches
     /// </summary>
-    public decimal TextDistace { get; set; }
+    public decimal TextDistace { get; set; } = 0.5m;
 
     /// <summary>
     /// Default width of text under logos, in inches
     /// </summary>
-    public decimal TextWidth { get; set; }
+    public decimal TextWidth { get; set; } = 1m;
 
     /// <summary>
     /// Height of text box under logos, in inches
     /// </summary>
-    public decimal TextHeight { get; set; }
+    public decimal TextHeight { get; set; } = 0.5m;
 
     /// <summary>
     /// Width & height of square icons, in inches
     /// </summary>
 
-    public decimal IconSize { get; set; }
-        /// <summary>
+    public decimal IconSize { get; set; } = 0.5m;
+
+    /// <summary>
     /// Dots (pixels) per inch
     /// </summary>
-    public decimal Dpi { get; set; }
+    public decimal Dpi { get; set; } = 96m;
 
-    public int FontSize { get; set; } = 24;
+    public int FontSize { get; set; } = 12;
 
     public string FontName { get; set; } = "sans";
 

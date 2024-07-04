@@ -1,0 +1,26 @@
+﻿#
+# [UI] [Error] Missing logo definition #20 
+#
+# When: Loading a TOML file with a box referring to a logo that doesn't exist
+# Then: Error displayed to user
+# And: File loads successfully
+# And: Missing logo has an "error" logo where it should be
+#
+# ...and...
+#
+#  [UI] [Error] Image path not found #1 
+#
+# Given: A TOML file containing a logo path which doesn't exist
+# When: Loading that TOML using UI
+# Then: An error is shown to user
+# And: An error placeholder logo is shown in its place
+#
+
+[[boxes]]
+title = "Upper left"
+logos.1 = [ "smiley", "wine", "wine", "wine" ]
+outer = { x = 0.3333, y = 0.3333, width = 6.15, height = 3.26 }
+
+[logos.smiley]
+title = "Smiley Face"
+path = "not-found/smiley.png"

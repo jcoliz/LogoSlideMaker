@@ -43,14 +43,10 @@ public class PrimitivesEngine(RenderConfig config, IGetImageAspectRatio getLogoA
     {
         var result = new List<Primitive>();
 
-        var logo = logolayout.Logo;
+        var logo = logolayout.Logo ?? new Logo() { Title = "None" };
 
-        if (logo is null || ! getLogoAspect.Contains(logo.Path))
-        {
-            return [];
-        }
-
-        var aspect = getLogoAspect.GetAspectRatio(logo.Path);
+        var exists = getLogoAspect.Contains(logo.Path);
+        var aspect = exists ? getLogoAspect.GetAspectRatio(logo.Path) : 1m;
         var width_factor = (decimal)Math.Sqrt((double)aspect);
         var height_factor = 1.0m / width_factor;
         var icon_width = config.IconSize * width_factor * logo.Scale;
@@ -63,9 +59,18 @@ public class PrimitivesEngine(RenderConfig config, IGetImageAspectRatio getLogoA
             Height = icon_height * config.Dpi
         };
 
-        result.Add(
-            new ImagePrimitive() { Rectangle = imageRect, Path = logo.Path }
-        );
+        if (exists)
+        {
+            result.Add(
+                new ImagePrimitive() { Rectangle = imageRect, Path = logo.Path }
+            );
+        }
+        else
+        {
+            result.Add(
+                new RectanglePrimitive() { Rectangle = imageRect }
+            );
+        }
 
         var text_width_inches = logo.TextWidth ?? config.TextWidth;
         var textRectangle = new Rectangle()

@@ -205,7 +205,7 @@ public class LayoutEngine(Definition definition, Variant variant)
 
         var layout = entries
             .TakeWhile(x=>x.Command != Commands.End)
-            .Select((x,i)=>(logo:definition.Logos[x.Id!],column:i))
+            .Select((x,i)=>(logo:LookupLogo(x.Id),column:i))
             .Where(x=> LogoShownInVariant(x.logo))
             .Select(x=>new LogoLayout() { Logo = x.logo, X = row.XPosition + x.column * row.Spacing , Y = row.YPosition });
 
@@ -235,7 +235,7 @@ public class LayoutEngine(Definition definition, Variant variant)
         // Add tags from logo if there is a logo
         if (entry.Id != null)
         {
-            var logo = definition.Logos[entry.Id];
+            var logo = LookupLogo(entry.Id);
 
             // Also include placement-only tags which are included in the
             // id with an at-sign,
@@ -272,7 +272,7 @@ public class LayoutEngine(Definition definition, Variant variant)
         // Add tags from logo if there is a logo
         if (entry.Id != null)
         {
-            var logo = definition.Logos[entry.Id];
+            var logo = LookupLogo(entry.Id);
 
             // Also include placement-only tags which are included in the
             // id with an at-sign,
@@ -337,6 +337,27 @@ public class LayoutEngine(Definition definition, Variant variant)
         return false;
     }
 
+    /// <summary>
+    /// Find or create the logo matching this <paramref name="Id"/>
+    /// </summary>
+    /// <remarks>
+    /// Looks up the logo in the defintion. If not found, will create a "missing" placeholder
+    /// </remarks>
+    /// <param name="Id">Id of logo</param>
+    /// <returns>Logo created or found</returns>
+    private Logo LookupLogo(string? Id)
+    {
+        if (string.IsNullOrWhiteSpace(Id))
+        {
+            return new Logo() { Title = "Empty" };        
+        }
+        if (!definition.Logos.TryGetValue(Id, out var logo))
+        {
+            logo = new Logo() { Title = $"Missing Logo: {Id}" };
+            definition.Logos[Id] = logo;
+        }
+        return logo;
+    }
 }
 
 /// <summary>
