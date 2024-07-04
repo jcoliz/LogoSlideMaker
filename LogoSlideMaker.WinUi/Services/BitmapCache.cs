@@ -50,6 +50,9 @@ public class BitmapCache : IGetImageAspectRatio
                 var bounds = cb.GetBounds(resourceCreator);
                 bitmapAspectRatios[path] = (decimal)bounds.Width / (decimal)bounds.Height;
             }
+            // else if is null, we couldn't actually load it. That's fine, we'll just ignore
+            // it for here. Later, when someone comes looking for it, and we don't have it,
+            // they'll have to cope!
         }
     }
 
@@ -83,11 +86,11 @@ public class BitmapCache : IGetImageAspectRatio
     private readonly Dictionary<string, decimal> bitmapAspectRatios = [];
 
     /// <summary>
-    /// Load a single bitmap from embedded storage
+    /// Load a single bitmap from embedded storage, or null if not found
     /// </summary>
     /// <param name="resourceCreator">Where to create bitmaps</param>
     /// <param name="filename">Name of source file</param>
-    /// <returns>Created bitmap in this canvas</returns>
+    /// <returns>Created bitmap in this canvas, or null if not found</returns>
     private async Task<CanvasBitmap?> LoadBitmapAsync(ICanvasResourceCreator resourceCreator, string filename)
     {
         try
@@ -126,9 +129,10 @@ public class BitmapCache : IGetImageAspectRatio
             }
 
         }
-        catch (Exception ex)
+        catch
         {
-            Trace.WriteLine(ex.Message);
+            // Path not found is not a signficant error condition
+            // TODO: SHOULD be more vocal about other kinds of errors.
             return null;
         }
     }
