@@ -120,6 +120,12 @@ public sealed partial class MainWindow : Window
             // New slide, redraw
             canvas.Invalidate();
         }
+
+        if (e.PropertyName == nameof(MainViewModel.ShowBoundingBoxes))
+        {
+            // New slide, redraw
+            canvas.Invalidate();
+        }
     }
 
     private void ViewModel_ErrorFound(object? sender, ViewModels.ErrorEventArgs e)
@@ -352,25 +358,29 @@ public sealed partial class MainWindow : Window
     }
     private void Draw(TextPrimitive primitive, CanvasDrawingSession session)
     {
-#if false
-        // Draw a text bounding box
-        session.DrawRectangle(primitive.Rectangle.AsWindowsRect(), Microsoft.UI.Colors.Blue, 1);
-#endif
         // Draw the actual text
         session.DrawText(primitive.Text, primitive.Rectangle.AsWindowsRect(), solidBlack, defaultTextFormat);
+
+        // Draw a text bounding box
+        if (viewModel.ShowBoundingBoxes)
+        {
+            session.DrawRectangle(primitive.Rectangle.AsWindowsRect(), Microsoft.UI.Colors.Blue, 1);
+        }
     }
 
     private void Draw(ImagePrimitive primitive, CanvasDrawingSession session)
     {
-#if false
-        // Draw a logo bounding box
-        session.DrawRectangle(primitive.Rectangle.AsWindowsRect(), Microsoft.UI.Colors.Red, 1);
-#endif
         // Draw the actual logo
         var bitmap = bitmapCache.GetOrDefault(primitive.Path);
         if (bitmap is not null)
         {
             session.DrawImage(bitmap, primitive.Rectangle.AsWindowsRect(), bitmap.Bounds, 1.0f, CanvasImageInterpolation.HighQualityCubic );
+        }
+
+        // Draw a logo bounding box
+        if (viewModel.ShowBoundingBoxes)
+        {
+            session.DrawRectangle(primitive.Rectangle.AsWindowsRect(), Microsoft.UI.Colors.Red, 1);
         }
     }
 

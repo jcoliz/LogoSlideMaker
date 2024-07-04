@@ -225,6 +225,21 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
         }
     }
 
+    //    // [User Can] Turn visual display of bounding boxes on and off in preview
+    public bool ShowBoundingBoxes
+    {
+        get => _ShowBoundingBoxes;
+        set
+        {
+            if (value != _ShowBoundingBoxes)
+            {
+                _ShowBoundingBoxes = value;
+                OnPropertyChanged();
+            }
+        }    
+    }
+    private bool _ShowBoundingBoxes = false;
+
     /// <summary>
     /// [User Can] Reload changes made in TOML file since last (re)load
     /// </summary>
@@ -242,7 +257,6 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
     /// </summary>
     public ICommand PreviousSlide => _PreviousSlide ??= new RelayCommand(_ => BackToPreviousSlide());
     private ICommand? _PreviousSlide = null;
-
     #endregion
 
     #region Methods
@@ -381,23 +395,27 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
         _primitives.AddRange(_layout.Logos.SelectMany(generator.ToPrimitives));
 
 #if false
-        // TODO: This will be user-configurable
+        // TODO: Need a new home for this! Elsewhere we are handling bounding boxes
+        // as a rendering operation NOT a primitive-generating operation.
         // Add bounding boxes for any boxes with explicit outer dimensions
-        _primitives.AddRange(
-            _definition.Boxes
-                .Where(x => x.Outer is not null)
-                .Select(x => new RectanglePrimitive()
-                {
-                    Rectangle = x.Outer! with 
-                    { 
-                        X = x.Outer.X * 96m, 
-                        Y = x.Outer.Y * 96m,
-                        Width = x.Outer.Width * 96m,
-                        Height = x.Outer.Height * 96m
+        if (ShowBoundingBoxes)
+        {
+            _primitives.AddRange(
+                _definition.Boxes
+                    .Where(x => x.Outer is not null)
+                    .Select(x => new RectanglePrimitive()
+                    {
+                        Rectangle = x.Outer! with
+                        {
+                            X = x.Outer.X * 96m,
+                            Y = x.Outer.Y * 96m,
+                            Width = x.Outer.Width * 96m,
+                            Height = x.Outer.Height * 96m
+                        }
                     }
-                }
-        )
-        );
+            )
+            );
+        }
 #endif
     }
 

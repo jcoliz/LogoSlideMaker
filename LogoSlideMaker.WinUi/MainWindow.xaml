@@ -26,6 +26,7 @@
             <AppBarButton Icon="Refresh" Label="Reload" Command="{Binding Reload}" />
             <AppBarButton Icon="Back" Label="Previous" Command="{Binding PreviousSlide}" />
             <AppBarButton Icon="Forward" Label="Next" Command="{Binding NextSlide}" />
+            <AppBarToggleButton Icon="ViewAll" Label="Boxes" IsChecked="{Binding ShowBoundingBoxes, Mode=TwoWay}" />
             <AppBarButton Icon="Download" Label="Export" Click="DoExport_Click"/>
         </StackPanel>
         <Border Grid.Column="1" Background="#333333" Height="64">
