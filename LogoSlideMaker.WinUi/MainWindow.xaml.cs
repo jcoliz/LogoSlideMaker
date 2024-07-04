@@ -35,6 +35,9 @@ public sealed partial class MainWindow : Window
     private CanvasTextFormat? defaultTextFormat;
     private ICanvasBrush? solidBlack;
 
+    // Internal state
+    private bool needResourceLoad = false;
+
     #endregion
 
     #region Constructor
@@ -94,7 +97,7 @@ public sealed partial class MainWindow : Window
         var enqueued = this.DispatcherQueue.TryEnqueue(async () =>
         {
             // TODO: https://microsoft.github.io/Win2D/WinUI2/html/LoadingResourcesOutsideCreateResources.htm
-            this.Canvas_CreateResources(this.canvas);
+            this.CreateResources(this.canvas);
         });
 
         if (!enqueued)
@@ -139,6 +142,23 @@ public sealed partial class MainWindow : Window
         {
             logger.LogError("Failed to enqueue error dialog: {Title} {Details}", e.Title, e.Details);        
         }
+    }
+
+    private void Canvas_CreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs args)
+    {
+        // This is called by the canvas when it's ready for resources. Typically, this shouldn't be needed,
+        // as the canvas should be ready for resources before we have them loaded. However, there
+        // seem to be cases where the definition is loaded BEFORE the canvas is ready, so this event
+        // handler should ensure the resources are loaded anyway.
+
+        if (!needResourceLoad)
+        {
+            // When viewmodel is DONE loading, it will call us
+            logger.LogDebug("Create Resources: No resource load needed at this time");
+            return;
+        }
+
+        CreateResources(sender);
     }
 
     private void Window_Closed(object _, WindowEventArgs __)
@@ -243,7 +263,7 @@ public sealed partial class MainWindow : Window
 
     #region Canvas management & drawing
 
-    private async void Canvas_CreateResources(CanvasControl sender)
+    private async void CreateResources(CanvasControl sender)
     {
         try
         {
@@ -257,11 +277,11 @@ public sealed partial class MainWindow : Window
             }
             if (!canvas.IsLoaded)
             {
-                // This is problematic, and need to solve it. If the canvas isn't loaded, we will NEVER
-                // load resources.
-                logger.LogError("Create Resources: Canvas not loaded, skipping");
+                needResourceLoad = true;
+                logger.LogDebug("Create Resources: Canvas not loaded, skipping");
                 return;
             }
+            needResourceLoad = false;
             defaultTextFormat = new() { FontSize = config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
             solidBlack = new CanvasSolidColorBrush(sender, Microsoft.UI.Colors.Black);
 
