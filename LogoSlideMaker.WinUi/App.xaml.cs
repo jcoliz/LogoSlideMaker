@@ -44,9 +44,8 @@ public partial class App : Application
                     services.AddSingleton<MainWindow>();
                     services.AddSingleton<MainViewModel>();
 
-                    var bitmaps = new BitmapCache();
-                    services.AddSingleton<IGetImageAspectRatio>(bitmaps);
-                    services.AddSingleton(bitmaps);
+                    services.AddSingleton<BitmapCache>();
+                    services.AddSingleton<IGetImageAspectRatio>(x => x.GetRequiredService<BitmapCache>());
                 })
 
                 .Build();

@@ -23,4 +23,4 @@ outer = { x = 0.3333, y = 0.3333, width = 6.15, height = 3.26 }
 
 [logos.smiley]
 title = "Smiley Face"
-path = "not-found/smiley.png"
+path = "smiley.png"
