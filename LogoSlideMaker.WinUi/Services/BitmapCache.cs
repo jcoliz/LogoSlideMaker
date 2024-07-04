@@ -53,11 +53,13 @@ public class BitmapCache : IGetImageAspectRatio
         }
     }
 
+    /// <inheritdoc/>
     public bool Contains(string imagePath)
     {
         return bitmapAspectRatios.ContainsKey(imagePath);
     }
 
+    /// <inheritdoc/>
     public decimal GetAspectRatio(string imagePath)
     {
         if (!bitmapAspectRatios.TryGetValue(imagePath, out var result))
@@ -67,6 +69,11 @@ public class BitmapCache : IGetImageAspectRatio
         return result;
     }
 
+    /// <summary>
+    /// Get the bitmap available, or default if we dont have one
+    /// </summary>
+    /// <param name="imagePath">Filesystem path to use as a key</param>
+    /// <returns></returns>
     public CanvasBitmap? GetOrDefault(string imagePath)
     {
         return bitmaps.GetValueOrDefault(imagePath);
