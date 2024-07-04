@@ -29,6 +29,11 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
     /// A new definition has been loaded
     /// </summary>
     public event EventHandler<EventArgs>? DefinitionLoaded = delegate { }; 
+
+    /// <summary>
+    /// User action has resulted in an error
+    /// </summary>
+    public event EventHandler<ErrorEventArgs>? ErrorFound = delegate { };
     #endregion
 
     #region Properties
@@ -200,6 +205,13 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
                 return "Only slide";
             }
             var variant = _definition.Variants[SlideNumber];
+
+            if (SlideNumber < 0 || SlideNumber >= _definition.Variants.Count)
+            {
+                logger.LogError("DocumentSubtitle: Error slide number {Number} out of range {Count}", SlideNumber, _definition.Variants.Count);
+                return "???";            
+            }
+
             var result = $"Slide {SlideNumber + 1} of {_definition.Variants.Count}";
             if (!string.IsNullOrWhiteSpace(variant.Name))
             {
@@ -253,13 +265,17 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
                 }
                 catch (TomlException ex)
                 {
-                    // This is a real error that needs to go to the user!
-                    logger.LogError(ex, "LoadDefinitionAsync: TOML parsing failed");
+                    var args = new ErrorEventArgs() { Title = "TOML parsing failed", Details = ex.Message };
+                    ErrorFound?.Invoke(this, args);
                 }
                 catch (Exception ex)
                 {
-                    // This is something else. Probably should surface it also
+                    // I would like to track what causes this, so as to perhaps create more detailed
+                    // error-handling
                     logger.LogError(ex, "LoadDefinitionAsync: Stream load Failed");
+
+                    var args = new ErrorEventArgs() { Title = "Opening file failed", Details = ex.Message };
+                    ErrorFound?.Invoke(this, args);
                 }
             });
             logger.LogDebug("LoadDefinitionAsync: Launched");
@@ -444,7 +460,10 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
 
             var sr = new StreamReader(stream);
             var toml = sr.ReadToEnd();
+            
+            // This will throw if unable to parse
             var loaded = Toml.ToModel<Definition>(toml);
+
             _definition = loaded;
             if (SlideNumber >= _definition.Variants.Count)
             {
@@ -454,12 +473,6 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
             PopulateLayout();
 
             logger.LogInformation("LoadDefinition: OK {title}", DocumentTitle);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "LoadDefinition: Failed");
-            IsLoading = false;
-            throw;
         }
         finally
         {

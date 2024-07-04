@@ -8,7 +8,9 @@ using Microsoft.Graphics.Canvas.Text;
 using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
 using Windows.Foundation;
@@ -51,6 +53,7 @@ public sealed partial class MainWindow : Window
             viewModel.UIAction = x => this.DispatcherQueue.TryEnqueue(() => x());
             viewModel.PropertyChanged += ViewModel_PropertyChanged;
             viewModel.DefinitionLoaded += ViewModel_DefinitionLoaded;
+            viewModel.ErrorFound += ViewModel_ErrorFound;
             this.Root.DataContext = viewModel;
 
             // Set up app window
@@ -92,7 +95,7 @@ public sealed partial class MainWindow : Window
         this.Canvas_CreateResources(this.canvas);
     }
 
-    private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(MainViewModel.IsLoading))
         {
@@ -104,6 +107,29 @@ public sealed partial class MainWindow : Window
         {
             // New slide, redraw
             canvas.Invalidate();
+        }
+    }
+
+    private void ViewModel_ErrorFound(object? sender, ViewModels.ErrorEventArgs e)
+    {
+        var enqueued = this.DispatcherQueue.TryEnqueue(async () => 
+        {
+            var dialog = new ContentDialog
+            {
+                Title = e.Title,
+                Content = e.Details,
+                CloseButtonText = "OK"
+            };
+            dialog.XamlRoot = this.Root.XamlRoot;
+
+            ContentDialogResult result = await dialog.ShowAsync();
+
+            logger.LogInformation("Error dialog shown: {Title} {Details}", e.Title, e.Details);
+        });
+
+        if (!enqueued)
+        {
+            logger.LogError("Failed to enqueue error dialog: {Title} {Details}", e.Title, e.Details);        
         }
     }
 
@@ -136,9 +162,10 @@ public sealed partial class MainWindow : Window
             if (file != null)
             {
                 var path = file.Path;
+                logger.LogInformation("OpenFile: OK selected {path}", path);
+
                 bitmapCache.BaseDirectory = Path.GetDirectoryName(path);
                 await viewModel.LoadDefinitionAsync(path);
-                logger.LogInformation("OpenFile: OK loaded chosen file {path}", path);
             }
             else
             {
