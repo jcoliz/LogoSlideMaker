@@ -94,7 +94,7 @@ public sealed partial class MainWindow : Window
 
     private void ViewModel_DefinitionLoaded(object? sender, EventArgs e)
     {
-        var enqueued = this.DispatcherQueue.TryEnqueue(async () =>
+        var enqueued = this.DispatcherQueue.TryEnqueue(() =>
         {
             // TODO: https://microsoft.github.io/Win2D/WinUI2/html/LoadingResourcesOutsideCreateResources.htm
             this.CreateResources(this.canvas);
@@ -129,11 +129,11 @@ public sealed partial class MainWindow : Window
             {
                 Title = e.Title,
                 Content = e.Details,
-                CloseButtonText = "OK"
+                CloseButtonText = "OK",
+                XamlRoot = this.Root.XamlRoot
             };
-            dialog.XamlRoot = this.Root.XamlRoot;
 
-            ContentDialogResult result = await dialog.ShowAsync();
+            var result = await dialog.ShowAsync();
 
             logger.LogInformation("Error dialog shown: {Title} {Details}", e.Title, e.Details);
         });
