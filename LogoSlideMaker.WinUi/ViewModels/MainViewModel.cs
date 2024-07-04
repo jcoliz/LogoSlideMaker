@@ -243,16 +243,31 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
     {
         try
         {
-            LastOpenedFilePath = path;
             using var stream = path is null ? OpenEmbeddedDefinition() : File.OpenRead(path);
-            await Task.Run(() => { LoadDefinition(stream); });
-            logger.LogDebug("LoadDefinitionAsync: OK");
+            await Task.Run(() => 
+            {
+                try
+                {
+                    LoadDefinition(stream);
+                    LastOpenedFilePath = path;
+                }
+                catch (TomlException ex)
+                {
+                    // This is a real error that needs to go to the user!
+                    logger.LogError(ex, "LoadDefinitionAsync: TOML parsing failed");
+                }
+                catch (Exception ex)
+                {
+                    // This is something else. Probably should surface it also
+                    logger.LogError(ex, "LoadDefinitionAsync: Stream load Failed");
+                }
+            });
+            logger.LogDebug("LoadDefinitionAsync: Launched");
         }
         catch (Exception ex)
         {
             // TODO: Actually need to surface these to user. But for now, just dont crash
 
-            LastOpenedFilePath = null;
             logger.LogError(ex,"LoadDefinitionAsync: Failed");
         }
     }
@@ -429,7 +444,8 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
 
             var sr = new StreamReader(stream);
             var toml = sr.ReadToEnd();
-            _definition = Toml.ToModel<Definition>(toml);
+            var loaded = Toml.ToModel<Definition>(toml);
+            _definition = loaded;
             if (SlideNumber >= _definition.Variants.Count)
             {
                 SlideNumber = 0;
@@ -437,16 +453,19 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
 
             PopulateLayout();
 
-            UIAction(() => DefinitionLoaded?.Invoke(this, new EventArgs()));
-            OnPropertyChanged(nameof(DocumentTitle));
-            OnPropertyChanged(nameof(DocumentSubtitle));
-
             logger.LogInformation("LoadDefinition: OK {title}", DocumentTitle);
         }
         catch (Exception ex)
         {
-            LastOpenedFilePath = null;
             logger.LogError(ex, "LoadDefinition: Failed");
+            IsLoading = false;
+            throw;
+        }
+        finally
+        {
+            UIAction(() => DefinitionLoaded?.Invoke(this, new EventArgs()));
+            OnPropertyChanged(nameof(DocumentTitle));
+            OnPropertyChanged(nameof(DocumentSubtitle));
         }
     }
 

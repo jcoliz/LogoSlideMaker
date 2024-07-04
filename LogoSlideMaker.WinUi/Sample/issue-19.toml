@@ -1,0 +1,8 @@
+﻿[[boxes]]
+title = "Upper left"
+logos.1 = [ "smiley", "wine", "wine", "wine" ]
+outer = { x = 0.3333, y = 0.3333, width = 6.15, height = 3.26 }
+
+[failure]
+title = "Smiley Face"
+path = "not-found/smiley.png"
