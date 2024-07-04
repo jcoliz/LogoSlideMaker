@@ -46,12 +46,11 @@ public partial class App : Application
                 configurationBuilder.AddJsonFile("appsettings.json", optional:true);
 
                 // Enable picking up configuration from the environment vars
+                // TODO: Probably do NOT want to do this in production
                 configurationBuilder.AddEnvironmentVariables();
             })
             .ConfigureServices((context, services) =>
             {
-                // Only really need ONE of these main window implementations.
-                // Including both here so it's easy to switch between them
                 services.AddSingleton<MainWindow>();
                 services.AddSingleton<MainViewModel>();
 
