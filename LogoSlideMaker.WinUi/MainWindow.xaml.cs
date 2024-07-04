@@ -91,8 +91,16 @@ public sealed partial class MainWindow : Window
 
     private void ViewModel_DefinitionLoaded(object? sender, EventArgs e)
     {
-        // TODO: https://microsoft.github.io/Win2D/WinUI2/html/LoadingResourcesOutsideCreateResources.htm
-        this.Canvas_CreateResources(this.canvas);
+        var enqueued = this.DispatcherQueue.TryEnqueue(async () =>
+        {
+            // TODO: https://microsoft.github.io/Win2D/WinUI2/html/LoadingResourcesOutsideCreateResources.htm
+            this.Canvas_CreateResources(this.canvas);
+        });
+
+        if (!enqueued)
+        {
+            logger.LogError("ViewModel_DefinitionLoaded: Failed to enqueue Create Resources");
+        }
     }
 
     private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -249,7 +257,9 @@ public sealed partial class MainWindow : Window
             }
             if (!canvas.IsLoaded)
             {
-                logger.LogInformation("Create Resources: Canvas not loaded, skipping");
+                // This is problematic, and need to solve it. If the canvas isn't loaded, we will NEVER
+                // load resources.
+                logger.LogError("Create Resources: Canvas not loaded, skipping");
                 return;
             }
             defaultTextFormat = new() { FontSize = config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };

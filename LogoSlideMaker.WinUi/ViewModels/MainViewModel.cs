@@ -476,7 +476,7 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
         }
         finally
         {
-            UIAction(() => DefinitionLoaded?.Invoke(this, new EventArgs()));
+            DefinitionLoaded?.Invoke(this, new EventArgs());
             OnPropertyChanged(nameof(DocumentTitle));
             OnPropertyChanged(nameof(DocumentSubtitle));
         }
@@ -505,7 +505,8 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         // Raise the PropertyChanged event, passing the name of the property whose value has changed.
-        // And be sure to do it on UI thread, because we may be running on a BG thread
+        // And be sure to do it on UI thread, because we may be running on a BG thread, and the
+        // handler is often the framework, which runs on UI thread
         UIAction(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)));
     }
     #endregion
