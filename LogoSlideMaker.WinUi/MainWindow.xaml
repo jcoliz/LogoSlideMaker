@@ -26,7 +26,11 @@
             <AppBarButton Icon="Back" Label="Previous" Command="{Binding PreviousSlide}" />
             <AppBarButton Icon="Forward" Label="Next" Command="{Binding NextSlide}" />
             <AppBarToggleButton Icon="ViewAll" Label="Boxes" IsChecked="{Binding ShowBoundingBoxes, Mode=TwoWay}" />
-            <AppBarButton Icon="Help" Label="About" Click="About_Click" />
+            <AppBarButton Label="About" Click="About_Click">
+                <AppBarButton.Icon>
+                    <ImageIcon Source="ms-appx:///Assets/icon-info.svg"/>
+                </AppBarButton.Icon>
+            </AppBarButton>
             <AppBarButton Icon="Download" Label="Export" Click="DoExport_Click"/>
         </StackPanel>
         <Border Grid.Column="1" Background="#333333" Height="64">
