@@ -253,6 +253,18 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
             return $"{version.Value.Major}.{version.Value.Minor}.{version.Value.Revision}.{version.Value.Build}";
         }
     }
+    public string BuildVersion
+    {
+        get
+        {
+            if (_BuildVersion is null)
+            {
+                _BuildVersion = LoadBuildVersion();
+            }
+            return _BuildVersion ?? string.Empty;
+        }
+    }
+    private string? _BuildVersion;
 
     public string AppDisplayName => Package.Current?.DisplayName ?? "N/A";
 
@@ -474,11 +486,19 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
     private static Stream OpenEmbeddedDefinition()
     {
         var filename = "sample.toml";
-        var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
-        var resource = names.Where(x => x.Contains($".{filename}")).Single();
-        var stream = Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource)!;
 
-        return stream;
+        return OpenEmbeddedFile(filename) ?? throw new KeyNotFoundException($"Cannot find {filename}");
+    }
+
+    private static Stream? OpenEmbeddedFile(string filename)
+    {
+        var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
+        var resource = names.Where(x => x.Contains($".{filename}")).SingleOrDefault();
+        if (resource is null)
+        {
+            return null;
+        }
+        return Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource)!;
     }
 
     /// <summary>
@@ -530,6 +550,24 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
 
         var engine = new LayoutEngine(_definition, variant);
         _layout = engine.CreateSlideLayout();
+    }
+
+    /// <summary>
+    /// Load the version of the app as known to the build system
+    /// </summary>
+    /// <remarks>
+    /// Build system generates version.txt which has an app version in that.
+    /// </remarks>
+    private string? LoadBuildVersion()
+    {
+        var stream = OpenEmbeddedFile("version.txt");
+        if (stream is null)
+        {
+            return null;
+        }
+
+        using var reader = new StreamReader(stream);
+        return reader.ReadToEnd().Trim();
     }
 
     /// <summary>

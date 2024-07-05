@@ -59,7 +59,7 @@
                 <TextBlock TextWrapping="WrapWholeWords" Margin="0,0,0,10">Permission is hereby granted, free of charge, to any person 
                     obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction. 
                     See license for details.</TextBlock>
-                <TextBlock TextWrapping="WrapWholeWords" Margin="0,0,0,0">Version <Run Text="{Binding AppVersion}"/></TextBlock>
+                <TextBlock TextWrapping="WrapWholeWords" Margin="0,0,0,0">Version <Run Text="{Binding AppVersion}"/> (<Run Text="{Binding BuildVersion}"/>)</TextBlock>
             </StackPanel>
         </ContentDialog>
     </Grid>
