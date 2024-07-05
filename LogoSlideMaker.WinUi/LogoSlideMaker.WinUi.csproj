@@ -70,7 +70,14 @@
 	  <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
-  <!-- 
+	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+		<Exec Command="pwsh --command &quot; &amp;'$(SolutionDir)scripts\Get-Version.ps1' &gt; '$(BaseIntermediateOutputPath)\version.txt' &quot;" />
+	</Target>
+	<ItemGroup>
+		<EmbeddedResource Include="$(BaseIntermediateOutputPath)\version.txt" />
+	</ItemGroup>
+	
+	<!-- 
     Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
     Tools extension to be activated for this project even if the Windows App SDK Nuget
     package has not yet been restored.
