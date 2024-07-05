@@ -29,6 +29,8 @@ public partial class App : Application
         {
             Log.Information("----------------------------------");
 
+            Application.Current.UnhandledException += Application_UnhandledException;
+
             this.InitializeComponent();
 
             //
@@ -46,13 +48,33 @@ public partial class App : Application
 
                     services.AddSingleton<BitmapCache>();
                     services.AddSingleton<IGetImageAspectRatio>(x => x.GetRequiredService<BitmapCache>());
+
+                    Log.Debug("Startup: ConfigureServices OK");
                 })
 
                 .Build();
+
+            Log.Debug("Startup: Build OK");
         }
         catch (Exception ex)
         {
             Log.Fatal(ex, "Startup failed");
+        }
+    }
+
+    private void Application_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+    {
+        if (e.Exception is Microsoft.UI.Xaml.Markup.XamlParseException pex)
+        {
+            Log.Fatal(e.Exception, "Unhandled XamlParseException Stack: {Stack} Source: {Source}", pex.StackTrace ?? "null", pex.Source ?? "null");
+            if (pex.InnerException is not null)
+            {
+                Log.Fatal(pex.InnerException, "Inner exception");
+            }
+        }
+        else
+        {
+            Log.Fatal(e.Exception, "Unhandled exception");
         }
     }
 
