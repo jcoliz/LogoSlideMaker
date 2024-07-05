@@ -60,7 +60,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.2.0" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240607001" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.3233" />
 	<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
 	<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
 	<PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
