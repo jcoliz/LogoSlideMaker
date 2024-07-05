@@ -1,7 +1,8 @@
 {
   "profiles": {
     "LogoSlideMaker.WinUi (Package)": {
-      "commandName": "MsixPackage"
+      "commandName": "MsixPackage",
+      "nativeDebugging": true
     },
     "LogoSlideMaker.WinUi (Unpackaged)": {
       "commandName": "Project"
