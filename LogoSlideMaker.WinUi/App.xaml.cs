@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
 using Serilog;
+using Windows.Storage;
 
 namespace LogoSlideMaker.WinUi;
 /// <summary>
@@ -92,6 +93,9 @@ public partial class App : Application
             {
                 throw new Exception("Host not found");            
             }
+
+            var folder = ApplicationData.Current.LocalFolder;
+            Log.Debug("Local Folder: {Path}", folder.Path);
 
             await _host.StartAsync();
 
