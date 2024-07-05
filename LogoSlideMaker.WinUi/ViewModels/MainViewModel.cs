@@ -13,6 +13,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Tomlyn;
+using Windows.ApplicationModel;
 using Windows.Storage;
 
 namespace LogoSlideMaker.WinUi.ViewModels;
@@ -239,6 +240,21 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
         }    
     }
     private bool _ShowBoundingBoxes = false;
+
+    public string AppVersion
+    {
+        get
+        {
+            var version = Package.Current?.Id.Version;
+            if (version is null)
+            {
+                return "N/A";
+            }
+            return $"{version.Value.Major}.{version.Value.Minor}.{version.Value.Revision}.{version.Value.Build}";
+        }
+    }
+
+    public string AppDisplayName => Package.Current?.DisplayName ?? "N/A";
 
     /// <summary>
     /// [User Can] Reload changes made in TOML file since last (re)load

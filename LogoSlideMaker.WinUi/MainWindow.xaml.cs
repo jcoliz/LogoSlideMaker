@@ -11,6 +11,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using Windows.Foundation;
@@ -58,6 +59,7 @@ public sealed partial class MainWindow : Window
             viewModel.DefinitionLoaded += ViewModel_DefinitionLoaded;
             viewModel.ErrorFound += ViewModel_ErrorFound;
             this.Root.DataContext = viewModel;
+            this.Title = viewModel.AppDisplayName;
 
             // Set up app window
             var dpi = GetDpiForWindow(hWnd);
@@ -269,6 +271,19 @@ public sealed partial class MainWindow : Window
         {
             logger.LogError(ex, "Export failed");
         }
+    }
+
+    private async void About_Click(object sender, RoutedEventArgs e)
+    {
+        var result = await aboutDialog.ShowAsync();
+
+        logger.LogDebug("About Dialog: {Result}", result);
+    }
+
+    private void aboutDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+    {
+        var path = Path.GetTempPath() + "LogoSlideMaker";
+        Process.Start("explorer.exe", path);
     }
 
     #endregion

@@ -8,7 +8,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:win2dcanvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
     mc:Ignorable="d"
-    Title="Logo Slide Maker"
     Closed="Window_Closed"
     >
 
@@ -27,7 +26,7 @@
             <AppBarButton Icon="Back" Label="Previous" Command="{Binding PreviousSlide}" />
             <AppBarButton Icon="Forward" Label="Next" Command="{Binding NextSlide}" />
             <AppBarToggleButton Icon="ViewAll" Label="Boxes" IsChecked="{Binding ShowBoundingBoxes, Mode=TwoWay}" />
-            <AppBarButton Icon="Help" Label="About" />
+            <AppBarButton Icon="Help" Label="About" Click="About_Click" />
             <AppBarButton Icon="Download" Label="Export" Click="DoExport_Click"/>
         </StackPanel>
         <Border Grid.Column="1" Background="#333333" Height="64">
@@ -40,30 +39,23 @@
         <win2dcanvas:CanvasControl Grid.Row="1" Grid.ColumnSpan="2" x:Name="canvas" Draw="CanvasControl_Draw" ClearColor="#333333" CreateResources="Canvas_CreateResources"/>
         <ProgressRing Grid.Row="1" Grid.ColumnSpan="2" IsActive="{Binding IsLoading}" Foreground="White"/>
 
-        <ContentDialog x:Name="aboutDialog"
-           PrimaryButtonText="Accept" IsPrimaryButtonEnabled="True"
-           CloseButtonText="Cancel">
+        <ContentDialog x:Name="aboutDialog" SecondaryButtonText="View Logs" SecondaryButtonClick="aboutDialog_SecondaryButtonClick"
+           PrimaryButtonText="OK">
             <ContentDialog.TitleTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <Image Source="ms-appx:///Assets/SmallLogo.png" Width="40" Height="40" Margin="10,0"/>
-                        <TextBlock Text="Terms of use"/>
+                        <Image Source="ms-appx:///Assets/icons8-picture-48.png" Width="40" Height="40" Margin="10,0"/>
+                        <TextBlock Text="{Binding AppDisplayName}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </DataTemplate>
             </ContentDialog.TitleTemplate>
             <StackPanel>
-                <TextBlock TextWrapping="WrapWholeWords">
-        <Run>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor
-             congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus
-             malesuada libero, sit amet commodo magna eros quis urna.</Run><LineBreak/>
-        <Run>Nunc viverra imperdiet enim. Fusce est. Vivamus a tellus.</Run><LineBreak/>
-        <Run>Pellentesque habitant morbi tristique senectus et netus et malesuada fames
-             ac turpis egestas. Proin pharetra nonummy pede. Mauris et orci.</Run><LineBreak/>
-        <Run>Suspendisse dui purus, scelerisque at, vulputate vitae, pretium mattis, nunc.
-             Mauris eget neque at sem venenatis eleifend. Ut nonummy.</Run>
-                </TextBlock>
-                <CheckBox x:Name="ConfirmAgeCheckBox" Content="I am over 13 years of age."
-              />
+                <TextBlock TextWrapping="WrapWholeWords" Margin="0,0,0,10"><Hyperlink NavigateUri="https://github.com/jcoliz/LogoSlideMaker/">https://github.com/jcoliz/LogoSlideMaker/</Hyperlink></TextBlock>
+                <TextBlock TextWrapping="WrapWholeWords" Margin="0,0,0,10">Copyright (C) 2024 James Coliz, Jr. All rights reserved.</TextBlock>
+                <TextBlock TextWrapping="WrapWholeWords" Margin="0,0,0,10">Permission is hereby granted, free of charge, to any person 
+                    obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction. 
+                    See license for details.</TextBlock>
+                <TextBlock TextWrapping="WrapWholeWords" Margin="0,0,0,0">Version <Run Text="{Binding AppVersion}"/></TextBlock>
             </StackPanel>
         </ContentDialog>
     </Grid>

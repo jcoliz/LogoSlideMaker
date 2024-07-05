@@ -37,6 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Assets\icons8-picture-48.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\Square150x150Logo.scale-200.png" />
