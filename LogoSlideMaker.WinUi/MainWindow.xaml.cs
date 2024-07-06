@@ -275,9 +275,19 @@ public sealed partial class MainWindow : Window
 
     private async void About_Click(object sender, RoutedEventArgs e)
     {
-        var result = await aboutDialog.ShowAsync();
+        ContentDialogResult result = await aboutDialog.ShowAsync();
 
-        logger.LogDebug("About Dialog: {Result}", result);
+        logger.LogDebug
+        (
+            "About Dialog: {Result}",
+            result switch
+            {
+                ContentDialogResult.Primary => "OK",
+                ContentDialogResult.Secondary => "Logs",
+                ContentDialogResult.None => "None",
+                _ => "Unknown"
+            }
+        );
     }
 
     private void aboutDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
