@@ -19,9 +19,10 @@
 	<AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
 	<AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
 	<AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
-	<GenerateTestArtifacts>True</GenerateTestArtifacts>
+	<GenerateTestArtifacts>False</GenerateTestArtifacts>
 	<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
 	<PackageCertificateThumbprint>26A3701F13FCE1D1FECC90C644D674D2698D54AF</PackageCertificateThumbprint>
+	<AppxBundle>Never</AppxBundle>
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="Assets\icon-info.svg" />
