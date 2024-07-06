@@ -59,7 +59,7 @@ public sealed partial class MainWindow : Window
             viewModel.DefinitionLoaded += ViewModel_DefinitionLoaded;
             viewModel.ErrorFound += ViewModel_ErrorFound;
             this.Root.DataContext = viewModel;
-            this.Title = viewModel.AppDisplayName;
+            this.Title = MainViewModel.AppDisplayName;
 
             // Set up app window
             var dpi = GetDpiForWindow(hWnd);
@@ -282,8 +282,7 @@ public sealed partial class MainWindow : Window
 
     private void aboutDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
-        var path = Path.GetTempPath() + "LogoSlideMaker";
-        Process.Start("explorer.exe", path);
+        Process.Start("explorer.exe", MainViewModel.LogsFolder);
     }
 
     #endregion

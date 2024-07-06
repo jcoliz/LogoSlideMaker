@@ -266,7 +266,17 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
     }
     private string? _BuildVersion;
 
-    public string AppDisplayName => Package.Current?.DisplayName ?? "N/A";
+    public static string AppDisplayName => Package.Current?.DisplayName ?? "N/A";
+
+    public static string LogsFolder
+    {
+        get
+        {
+            var tempfolder = ApplicationData.Current.TemporaryFolder.Path;
+            var result = Path.Combine(tempfolder, "Logs");
+            return result;
+        }
+    }
 
     /// <summary>
     /// [User Can] Reload changes made in TOML file since last (re)load

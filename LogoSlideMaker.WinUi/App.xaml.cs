@@ -23,7 +23,7 @@ public partial class App : Application
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
             .WriteTo.Debug()
-            .WriteTo.File(System.IO.Path.GetTempPath()+"/LogoSlideMaker/log-.txt", rollingInterval: RollingInterval.Day)
+            .WriteTo.File(MainViewModel.LogsFolder+"/log-.txt", rollingInterval: RollingInterval.Day)
             .CreateLogger();
 
         try
