@@ -275,7 +275,7 @@ public sealed partial class MainWindow : Window
 
     private async void About_Click(object sender, RoutedEventArgs e)
     {
-        ContentDialogResult result = await aboutDialog.ShowAsync();
+        var result = await aboutDialog.ShowAsync();
 
         logger.LogDebug
         (

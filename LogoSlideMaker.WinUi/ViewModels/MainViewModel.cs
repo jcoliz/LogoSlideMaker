@@ -241,7 +241,7 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
     }
     private bool _ShowBoundingBoxes = false;
 
-    public string AppVersion
+    public static string AppVersion
     {
         get
         {
@@ -257,10 +257,7 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
     {
         get
         {
-            if (_BuildVersion is null)
-            {
-                _BuildVersion = LoadBuildVersion();
-            }
+            _BuildVersion ??= LoadBuildVersion();
             return _BuildVersion ?? string.Empty;
         }
     }
@@ -568,7 +565,7 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
     /// <remarks>
     /// Build system generates version.txt which has an app version in that.
     /// </remarks>
-    private string? LoadBuildVersion()
+    private static string? LoadBuildVersion()
     {
         var stream = OpenEmbeddedFile("version.txt");
         if (stream is null)
