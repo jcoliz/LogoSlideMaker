@@ -10,7 +10,7 @@
   <Identity
     Name="40771JamesColiz.LogoSlideMaker"
     Publisher="CN=BC3C092B-CAC4-4895-988A-ACA5F653CDF9"
-    Version="1.0.0.0" />
+    Version="1.0.2.0" />
 
   <mp:PhoneIdentity PhoneProductId="d8940b69-72b4-4d24-977f-b18b2f707fa9" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 

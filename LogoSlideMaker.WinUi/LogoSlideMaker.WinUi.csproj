@@ -15,13 +15,13 @@
 	<AssemblyTitle>Logo Slide Maker</AssemblyTitle>
 	<GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
 	<GenerateAppInstallerFile>False</GenerateAppInstallerFile>
-	<AppxPackageSigningEnabled>False</AppxPackageSigningEnabled>
+	<AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
 	<AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
 	<AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
 	<AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
 	<GenerateTestArtifacts>True</GenerateTestArtifacts>
-	<AppxBundle>Never</AppxBundle>
 	<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+	<PackageCertificateThumbprint>26A3701F13FCE1D1FECC90C644D674D2698D54AF</PackageCertificateThumbprint>
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="Assets\icon-info.svg" />
