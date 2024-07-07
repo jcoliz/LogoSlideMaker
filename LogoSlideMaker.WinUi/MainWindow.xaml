@@ -40,7 +40,7 @@
                 <Run Text="{Binding DocumentSubtitle}"/>
             </TextBlock>
         </Border>
-        <win2dcanvas:CanvasControl Grid.Row="1" Grid.ColumnSpan="2" x:Name="canvas" Draw="CanvasControl_Draw" ClearColor="#333333" CreateResources="Canvas_CreateResources"/>
+        <win2dcanvas:CanvasControl Width="1280" Height="720" Grid.Row="1" Grid.ColumnSpan="2" x:Name="canvas" Draw="CanvasControl_Draw" ClearColor="#333333" CreateResources="Canvas_CreateResources"/>
         <ProgressRing Grid.Row="1" Grid.ColumnSpan="2" IsActive="{Binding IsLoading}" Foreground="White"/>
 
         <ContentDialog x:Name="aboutDialog" SecondaryButtonText="View Logs" SecondaryButtonClick="aboutDialog_SecondaryButtonClick"
