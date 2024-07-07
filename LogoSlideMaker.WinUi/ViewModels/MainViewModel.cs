@@ -250,7 +250,7 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
             {
                 return "N/A";
             }
-            return $"{version.Value.Major}.{version.Value.Minor}.{version.Value.Revision}.{version.Value.Build}";
+            return $"{version.Value.Major}.{version.Value.Minor}.{version.Value.Build}.{version.Value.Revision}";
         }
     }
     public string BuildVersion
