@@ -9,6 +9,11 @@ Or how many disparate technology components you've leverage in your own solution
 Logo Slide Maker is a Windows Desktop application to build, preview, and generate PowerPoint presentations containing
 logos with text. It can also be run from a terminal window. 
 
+## Installing
+
+Head over to the [Releases](https://github.com/jcoliz/LogoSlideMaker/releases) section to download the latest MSIX for your architecture. Before installing it the first time,
+you'll need to download and trust the matching certificate file (.cer). In the future, the app will be available in the Microsoft Store.
+
 ## Getting Started
 
 Here's the basic getting started guide:
@@ -17,10 +22,9 @@ Here's the basic getting started guide:
 1. Open the TOML file in the app to preview.
 1. Make changes to the TOML as needed to fulfil your vision, and reload to update the preview with your changes.
 1. If you have multiple slides defined, view each slide individually, using Previous and Next commands.
-1. Once you're happy, export the slides to a PowerPoint presentation
+1. Once you're happy, export the slides to a PowerPoint presentation.
 
-## Unfinished Business
+## Roadmap
 
-For now, the only way to use the tool is to clone this repo and build it yourself. In the future, fully built versions will be available in the Microsoft Store.
-
-For more details, please see the [Issues](https://github.com/jcoliz/LogoSlideMaker/issues) section of this repo for a full list of functionality envisioned for the future.
+For details on future planned features, please visit the [Issues](https://github.com/jcoliz/LogoSlideMaker/issues) section. Feel free to file an issue there to report a
+bug or suggest a new feature.

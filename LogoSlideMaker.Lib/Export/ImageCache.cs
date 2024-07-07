@@ -108,9 +108,9 @@ public class ImageCache : IGetImageAspectRatio
         Stream? stream = null;
         if (BaseDirectory is null)
         {
-            var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
+            var names = Assembly.GetEntryAssembly()!.GetManifestResourceNames();
             var resource = names.Where(x => x.Contains($".{filename}")).Single();
-            stream = Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource);
+            stream = Assembly.GetEntryAssembly()!.GetManifestResourceStream(resource);
         }
         else
         {

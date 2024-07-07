@@ -57,7 +57,8 @@ await exportPipeline.LoadAndMeasureAsync(Path.GetDirectoryName(options.Input)!);
 // EXPORT
 //
 
-exportPipeline.Save(definitions.Files.Template.Slides, definitions.Files.Output, options.Version);
+using var templateStream = definitions.Files.Template.Slides is not null ? File.OpenRead(definitions.Files.Output) : null;
+exportPipeline.Save(templateStream, definitions.Files.Output, options.Version);
 
 //
 // LISTING

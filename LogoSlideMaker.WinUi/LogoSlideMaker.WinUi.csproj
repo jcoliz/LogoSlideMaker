@@ -36,6 +36,7 @@
     <None Remove="Sample\wine-local.png" />
     <None Remove="Sample\wine-svgrepo-com.svg" />
     <None Remove="Sample\wine.png" />
+	<None Remove="Sample\template.pptx" />
   </ItemGroup>
 
   <ItemGroup>
@@ -56,6 +57,7 @@
     <EmbeddedResource Include="Sample\wine-local.png" />
     <EmbeddedResource Include="Sample\wine-svgrepo-com.svg" />
     <EmbeddedResource Include="Sample\wine.png" />
+	<EmbeddedResource Include="Sample\template.pptx" />
   </ItemGroup>
 
   <ItemGroup>

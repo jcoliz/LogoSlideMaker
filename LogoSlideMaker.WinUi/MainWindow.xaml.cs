@@ -224,29 +224,16 @@ public sealed partial class MainWindow : Window
     {
         try
         {
-            // Will save this out as powerpoint file
-            // Get the default output file from the viewmodel
-            var path = viewModel.OutputPath;
-            if (path is null)
-            {
-                // TODO: Should disable 'Export' app button when output path is null
-
-                logger.LogError("Unable to export to empty path");
-
-                return;
-            }
-
             // Bring up a save picker to let user have ultimate decision on file
             var picker = new FileSavePicker()
             {
-                SuggestedFileName = Path.GetFileName(path),
-                DefaultFileExtension = Path.GetExtension(path),
+                SuggestedFileName = Path.GetFileName(viewModel.OutputPath ?? viewModel.LastOpenedFilePath ?? "logo-slides.pptx"),
                 SettingsIdentifier = "Common"
             };
             picker.FileTypeChoices.Add("PowerPoint Files", [".pptx"]);
 
             // Associate the HWND with the file picker
-            WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
+            InitializeWithWindow.Initialize(picker, hWnd);
 
             var file = await picker.PickSaveFileAsync();
             if (file != null)
@@ -258,18 +245,18 @@ public sealed partial class MainWindow : Window
                 // TODO: Also should get this off the UI thread! :(
                 await viewModel.ExportToAsync(outPath);
 
-                logger.LogInformation("OpenFile: OK exported {path}", path);
+                logger.LogInformation("Export: OK {path}", outPath);
             }
             else
             {
-                logger.LogDebug("OpenFile: No file chosen");
+                logger.LogDebug("Export: No file chosen");
             }
 
             // TODO: Give user option to launch the ppt (would be nice)
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Export failed");
+            logger.LogError(ex, "Export: Failed");
         }
     }
 

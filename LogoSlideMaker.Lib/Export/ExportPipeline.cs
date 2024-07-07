@@ -23,16 +23,16 @@ public class ExportPipeline
         renderEngine = new(definition.Render, imageCache);
     }
 
-    public async Task LoadAndMeasureAsync(string basePath)
+    public async Task LoadAndMeasureAsync(string? basePath)
     {
         imageCache.BaseDirectory = basePath;
         await imageCache.LoadAsync(definition.Logos.Select(x => x.Value.Path));
     }
 
-    public void Save(string? templatePath, string outputPath, string? dataVersion)
+    public void Save(Stream? templateStream, string outputPath, string? dataVersion)
     {
         // Open template or create new presentation
-        var pres = !string.IsNullOrWhiteSpace(templatePath) ? new Presentation(templatePath) : new Presentation();
+        var pres = templateStream is not null ? new Presentation(templateStream) : new Presentation();
 
         // If there isn't a specified variant, default to an EMPTY one
         // TODO: Perhaps better to do this on LOAD
