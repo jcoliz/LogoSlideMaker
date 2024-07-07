@@ -33,33 +33,17 @@ name = "Both PNG & SVG"
 include = [ "svg" ]
 
 [[boxes]]
-title = "Upper left"
+title = "Left side"
 logos.1 = [ "wine", "wine-svg", "wine", "wine-svg" ]
 logos.2 = [ "wine", "wine-svg" ]
-outer = { x = 0.3333, y = 0.3333, width = 6.15, height = 3.26 }
+outer = { x = 0.87, y = 2.51, width = 5.71, height = 4 }
 min_columns = 4
 auto_flow = true
 
 [[boxes]]
-title = "Lower left"
+title = "Right side"
 logos.1 = [ "wine", "wine-svg", "wine", "wine-svg" ]
 logos.2 = [ "wine", "wine-svg" ]
-outer = { x = 0.3333, y = 3.91, width = 6.15, height = 3.26 }
-min_columns = 4
-auto_flow = true
-
-[[boxes]]
-title = "Upper right"
-logos.1 = [ "wine", "wine-svg", "wine", "wine-svg" ]
-logos.2 = [ "wine", "wine-svg" ]
-outer = { x = 6.85, y = 0.3333, width = 6.15, height = 3.26 }
-min_columns = 4
-auto_flow = true
-
-[[boxes]]
-title = "Lower right"
-logos.1 = [ "wine", "wine-svg", "wine", "wine-svg" ]
-logos.2 = [ "wine", "wine-svg" ]
-outer = { x = 6.85, y = 3.91, width = 6.15, height = 3.26 }
+outer = { x = 6.78, y = 2.51, width = 5.71, height = 4 }
 min_columns = 4
 auto_flow = true
