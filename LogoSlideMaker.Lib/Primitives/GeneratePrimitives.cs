@@ -43,7 +43,13 @@ public class PrimitivesEngine(RenderConfig config, IGetImageAspectRatio getLogoA
     {
         var result = new List<Primitive>();
 
-        var logo = logolayout.Logo ?? new Logo() { Title = "None" };
+        if (logolayout.Logo is null)
+        {
+            // Some confusion here. Worth tracking down what I was expecting by
+            // having a null in the logolayouts.
+            return [];
+        }
+        var logo = logolayout.Logo; // ?? new Logo() { Title = "None" };
 
         var exists = getLogoAspect.Contains(logo.Path);
         var aspect = exists ? getLogoAspect.GetAspectRatio(logo.Path) : 1m;
