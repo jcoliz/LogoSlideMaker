@@ -41,4 +41,14 @@ public record Config
     /// Only used when boxes have an outer container specified
     /// </remarks>
     public decimal? Padding { get; set; }
+
+    /// <summary>
+    /// Padding on X axis. Overrides padding if exists
+    /// </summary>
+    public decimal? PaddingX { get; set; }
+    /// <summary>
+    /// Padding on Y axis. Overrides padding if exists
+    /// </summary>
+    public decimal? PaddingY { get; set; }
+
 }

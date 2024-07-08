@@ -78,7 +78,10 @@ public class PrimitivesEngine(RenderConfig config, IGetImageAspectRatio getLogoA
             );
         }
 
-        var text_width_inches = logo.TextWidth ?? config.TextWidth;
+        // Default text width is the perfect size to fit given the number of colums
+        // Logos can set a minimum, as can the whole file
+        var text_width_inches = Math.Max(config.TextWidth, Math.Max(logolayout.DefaultTextWidth.HasValue ? logolayout.DefaultTextWidth.Value - .02m : 0, logo.TextWidth ?? 0));
+
         var textRectangle = new Rectangle()
         {
             X = ( logolayout.X - text_width_inches / 2.0m ) * config.Dpi,

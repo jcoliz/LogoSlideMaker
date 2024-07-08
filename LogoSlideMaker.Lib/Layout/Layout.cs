@@ -182,9 +182,9 @@ public class LayoutEngine(Definition definition, Variant variant)
                 } 
             : new Rectangle()
             {
-                X = box.Outer.X + (definition.Layout.Padding ?? 0) + definition.Render.TextWidth / 2m,
-                Y = (box.Outer.Y is not null) ? box.Outer.Y + (definition.Layout.Padding ?? 0) + definition.Render.IconSize / 2m : YPosition,
-                Width = box.Outer.Width - (definition.Layout.Padding ?? 0) * 2 - definition.Render.TextWidth
+                X = box.Outer.X + (definition.Layout.PaddingX ?? 0) + definition.Render.TextWidth / 2m,
+                Y = (box.Outer.Y is not null) ? box.Outer.Y + (definition.Layout.PaddingY ?? definition.Layout.Padding ?? 0) + definition.Render.IconSize / 2m : YPosition,
+                Width = box.Outer.Width - (definition.Layout.PaddingX ?? definition.Layout.Padding ?? 0) * 2 - definition.Render.TextWidth
             };
 
         return (List<string> logos, int col) => new Row() 
@@ -207,7 +207,7 @@ public class LayoutEngine(Definition definition, Variant variant)
             .TakeWhile(x=>x.Command != Commands.End)
             .Select((x,i)=>(logo:LookupLogo(x.Id),column:i))
             .Where(x=> LogoShownInVariant(x.logo))
-            .Select(x=>new LogoLayout() { Logo = x.logo, X = row.XPosition + x.column * row.Spacing , Y = row.YPosition });
+            .Select(x=>new LogoLayout() { Logo = x.logo, X = row.XPosition + x.column * row.Spacing , Y = row.YPosition, DefaultTextWidth = row.Spacing });
 
         // If row ends up being empty, we still need to placehold vertical space for it
         return layout.Any() ? layout : [ new() { Y = row.YPosition } ];
@@ -368,6 +368,16 @@ public record LogoLayout
     public Logo? Logo { get; init; }
     public decimal X { get; init; }
     public decimal Y { get; init; }
+
+    /// <summary>
+    /// Based on the layout, what is a good text width?
+    /// </summary>
+    /// <remarks>
+    /// This can be overridden by the logo's own defined text width.
+    /// Having it in layout allows it to vary by how many columns
+    /// are in the box.
+    /// </remarks>
+    public decimal? DefaultTextWidth { get; init; }
 }
 
 /// <summary>
