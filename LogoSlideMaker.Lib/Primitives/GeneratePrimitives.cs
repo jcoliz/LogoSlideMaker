@@ -78,9 +78,18 @@ public class PrimitivesEngine(RenderConfig config, IGetImageAspectRatio getLogoA
             );
         }
 
+        // Proposed new change:
         // Default text width is the perfect size to fit given the number of colums
         // Logos can set a minimum, as can the whole file
-        var text_width_inches = Math.Max(config.TextWidth, Math.Max(logolayout.DefaultTextWidth.HasValue ? logolayout.DefaultTextWidth.Value - .02m : 0, logo.TextWidth ?? 0));
+        //var text_width_inches = Math.Max(config.TextWidth, Math.Max(logolayout.DefaultTextWidth.HasValue ? logolayout.DefaultTextWidth.Value - .02m : 0, logo.TextWidth ?? 0));
+
+        // Unfortunately, this makes the old slide look bad. So I will have to think more
+        // about how to configure this. With the two-page layout, I want the first page to
+        // have a narrower text width than the second page. So I guess this means I need an
+        // override text width on the variant
+
+        // logo layout will now get text wifth from variant. This is kind of a hack.
+        var text_width_inches = logo.TextWidth ?? logolayout.DefaultTextWidth ?? config.TextWidth;
 
         var textRectangle = new Rectangle()
         {

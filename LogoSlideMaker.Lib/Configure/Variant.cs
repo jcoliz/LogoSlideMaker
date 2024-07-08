@@ -66,6 +66,15 @@ public record Variant
     /// NOTE: Not implemented yet
     /// </remarks>
     public string? Lang { get; set; }
+
+    /// <summary>
+    /// Default text width for this variant
+    /// </summary>
+    /// <remarks>
+    /// Overrides text width for the whole page, but can be overriden by 
+    /// logo-specific text width
+    /// </remarks>
+    public decimal? TextWidth { get; set; }
 }
 
 /// <summary>
