@@ -135,7 +135,13 @@ public sealed partial class MainWindow : Window
     {
         var enqueued = this.DispatcherQueue.TryEnqueue(() => 
         {
-            ShowErrorAsync(e.Title, e.Details).ContinueWith(_ => { });
+            ShowErrorAsync(e.Title, e.Details).ContinueWith(t => 
+            {
+                if (t.Exception is not null)
+                {
+                    logger.LogError(t.Exception, "ViewModel_ErrorFound: Error displaying user error");
+                }
+            });
         });
 
         if (!enqueued)
