@@ -326,7 +326,7 @@ public sealed partial class MainWindow : Window
                 return;
             }
             needResourceLoad = false;
-            defaultTextFormat = new() { FontSize = config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
+            defaultTextFormat = new() { FontSize = (float)config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
             solidBlack = new CanvasSolidColorBrush(sender, Microsoft.UI.Colors.Black);
 
             logger.LogDebug("Create Resources: Loading...");

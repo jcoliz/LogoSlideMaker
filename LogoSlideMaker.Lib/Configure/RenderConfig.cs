@@ -31,7 +31,7 @@ public record RenderConfig
     /// </summary>
     public decimal Dpi { get; set; } = 96m;
 
-    public int FontSize { get; set; } = 12;
+    public decimal FontSize { get; set; } = 12m;
 
     public string FontName { get; set; } = "sans";
 
