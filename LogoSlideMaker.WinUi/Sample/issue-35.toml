@@ -1,0 +1,19 @@
+﻿#
+# [UI] [Error] Unable to find template slides #35 
+#
+# Given: Loaded a TOML file in the UI with output slides referring to a PPTX file that doesn't exist
+# When: Exporting
+# Then: Error displayed to user
+# And: No error in the logs (because it's not a code error)
+#
+
+[files]
+template.slides = "does-not-exist.pptx"
+
+[logos.wine]
+title = "Glass of Wine"
+path = "wine-local.png"
+
+[[boxes]]
+logos.1 = [ "wine" ]
+outer = { x = 0.87, y = 2.51, width = 5.71, height = 4 }

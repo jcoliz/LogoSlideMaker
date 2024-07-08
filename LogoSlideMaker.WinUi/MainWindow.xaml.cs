@@ -14,6 +14,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
@@ -132,19 +133,9 @@ public sealed partial class MainWindow : Window
 
     private void ViewModel_ErrorFound(object? sender, ViewModels.ErrorEventArgs e)
     {
-        var enqueued = this.DispatcherQueue.TryEnqueue(async () => 
+        var enqueued = this.DispatcherQueue.TryEnqueue(() => 
         {
-            var dialog = new ContentDialog
-            {
-                Title = e.Title,
-                Content = e.Details,
-                CloseButtonText = "OK",
-                XamlRoot = this.Root.XamlRoot
-            };
-
-            var result = await dialog.ShowAsync();
-
-            logger.LogInformation("Error dialog shown: {Title} {Details}", e.Title, e.Details);
+            ShowErrorAsync(e.Title, e.Details).ContinueWith(_ => { });
         });
 
         if (!enqueued)
@@ -152,6 +143,24 @@ public sealed partial class MainWindow : Window
             logger.LogError("Failed to enqueue error dialog: {Title} {Details}", e.Title, e.Details);        
         }
     }
+
+    private async Task ShowErrorAsync(string title, string details)
+    {
+        var dialog = new ContentDialog
+        {
+            Title = title,
+            Content = details,
+            CloseButtonText = "OK",
+            XamlRoot = this.Root.XamlRoot
+        };
+
+        var _ = await dialog.ShowAsync();
+
+        logger.LogInformation("Error dialog shown: {Title} {Details}", title, details);
+    }
+
+    private Task ShowErrorAsync(ViewModels.ErrorEventArgs eventargs) => ShowErrorAsync(eventargs.Title, eventargs.Details);
+    private Task ShowErrorAsync(UserErrorException ex) => ShowErrorAsync(ex.Title, ex.Details);
 
     private void Canvas_CreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs args)
     {
@@ -253,6 +262,12 @@ public sealed partial class MainWindow : Window
             }
 
             // TODO: Give user option to launch the ppt (would be nice)
+        }
+        catch (UserErrorException ex)
+        {
+            // Return user-caused errors to the user
+            // Note that this will also log the details
+            await ShowErrorAsync(ex);
         }
         catch (Exception ex)
         {

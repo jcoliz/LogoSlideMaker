@@ -460,36 +460,51 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
     /// <param name="outPath">Fully-qualified location of output presentation</param>
     public async Task ExportToAsync(string outPath)
     {
-        if (_definition is null)
-        {
-            return;        
-        }
-        var exportPipeline = new ExportPipeline(_definition);
-
-        var directory = LastOpenedFilePath is not null ? Path.GetDirectoryName(LastOpenedFilePath) : null;
-
-        // TODO: Would be much better to do this when the definition is LOADED, because we'll
-        // already be on a loading screen at that point!
-        await exportPipeline.LoadAndMeasureAsync(directory);
-
         var templateStream = default(Stream);
-        var templatePath = _definition.Files?.Template?.Slides;
-        if (templatePath is not null)
+        try
         {
-            if (directory is not null)
+            if (_definition is null)
             {
-                templatePath = Path.Combine(directory, templatePath);
-                templateStream = File.OpenRead(templatePath);
+                return;
             }
-            else
-            {
-                templateStream = OpenEmbeddedFile(templatePath);
-            }
-        }
 
-        // TODO: Need a way to inject version (How are we even going to GET it??)
-        exportPipeline.Save(templateStream, outPath, null);
-        templateStream?.Dispose();
+            var exportPipeline = new ExportPipeline(_definition);
+
+            var directory = LastOpenedFilePath is not null ? Path.GetDirectoryName(LastOpenedFilePath) : null;
+
+            // TODO: Would be much better to do this when the definition is LOADED, because we'll
+            // already be on a loading screen at that point!
+            await exportPipeline.LoadAndMeasureAsync(directory);
+
+            var templatePath = _definition.Files?.Template?.Slides;
+            if (templatePath is not null)
+            {
+                if (directory is not null)
+                {
+                    templatePath = Path.Combine(directory, templatePath);
+                    if (!File.Exists(templatePath))
+                    {
+                        throw new UserErrorException("Export failed",$"Template not found at {templatePath}");
+                    }
+                    templateStream = File.OpenRead(templatePath);
+                }
+                else
+                {
+                    templateStream = OpenEmbeddedFile(templatePath);
+                }
+            }
+
+            exportPipeline.Save(templateStream, outPath, null);
+        }
+        catch
+        {
+            // Code errors can get logged by the parent
+            throw;
+        }
+        finally
+        {
+            templateStream?.Dispose();
+        }
     }
 
 #endregion
