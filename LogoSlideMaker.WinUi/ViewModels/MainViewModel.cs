@@ -279,7 +279,13 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
     /// <summary>
     /// [User Can] Reload changes made in TOML file since last (re)load
     /// </summary>
-    public ICommand Reload => _Reload ??= new RelayCommand(_ => ReloadDefinitionAsync().ContinueWith(_ => { }));
+    public ICommand Reload => _Reload ??= new RelayCommand(_ => ReloadDefinitionAsync().ContinueWith(t =>
+    {
+        if (t.Exception is not null)
+        {
+            logger.LogError(t.Exception, "ReloadDefinitionAsync: Error");
+        }
+    }));
     private ICommand? _Reload = null;
 
     /// <summary>
