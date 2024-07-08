@@ -63,6 +63,14 @@ public class ImageCache : IGetImageAspectRatio
                 imageAspectRatios[path] = MeasureImage(isSvg: Path.GetExtension(path).ToLowerInvariant() == ".svg", buffer);
             }
         }
+        catch (DirectoryNotFoundException)
+        {
+            throw;
+        }
+        catch (FileNotFoundException)
+        {
+            throw;
+        }
         catch (Exception ex)
         {
             throw new ApplicationException($"Unable to load image {path}", ex);

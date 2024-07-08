@@ -2,6 +2,7 @@
 using LogoSlideMaker.Export;
 using LogoSlideMaker.Layout;
 using LogoSlideMaker.Primitives;
+using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -210,7 +211,7 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
             if (SlideNumber < 0 || SlideNumber >= _definition.Variants.Count)
             {
                 logger.LogError("DocumentSubtitle: Error slide number {Number} out of range {Count}", SlideNumber, _definition.Variants.Count);
-                return "???";            
+                return "???";
             }
 
             var result = $"Slide {SlideNumber + 1} of {_definition.Variants.Count}";
@@ -484,7 +485,7 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
                     templatePath = Path.Combine(directory, templatePath);
                     if (!File.Exists(templatePath))
                     {
-                        throw new UserErrorException("Export failed",$"Template not found at {templatePath}");
+                        throw new UserErrorException("Export failed", $"Template not found at {templatePath}");
                     }
                     templateStream = File.OpenRead(templatePath);
                 }
@@ -495,6 +496,14 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
             }
 
             exportPipeline.Save(templateStream, outPath, null);
+        }
+        catch (DirectoryNotFoundException ex)
+        {
+            throw new UserErrorException("Export failed", ex.Message);
+        }
+        catch (FileNotFoundException ex)
+        {
+            throw new UserErrorException("Export failed", ex.Message);
         }
         catch
         {
