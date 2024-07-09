@@ -50,6 +50,11 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
     public IReadOnlyList<Primitive> Primitives => _primitives;
 
     /// <summary>
+    /// Drawing primitives needed to render bounding boxes for the current slide
+    /// </summary>
+    public IReadOnlyList<Primitive> BoxPrimitives => _boxPrimitives;
+
+    /// <summary>
     /// All the image paths we would need to render
     /// </summary>
     public IEnumerable<string> ImagePaths =>
@@ -400,12 +405,14 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
     /// </remarks>
     public void GeneratePrimitives()
     {
+        _primitives.Clear();
+        _boxPrimitives.Clear();
+
         if (_definition is null || _layout is null)
         {
             return;
         }
 
-        _primitives.Clear();
         var config = _definition.Render;
 
         // Add primitives for a background
@@ -436,29 +443,22 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
         var generator = new PrimitivesEngine(config, bitmaps);
         _primitives.AddRange(_layout.Logos.SelectMany(generator.ToPrimitives));
 
-#if false
-        // TODO: Need a new home for this! Elsewhere we are handling bounding boxes
-        // as a rendering operation NOT a primitive-generating operation.
-        // Add bounding boxes for any boxes with explicit outer dimensions
-        if (ShowBoundingBoxes)
-        {
-            _primitives.AddRange(
-                _definition.Boxes
-                    .Where(x => x.Outer is not null)
-                    .Select(x => new RectanglePrimitive()
+        // Add optional primitives to draw 
+        _boxPrimitives.AddRange(
+            _definition.Boxes
+                .Where(x => x.Outer is not null)
+                .Select(x => new RectanglePrimitive()
+                {
+                    Rectangle = x.Outer! with
                     {
-                        Rectangle = x.Outer! with
-                        {
-                            X = x.Outer.X * 96m,
-                            Y = x.Outer.Y * 96m,
-                            Width = x.Outer.Width * 96m,
-                            Height = x.Outer.Height * 96m
-                        }
+                        X = x.Outer.X * 96m,
+                        Y = x.Outer.Y * 96m,
+                        Width = x.Outer.Width * 96m,
+                        Height = x.Outer.Height * 96m
                     }
-            )
-            );
-        }
-#endif
+                }
+                )
+        );
     }
 
     /// <summary>
@@ -635,6 +635,7 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
     private Definition? _definition;
     private SlideLayout? _layout;
     private readonly List<Primitive> _primitives = [];
+    private readonly List<Primitive> _boxPrimitives = [];
 
     #endregion
 }

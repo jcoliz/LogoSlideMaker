@@ -13,6 +13,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Windows.Foundation;
@@ -357,7 +358,17 @@ public sealed partial class MainWindow : Window
     {
         try
         {
-            foreach (var p in viewModel.Primitives)
+            var primitives = viewModel.ShowBoundingBoxes ?
+                viewModel.Primitives.Concat(viewModel.BoxPrimitives) : 
+                viewModel.Primitives;
+
+            if (primitives is null)
+            {
+                logger.LogError("Draw: Primitives failed");
+                return;
+            }
+
+            foreach (var p in primitives)
             {
                 Draw(p, args.DrawingSession);
             }
