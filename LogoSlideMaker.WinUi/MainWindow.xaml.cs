@@ -1,4 +1,3 @@
-using DocumentFormat.OpenXml.Linq;
 using LogoSlideMaker.Primitives;
 using LogoSlideMaker.WinUi.Services;
 using LogoSlideMaker.WinUi.ViewModels;
@@ -75,11 +74,11 @@ public sealed partial class MainWindow : Window
             bitmapCache.BaseDirectory = Path.GetDirectoryName(viewModel.LastOpenedFilePath);
 
             // Reload last-used definition
-            this.viewModel.ReloadDefinitionAsync().ContinueWith(task => 
+            this.viewModel.ReloadDefinitionAsync().ContinueWith(task =>
             {
                 if (task.Exception != null)
                 {
-                    logFailMoment(task.Exception,"Reload");
+                    logFailMoment(task.Exception, "Reload");
                 }
                 else
                 {
@@ -109,7 +108,7 @@ public sealed partial class MainWindow : Window
 
         if (!enqueued)
         {
-            logger.LogError("ViewModel_DefinitionLoaded: Failed to enqueue Create Resources");
+            logFailMoment("Enqueue Create Resources");
         }
     }
 
@@ -136,9 +135,9 @@ public sealed partial class MainWindow : Window
 
     private void DisplayViewModelError(object? sender, ViewModels.ErrorEventArgs e)
     {
-        var enqueued = this.DispatcherQueue.TryEnqueue(() => 
+        var enqueued = this.DispatcherQueue.TryEnqueue(() =>
         {
-            ShowErrorAsync(e.Title, e.Details).ContinueWith(t => 
+            ShowErrorAsync(e.Title, e.Details).ContinueWith(t =>
             {
                 if (t.Exception is not null)
                 {
@@ -149,7 +148,7 @@ public sealed partial class MainWindow : Window
 
         if (!enqueued)
         {
-            logger.LogError("Failed to enqueue error dialog: {Title} {Details}", e.Title, e.Details);        
+            logFailMoment(e.Title);
         }
     }
 
@@ -165,7 +164,7 @@ public sealed partial class MainWindow : Window
 
         var _ = await dialog.ShowAsync();
 
-        logger.LogInformation("Error dialog shown: {Title} {Details}", title, details);
+        logOkTitleDetails(title, details);
     }
 
     private Task ShowErrorAsync(ViewModels.ErrorEventArgs eventargs) => ShowErrorAsync(eventargs.Title, eventargs.Details);
@@ -181,7 +180,7 @@ public sealed partial class MainWindow : Window
         if (!needResourceLoad)
         {
             // When viewmodel is DONE loading, it will call us
-            logger.LogDebug("Create Resources: No resource load needed at this time");
+            logDebugNoLoadNeeded();
             return;
         }
 
@@ -222,14 +221,14 @@ public sealed partial class MainWindow : Window
             if (file != null)
             {
                 var path = file.Path;
-                logger.LogInformation("OpenFile: OK selected {path}", path);
+                logOkMomentPath("Selected", path);
 
                 bitmapCache.BaseDirectory = Path.GetDirectoryName(path);
                 await viewModel.LoadDefinitionAsync(path);
             }
             else
             {
-                logger.LogDebug("OpenFile: No file chosen");
+                logDebugNoFile();
             }
         }
         catch (Exception ex)
@@ -263,11 +262,11 @@ public sealed partial class MainWindow : Window
                 // TODO: Also should get this off the UI thread! :(
                 await viewModel.ExportToAsync(outPath);
 
-                logger.LogInformation("Export: OK {path}", outPath);
+                logOkMomentPath("Completed", outPath);
             }
             else
             {
-                logger.LogDebug("Export: No file chosen");
+                logDebugNoFile();
             }
 
             // TODO: Give user option to launch the ppt (would be nice)
@@ -309,20 +308,20 @@ public sealed partial class MainWindow : Window
             var config = viewModel.RenderConfig;
             if (config is null)
             {
-                logger.LogInformation("Create Resources: Render config not populated");
+                logDebugNoRenderConfig();
                 return;
             }
             if (!canvas.IsLoaded)
             {
                 needResourceLoad = true;
-                logger.LogDebug("Create Resources: Canvas not loaded, skipping");
+                logDebugNotLoaded();
                 return;
             }
             needResourceLoad = false;
             defaultTextFormat = new() { FontSize = (float)config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
             solidBlack = new CanvasSolidColorBrush(sender, Microsoft.UI.Colors.Black);
 
-            logger.LogDebug("Create Resources: Loading...");
+            logDebugLoading();
 
             // Load (and measure) all the bitmaps
             // NOTE: If multiple TOML files share the same path, we will re-use the previously
@@ -351,7 +350,7 @@ public sealed partial class MainWindow : Window
         try
         {
             var primitives = viewModel.ShowBoundingBoxes ?
-                viewModel.Primitives.Concat(viewModel.BoxPrimitives) : 
+                viewModel.Primitives.Concat(viewModel.BoxPrimitives) :
                 viewModel.Primitives;
 
             if (primitives is null)
@@ -376,15 +375,15 @@ public sealed partial class MainWindow : Window
         switch (primitive)
         {
             case TextPrimitive text:
-                Draw(text,session);
+                Draw(text, session);
                 break;
 
             case ImagePrimitive image:
-                Draw(image,session);
+                Draw(image, session);
                 break;
 
             case RectanglePrimitive rect:
-                Draw(rect,session);
+                Draw(rect, session);
                 break;
 
             default:
@@ -409,7 +408,7 @@ public sealed partial class MainWindow : Window
         var bitmap = bitmapCache.GetOrDefault(primitive.Path);
         if (bitmap is not null)
         {
-            session.DrawImage(bitmap, primitive.Rectangle.AsWindowsRect(), bitmap.Bounds, 1.0f, CanvasImageInterpolation.HighQualityCubic );
+            session.DrawImage(bitmap, primitive.Rectangle.AsWindowsRect(), bitmap.Bounds, 1.0f, CanvasImageInterpolation.HighQualityCubic);
         }
 
         // Draw a logo bounding box
@@ -453,6 +452,12 @@ public sealed partial class MainWindow : Window
     [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: {Moment} OK")]
     public partial void logOkMoment(string moment, [CallerMemberName] string? location = null);
 
+    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: {Moment} OK {Path}")]
+    public partial void logOkMomentPath(string moment, string path, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: OK {Title} {Details}")]
+    public partial void logOkTitleDetails(string title, string details, [CallerMemberName] string? location = null);
+
     [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: Failed")]
     public partial void logFail(Exception ex, [CallerMemberName] string? location = null);
 
@@ -467,6 +472,21 @@ public sealed partial class MainWindow : Window
 
     [LoggerMessage(Level = LogLevel.Critical, Message = "{Location}: Critical failure")]
     public partial void logCritical(Exception ex, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "{Location}: Loading...")]
+    public partial void logDebugLoading([CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "{Location}: Skipping, no render config")]
+    public partial void logDebugNoRenderConfig([CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "{Location}: Skipping, canvas not loaded")]
+    public partial void logDebugNotLoaded([CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "{Location}: No file chosen")]
+    public partial void logDebugNoFile([CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "{Location}: No resource load needed at this time")]
+    public partial void logDebugNoLoadNeeded([CallerMemberName] string? location = null);
 
     #endregion
 }
