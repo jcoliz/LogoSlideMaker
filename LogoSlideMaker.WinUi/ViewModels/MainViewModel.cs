@@ -2,7 +2,6 @@
 using LogoSlideMaker.Export;
 using LogoSlideMaker.Layout;
 using LogoSlideMaker.Primitives;
-using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -19,7 +18,7 @@ using Windows.Storage;
 
 namespace LogoSlideMaker.WinUi.ViewModels;
 
-public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> logger): INotifyPropertyChanged
+public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> logger): INotifyPropertyChanged
 {
     #region Events
     /// <summary>
@@ -78,18 +77,18 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
             {
                 if (_definition is not null && value < _definition.Variants.Count && value != _slideNumber)
                 {
-                    _slideNumber = value;
-
                     PopulateLayout();
                     GeneratePrimitives();
+
+                    _slideNumber = value;
+
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(DocumentSubtitle));
                 }
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "SlideNumber: Failed to advance to {value}", value);
-
+                logFailSetValue(ex, value);
             }
         }
     }
@@ -215,7 +214,7 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
 
             if (SlideNumber < 0 || SlideNumber >= _definition.Variants.Count)
             {
-                logger.LogError("DocumentSubtitle: Error slide number {Number} out of range {Count}", SlideNumber, _definition.Variants.Count);
+                logFailSlideOutoFoRange(SlideNumber, _definition.Variants.Count);
                 return "???";
             }
 
@@ -288,7 +287,7 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
     {
         if (t.Exception is not null)
         {
-            logger.LogError(t.Exception, "ReloadDefinitionAsync: Error");
+            logFail(t.Exception);
         }
     }));
     private ICommand? _Reload = null;
@@ -333,19 +332,20 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
                 {
                     // I would like to track what causes this, so as to perhaps create more detailed
                     // error-handling
-                    logger.LogError(ex, "LoadDefinitionAsync: Stream load Failed");
+                    logFailMoment(ex, "Stream load");
 
                     var args = new ErrorEventArgs() { Title = "Opening file failed", Details = ex.Message };
                     ErrorFound?.Invoke(this, args);
                 }
             });
-            logger.LogDebug("LoadDefinitionAsync: Launched");
+
+            logDebugMoment("Launched");
         }
         catch (Exception ex)
         {
             // TODO: Actually need to surface these to user. But for now, just dont crash
 
-            logger.LogError(ex,"LoadDefinitionAsync: Failed");
+            logFail(ex);
         }
     }
 
@@ -573,7 +573,7 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
 
             PopulateLayout();
 
-            logger.LogInformation("LoadDefinition: OK {title}", DocumentTitle);
+            logOkDetails(DocumentTitle);
         }
         finally
         {
@@ -636,6 +636,55 @@ public class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> 
     private SlideLayout? _layout;
     private readonly List<Primitive> _primitives = [];
     private readonly List<Primitive> _boxPrimitives = [];
+
+    // Needed because .NET 8 can't get logger from default parameters. Will be fixed in .NET 9, so they say.
+    private readonly ILogger _logger = logger;
+    #endregion
+
+    #region Logging
+
+    // NOTE: These duplicate loggers in the main window. Should think about how to DRY this out!
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: OK")]
+    public partial void logOk([CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: {Moment} OK")]
+    public partial void logOkMoment(string moment, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: OK {Details}")]
+    public partial void logOkDetails(string details, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: {Moment} OK {Path}")]
+    public partial void logOkMomentPath(string moment, string path, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: OK {Title} {Details}")]
+    public partial void logOkTitleDetails(string title, string details, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: Failed")]
+    public partial void logFail(Exception ex, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: Failed")]
+    public partial void logFail([CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: {Moment} Failed")]
+    public partial void logFailMoment(Exception ex, string moment, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: {Moment} Failed")]
+    public partial void logFailMoment(string moment, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: Failed to set value to {Value}")]
+    public partial void logFailSetValue(Exception ex, object value, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Critical, Message = "{Location}: Critical failure")]
+    public partial void logCritical(Exception ex, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "{Location}: {Moment}")]
+    public partial void logDebugMoment(string moment, [CallerMemberName] string? location = null);
+
+    // Application-specific log messages follow
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: Slide number {Number} out of range {Count}")]
+    public partial void logFailSlideOutoFoRange(int number, int count, [CallerMemberName] string? location = null);
 
     #endregion
 }

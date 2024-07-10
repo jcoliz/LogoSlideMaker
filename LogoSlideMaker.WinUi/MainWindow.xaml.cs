@@ -262,7 +262,7 @@ public sealed partial class MainWindow : Window
                 // TODO: Also should get this off the UI thread! :(
                 await viewModel.ExportToAsync(outPath);
 
-                logOkMomentPath("Completed", outPath);
+                logOkPath(outPath);
             }
             else
             {
@@ -448,6 +448,9 @@ public sealed partial class MainWindow : Window
 
     [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: OK")]
     public partial void logOk([CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: OK {Path}")]
+    public partial void logOkPath(string path, [CallerMemberName] string? location = null);
 
     [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: {Moment} OK")]
     public partial void logOkMoment(string moment, [CallerMemberName] string? location = null);
