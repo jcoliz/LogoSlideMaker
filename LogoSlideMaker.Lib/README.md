@@ -1,6 +1,10 @@
-﻿# Rendering Pipeline
+﻿# Logo Slide Maker: Layout & rendering engine
 
-These are the stages from load to render:
+This project encapsulates the platform-independent layout and rendering logic.
+
+## Pipeline
+
+Stages from load to render:
 
 1. CONFIGURE. In this stage, a `Definition` is built. Typically, we deserialize this from a TOML file, but this is not required.
 1. LOAD/MEASURE. Here, we load all the logo files specified in the definition, and measure them. This phase is coupled to the renderer which will ultimately render them.
