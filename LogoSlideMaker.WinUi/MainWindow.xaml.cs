@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml.Linq;
 using LogoSlideMaker.Primitives;
 using LogoSlideMaker.WinUi.Services;
 using LogoSlideMaker.WinUi.ViewModels;
@@ -14,6 +15,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Windows.Foundation;
@@ -59,7 +61,7 @@ public sealed partial class MainWindow : Window
             viewModel.UIAction = x => this.DispatcherQueue.TryEnqueue(() => x());
             viewModel.PropertyChanged += ViewModel_PropertyChanged;
             viewModel.DefinitionLoaded += ViewModel_DefinitionLoaded;
-            viewModel.ErrorFound += ViewModel_ErrorFound;
+            viewModel.ErrorFound += DisplayViewModelError;
             this.Root.DataContext = viewModel;
             this.Title = MainViewModel.AppDisplayName;
 
@@ -67,7 +69,7 @@ public sealed partial class MainWindow : Window
             var dpi = GetDpiForWindow(hWnd);
             this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32(dpi * 1280 / 96, dpi * (720 + 64) / 96));
             this.AppWindow.SetIcon("Assets/app-icon.ico");
-            this.AppWindow.Closing += AppWindow_Closing;
+            this.AppWindow.Closing += CloseApp;
 
             // Set up bitmap cache
             bitmapCache.BaseDirectory = Path.GetDirectoryName(viewModel.LastOpenedFilePath);
@@ -77,19 +79,19 @@ public sealed partial class MainWindow : Window
             {
                 if (task.Exception != null)
                 {
-                    logger.LogError(task.Exception, "Main Window: Reload failed");
+                    logFailMoment(task.Exception,"Reload");
                 }
                 else
                 {
-                    logger.LogDebug("Main Window: Reload OK");
+                    logOkMoment("Reload");
                 }
             });
 
-            _logger.LogDebug("Main Window: OK");
+            logOk();
         }
         catch (Exception ex)
         {
-            _logger.LogCritical(ex, "Main Window: Failed to start up");
+            logCritical(ex);
         }
     }
 
@@ -132,7 +134,7 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void ViewModel_ErrorFound(object? sender, ViewModels.ErrorEventArgs e)
+    private void DisplayViewModelError(object? sender, ViewModels.ErrorEventArgs e)
     {
         var enqueued = this.DispatcherQueue.TryEnqueue(() => 
         {
@@ -140,7 +142,7 @@ public sealed partial class MainWindow : Window
             {
                 if (t.Exception is not null)
                 {
-                    logger.LogError(t.Exception, "ViewModel_ErrorFound: Error displaying user error");
+                    logFailMoment(t.Exception, "Displaying user error");
                 }
             });
         });
@@ -169,7 +171,7 @@ public sealed partial class MainWindow : Window
     private Task ShowErrorAsync(ViewModels.ErrorEventArgs eventargs) => ShowErrorAsync(eventargs.Title, eventargs.Details);
     private Task ShowErrorAsync(UserErrorException ex) => ShowErrorAsync(ex.Title, ex.Details);
 
-    private void Canvas_CreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs args)
+    private void CreateResourcesEvent(CanvasControl sender, CanvasCreateResourcesEventArgs args)
     {
         // This is called by the canvas when it's ready for resources. Typically, this shouldn't be needed,
         // as the canvas should be ready for resources before we have them loaded. However, there
@@ -191,16 +193,16 @@ public sealed partial class MainWindow : Window
         Application.Current.Exit();
     }
 
-    private void AppWindow_Closing(Microsoft.UI.Windowing.AppWindow sender, Microsoft.UI.Windowing.AppWindowClosingEventArgs args)
+    private void CloseApp(Microsoft.UI.Windowing.AppWindow sender, Microsoft.UI.Windowing.AppWindowClosingEventArgs args)
     {
-        logger.LogInformation("Closing");
+        logOk();
     }
 
     #endregion
 
     #region Command handlers
 
-    private async void OpenFile_Click(object _, RoutedEventArgs __)
+    private async void OpenDocument(object _, RoutedEventArgs __)
     {
         try
         {
@@ -232,11 +234,11 @@ public sealed partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "OpenFile failed");
+            logFail(ex);
         }
     }
 
-    private async void DoExport_Click(object _, RoutedEventArgs __)
+    private async void ExportSlides(object _, RoutedEventArgs __)
     {
         try
         {
@@ -278,28 +280,18 @@ public sealed partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Export: Failed");
+            logFail(ex);
         }
     }
 
-    private async void About_Click(object sender, RoutedEventArgs e)
+    private async void ShowAboutDialog(object sender, RoutedEventArgs e)
     {
         var result = await aboutDialog.ShowAsync();
 
-        logger.LogDebug
-        (
-            "About Dialog: {Result}",
-            result switch
-            {
-                ContentDialogResult.Primary => "OK",
-                ContentDialogResult.Secondary => "Logs",
-                ContentDialogResult.None => "None",
-                _ => "Unknown"
-            }
-        );
+        logOk();
     }
 
-    private void aboutDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+    private void OpenLogsFolder(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
         Process.Start("explorer.exe", MainViewModel.LogsFolder);
     }
@@ -346,15 +338,15 @@ public sealed partial class MainWindow : Window
             // Now we are really done loading
             viewModel.IsLoading = false;
 
-            logger.LogInformation("Create Resources: OK");
+            logOk();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Create Resources: failed");
+            logFail(ex);
         }
     }
 
-    private void CanvasControl_Draw(CanvasControl _, CanvasDrawEventArgs args)
+    private void DrawCanvas(CanvasControl _, CanvasDrawEventArgs args)
     {
         try
         {
@@ -364,7 +356,7 @@ public sealed partial class MainWindow : Window
 
             if (primitives is null)
             {
-                logger.LogError("Draw: Primitives failed");
+                logFail();
                 return;
             }
 
@@ -375,7 +367,7 @@ public sealed partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Canvas Draw failed");
+            logFail(ex);
         }
     }
 
@@ -450,6 +442,31 @@ public sealed partial class MainWindow : Window
     /// Get the current window's HWND by passing in the Window object
     /// </summary>
     private IntPtr hWnd => WindowNative.GetWindowHandle(this);
+
+    #endregion
+
+    #region Logging
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: OK")]
+    public partial void logOk([CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: {Moment} OK")]
+    public partial void logOkMoment(string moment, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: Failed")]
+    public partial void logFail(Exception ex, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: Failed")]
+    public partial void logFail([CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: {Moment} Failed")]
+    public partial void logFailMoment(Exception ex, string moment, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: {Moment} Failed")]
+    public partial void logFailMoment(string moment, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Critical, Message = "{Location}: Critical failure")]
+    public partial void logCritical(Exception ex, [CallerMemberName] string? location = null);
 
     #endregion
 }
