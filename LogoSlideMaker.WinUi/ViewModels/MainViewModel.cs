@@ -77,10 +77,10 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
             {
                 if (_definition is not null && value < _definition.Variants.Count && value != _slideNumber)
                 {
+                    _slideNumber = value;
+
                     PopulateLayout();
                     GeneratePrimitives();
-
-                    _slideNumber = value;
 
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(DocumentSubtitle));
@@ -88,6 +88,8 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
             }
             catch (Exception ex)
             {
+                // Note that we now have a consistency problem. We have tried to update the slide, so
+                // we have a new number, BUT it failed to take! So we are in an inconsistent state.
                 logFailSetValue(ex, value);
             }
         }
