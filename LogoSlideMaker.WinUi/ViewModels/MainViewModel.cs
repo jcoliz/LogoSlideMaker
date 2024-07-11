@@ -34,7 +34,7 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
     /// <summary>
     /// User action has resulted in an error
     /// </summary>
-    public event EventHandler<ErrorEventArgs>? ErrorFound = delegate { };
+    public event EventHandler<UserErrorEventArgs>? ErrorFound = delegate { };
     #endregion
 
     #region Properties
@@ -327,7 +327,7 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
                 }
                 catch (TomlException ex)
                 {
-                    var args = new ErrorEventArgs() { Title = "TOML parsing failed", Details = ex.Message };
+                    var args = new UserErrorEventArgs() { Title = "TOML parsing failed", Details = ex.Message };
                     ErrorFound?.Invoke(this, args);
                 }
                 catch (Exception ex)
@@ -336,7 +336,7 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
                     // error-handling
                     logFailMoment(ex, "Stream load");
 
-                    var args = new ErrorEventArgs() { Title = "Opening file failed", Details = ex.Message };
+                    var args = new UserErrorEventArgs() { Title = "Opening file failed", Details = ex.Message };
                     ErrorFound?.Invoke(this, args);
                 }
             });

@@ -133,7 +133,7 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void DisplayViewModelError(object? sender, ViewModels.ErrorEventArgs e)
+    private void DisplayViewModelError(object? sender, ViewModels.UserErrorEventArgs e)
     {
         var enqueued = this.DispatcherQueue.TryEnqueue(() =>
         {
@@ -167,7 +167,7 @@ public sealed partial class MainWindow : Window
         logOkTitleDetails(title, details);
     }
 
-    private Task ShowErrorAsync(ViewModels.ErrorEventArgs eventargs) => ShowErrorAsync(eventargs.Title, eventargs.Details);
+    private Task ShowErrorAsync(ViewModels.UserErrorEventArgs eventargs) => ShowErrorAsync(eventargs.Title, eventargs.Details);
     private Task ShowErrorAsync(UserErrorException ex) => ShowErrorAsync(ex.Title, ex.Details);
 
     private void CreateResourcesEvent(CanvasControl sender, CanvasCreateResourcesEventArgs args)

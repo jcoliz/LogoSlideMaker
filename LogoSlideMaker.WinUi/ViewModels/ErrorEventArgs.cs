@@ -8,7 +8,7 @@ namespace LogoSlideMaker.WinUi.ViewModels;
 /// <remarks>
 /// Generally, we should try to use these for errors that the user caused
 /// </remarks>
-public class ErrorEventArgs: EventArgs
+public class UserErrorEventArgs: EventArgs
 {
     /// <summary>
     /// Simple summary of the problem, 12 words max

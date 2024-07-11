@@ -4,27 +4,6 @@ using LogoSlideMaker.Layout;
 namespace LogoSlideMaker.Primitives;
 
 /// <summary>
-/// Provides the size of an image by path
-/// </summary>
-/// <remarks>
-/// Would be more correct to return aspect ratio here, that's what we really care about
-/// </remarks>
-public interface IGetImageAspectRatio
-{
-    /// <summary>
-    /// True if we have an aspect ratio for this image
-    /// </summary>
-    /// <param name="imagePath">Path to image, as specified in logo</param>
-    public bool Contains(string imagePath);
-
-    /// <summary>
-    /// Get the aspect ratio of a given image (width/height)
-    /// </summary>
-    /// <param name="imagePath">Path to image, as specified in logo</param>
-    public decimal GetAspectRatio(string imagePath);
-}
-
-/// <summary>
 /// Generates simple drawing primitives to show a single logolayout
 /// </summary>
 /// <remarks>
