@@ -503,7 +503,10 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
                 }
             }
 
-            exportPipeline.Save(templateStream, outPath, null);
+            // Extract version from directory
+            var version = directory is not null ? Utilities.GitVersion.GetForDirectory(directory) : null;
+
+            exportPipeline.Save(templateStream, outPath, version);
         }
         catch (DirectoryNotFoundException ex)
         {
