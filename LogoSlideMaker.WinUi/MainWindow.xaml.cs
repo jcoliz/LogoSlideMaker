@@ -1,8 +1,6 @@
-using DocumentFormat.OpenXml.Bibliography;
 using LogoSlideMaker.Primitives;
 using LogoSlideMaker.WinUi.Services;
 using LogoSlideMaker.WinUi.ViewModels;
-using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
@@ -14,6 +12,7 @@ using Microsoft.UI.Xaml.Controls;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -287,12 +286,13 @@ public sealed partial class MainWindow : Window
 
     private async void ShowAboutDialog(object sender, RoutedEventArgs e)
     {
-        var result = await aboutDialog.ShowAsync();
+        await aboutDialog.ShowAsync();
 
         logOk();
     }
 
-    private void OpenLogsFolder(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "UI system requires calling with instance")]
+    private void OpenLogsFolder(ContentDialog _, ContentDialogButtonClickEventArgs __)
     {
         Process.Start("explorer.exe", MainViewModel.LogsFolder);
     }

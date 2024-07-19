@@ -49,10 +49,10 @@ public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
         }
     }
 
-    private void SetDescription(SlideLayout layout, ISlideShapes target)
+    private static void SetDescription(SlideLayout layout, ISlideShapes target)
     {
         // Fill in description field
-        var num_description_lines = layout.Variant.Description.Count();
+        var num_description_lines = layout.Variant.Description.Count;
         if (num_description_lines > 0)
         {
             var description_box = target.TryGetByName<IShape>("Description");
