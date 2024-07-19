@@ -1,9 +1,7 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-using LogoSlideMaker.Configure;
+﻿using LogoSlideMaker.Configure;
 using LogoSlideMaker.Export;
 using LogoSlideMaker.Layout;
 using LogoSlideMaker.Primitives;
-using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -17,6 +15,7 @@ using System.Windows.Input;
 using Tomlyn;
 using Windows.ApplicationModel;
 using Windows.Storage;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace LogoSlideMaker.WinUi.ViewModels;
 
@@ -326,14 +325,11 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
                 {
                     LoadDefinition(stream);
                     LastOpenedFilePath = path;
+                    _gitVersion = path is not null ? Utilities.GitVersion.GetForDirectory(path) : null;
 
                     if (_definition?.Files.Output?.Contains("$Version") ?? false)
                     {
-                        // TODO: Retain this value so it can be used later!
-
-                        // Extract version from directory
-                        var version = path is not null ? Utilities.GitVersion.GetForDirectory(path) : null;
-                        _definition.Files.Output = _definition.Files.Output.Replace("$Version", version ?? string.Empty);
+                        _definition.Files.Output = _definition.Files.Output.Replace("$Version", _gitVersion);
                     }
                 }
                 catch (TomlException ex)
@@ -514,10 +510,7 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
                 }
             }
 
-            // Extract version from directory
-            var version = directory is not null ? Utilities.GitVersion.GetForDirectory(directory) : null;
-
-            exportPipeline.Save(templateStream, outPath, version);
+            exportPipeline.Save(templateStream, outPath, _gitVersion);
         }
         catch (DirectoryNotFoundException ex)
         {
@@ -582,6 +575,7 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
             var loaded = Toml.ToModel<Definition>(toml);
 
             _definition = loaded;
+            _gitVersion = null;
             if (SlideNumber >= _definition.Variants.Count)
             {
                 SlideNumber = 0;
@@ -650,6 +644,7 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
 
     private Definition? _definition;
     private SlideLayout? _layout;
+    private string? _gitVersion;
     private readonly List<Primitive> _primitives = [];
     private readonly List<Primitive> _boxPrimitives = [];
 
