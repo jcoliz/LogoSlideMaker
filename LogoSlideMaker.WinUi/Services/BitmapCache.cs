@@ -128,12 +128,22 @@ public class BitmapCache(ILogger<BitmapCache> logger) : IGetImageAspectRatio
             var randomAccessStream = pngStream.AsRandomAccessStream();
             var result = await CanvasBitmap.LoadAsync(resourceCreator, randomAccessStream);
 
+            if (stream is not null)
+            {
+                await stream.DisposeAsync();
+            }
+
             return result;
         }
         else
         {
             var randomAccessStream = stream.AsRandomAccessStream();
             var result = await CanvasBitmap.LoadAsync(resourceCreator, randomAccessStream);
+
+            if (stream is not null)
+            {
+                await stream.DisposeAsync();
+            }
 
             return result;
         }
