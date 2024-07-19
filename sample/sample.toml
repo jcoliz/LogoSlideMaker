@@ -1,6 +1,7 @@
 [files]
 template.slides = "template.pptx"
 template.bitmaps = "template.png"
+output = "Logo Slide Maker Sample $Version.pptx"
 
 [layout]
 title = "Logo Slide Maker Sample"

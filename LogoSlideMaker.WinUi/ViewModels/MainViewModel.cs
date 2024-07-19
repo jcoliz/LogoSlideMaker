@@ -1,7 +1,9 @@
-﻿using LogoSlideMaker.Configure;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using LogoSlideMaker.Configure;
 using LogoSlideMaker.Export;
 using LogoSlideMaker.Layout;
 using LogoSlideMaker.Primitives;
+using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -324,6 +326,15 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
                 {
                     LoadDefinition(stream);
                     LastOpenedFilePath = path;
+
+                    if (_definition?.Files.Output?.Contains("$Version") ?? false)
+                    {
+                        // TODO: Retain this value so it can be used later!
+
+                        // Extract version from directory
+                        var version = path is not null ? Utilities.GitVersion.GetForDirectory(path) : null;
+                        _definition.Files.Output = _definition.Files.Output.Replace("$Version", version ?? string.Empty);
+                    }
                 }
                 catch (TomlException ex)
                 {
