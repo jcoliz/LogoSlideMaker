@@ -114,6 +114,24 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
     }
     private bool _IsLoading = true;
 
+
+    /// <summary>
+    /// Whether we are currently exporting a presentation
+    /// </summary>
+    public bool IsExporting
+    {
+        get => _IsExporting;
+        set
+        {
+            if (value != _IsExporting)
+            {
+                _IsExporting = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    private bool _IsExporting = false;
+
     /// <summary>
     /// Display names of the slides
     /// </summary>
@@ -484,6 +502,8 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
                 return;
             }
 
+            IsExporting = true;
+
             var exportPipeline = new ExportPipeline(_definition);
 
             var directory = LastOpenedFilePath is not null ? Path.GetDirectoryName(LastOpenedFilePath) : null;
@@ -528,6 +548,8 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
         finally
         {
             templateStream?.Dispose();
+
+            IsExporting = false;
         }
     }
 

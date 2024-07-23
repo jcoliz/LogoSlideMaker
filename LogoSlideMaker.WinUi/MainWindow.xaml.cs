@@ -256,14 +256,26 @@ public sealed partial class MainWindow : Window
             var file = await picker.PickSaveFileAsync();
             if (file != null)
             {
-                // Render to slide
                 var outPath = file.Path;
 
-                // TODO: Loading affordance would be nice
-                // TODO: Also should get this off the UI thread! :(
-                await viewModel.ExportToAsync(outPath);
-
-                logOkPath(outPath);
+                // Get off of the UI thread
+                var ___ = Task.Run(async () =>
+                {
+                    await viewModel.ExportToAsync(outPath);
+                })
+                .ContinueWith(t => 
+                {
+                    if (t.Exception is not null)
+                    {
+                        logFail(t.Exception);
+                    }
+                    else
+                    {
+                        // TODO: This would be the time to emit an event that we have successfully
+                        // exported
+                        logOkPath(outPath);
+                    }
+                });
             }
             else
             {
@@ -286,12 +298,27 @@ public sealed partial class MainWindow : Window
 
     private async void ShowAboutDialog(object sender, RoutedEventArgs e)
     {
-        await aboutDialog.ShowAsync();
+        try
+        {
+            await aboutDialog.ShowAsync();
 
-        logOk();
+            logOk();
+        }
+        catch (Exception ex)
+        {
+            const int E_ASYNC_OPERATION_NOT_STARTED = unchecked((int)0x80000019);
+            if (ex.HResult == E_ASYNC_OPERATION_NOT_STARTED)
+            {
+                logDebugBusy();
+            }
+            else
+            {
+                logFail(ex);            
+            }
+        }
     }
 
-    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "UI system requires calling with instance")]
+    //[SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "UI system requires calling with instance")]
     private void OpenLogsFolder(ContentDialog _, ContentDialogButtonClickEventArgs __)
     {
         Process.Start("explorer.exe", MainViewModel.LogsFolder);
@@ -492,6 +519,9 @@ public sealed partial class MainWindow : Window
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "{Location}: No resource load needed at this time")]
     public partial void logDebugNoLoadNeeded([CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "{Location}: No action taken, because busy")]
+    public partial void logDebugBusy([CallerMemberName] string? location = null);
 
     #endregion
 }

@@ -7,11 +7,15 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:win2dcanvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
+    xmlns:converters="using:CommunityToolkit.WinUI.Converters"
     mc:Ignorable="d"
     Closed="Window_Closed"
     >
-
     <Grid x:Name="Root">
+        <Grid.Resources>
+            <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+            <converters:BoolNegationConverter x:Key="BoolNegationConverter" />
+        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="64" />
             <RowDefinition Height="*" />
@@ -21,17 +25,17 @@
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <StackPanel Orientation="Horizontal" Background="#333333">
-            <AppBarButton Icon="OpenFile" Label="Open" Click="OpenDocument"/>
-            <AppBarButton Icon="Refresh" Label="Reload" Command="{Binding Reload}" />
+            <AppBarButton Icon="OpenFile" Label="Open" Click="OpenDocument" IsEnabled="{Binding IsExporting, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"/>
+            <AppBarButton Icon="Refresh" Label="Reload" Command="{Binding Reload}" IsEnabled="{Binding IsExporting, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}" />
             <AppBarButton Icon="Back" Label="Previous" Command="{Binding PreviousSlide}" />
             <AppBarButton Icon="Forward" Label="Next" Command="{Binding NextSlide}" />
             <AppBarToggleButton Icon="ViewAll" Label="Boxes" IsChecked="{Binding ShowBoundingBoxes, Mode=TwoWay}" />
-            <AppBarButton Label="About" Click="ShowAboutDialog">
+            <AppBarButton Label="About" Click="ShowAboutDialog" IsEnabled="{Binding IsExporting, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}">
                 <AppBarButton.Icon>
                     <ImageIcon Source="ms-appx:///Assets/icon-info.svg"/>
                 </AppBarButton.Icon>
             </AppBarButton>
-            <AppBarButton Icon="Download" Label="Export" Click="ExportSlides"/>
+            <AppBarButton Icon="Download" Label="Export" Click="ExportSlides" IsEnabled="{Binding IsExporting, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"/>
         </StackPanel>
         <Border Grid.Column="1" Background="#333333" Height="64">
             <TextBlock Foreground="White" Height="64" FontFamily="Segoe UI" FontSize="14" HorizontalTextAlignment="Right" Margin="20,3,20,0">
@@ -42,6 +46,10 @@
         </Border>
         <win2dcanvas:CanvasControl Width="1280" Height="720" Grid.Row="1" Grid.ColumnSpan="2" x:Name="canvas" Draw="DrawCanvas" ClearColor="#333333" CreateResources="CreateResourcesEvent"/>
         <ProgressRing Grid.Row="1" Grid.ColumnSpan="2" IsActive="{Binding IsLoading}" Foreground="White"/>
+        <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Background="#333333" VerticalAlignment="Center" Padding="40" Visibility="{Binding IsExporting, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+            <TextBlock Margin="0,0,0,20" HorizontalAlignment="Center" FontSize="20">Exporting...</TextBlock>
+            <ProgressRing IsActive="True" Foreground="White"/>
+        </StackPanel>
 
         <ContentDialog x:Name="aboutDialog" SecondaryButtonText="View Logs" SecondaryButtonClick="OpenLogsFolder"
            PrimaryButtonText="OK">
