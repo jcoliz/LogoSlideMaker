@@ -382,12 +382,6 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
 
                     PopulateLayout();
 
-                    logOkDetails(DocumentTitle);
-
-                    DefinitionLoaded?.Invoke(this, new EventArgs());
-                    OnPropertyChanged(nameof(DocumentTitle));
-                    OnPropertyChanged(nameof(DocumentSubtitle));
-
                     LastOpenedFilePath = path;
                     _gitVersion = path is not null ? Utilities.GitVersion.GetForDirectory(path) : null;
 
@@ -395,6 +389,12 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
                     {
                         _definition.Files.Output = _definition.Files.Output.Replace("$Version", _gitVersion);
                     }
+
+                    logOkDetails(DocumentTitle);
+
+                    DefinitionLoaded?.Invoke(this, new EventArgs());
+                    OnPropertyChanged(nameof(DocumentTitle));
+                    OnPropertyChanged(nameof(DocumentSubtitle));
                 }
                 catch (TomlException ex)
                 {
@@ -413,6 +413,13 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
             });
 
             logDebugMoment("Launched");
+        }
+        catch (FileNotFoundException ex)
+        {
+            LastOpenedFilePath = null;
+
+            var args = new UserErrorEventArgs() { Title = "File not found", Details = ex.Message };
+            ErrorFound?.Invoke(this, args);
         }
         catch (Exception ex)
         {

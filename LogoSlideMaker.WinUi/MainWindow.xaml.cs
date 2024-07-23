@@ -12,7 +12,6 @@ using Microsoft.UI.Xaml.Controls;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -64,6 +63,7 @@ public sealed partial class MainWindow : Window
             viewModel.ErrorFound += DisplayViewModelError;
             this.Root.DataContext = viewModel;
             this.Title = MainViewModel.AppDisplayName;
+            this.Root.Loaded += Root_Loaded;
 
             // Set up app window
             var dpi = GetDpiForWindow(hWnd);
@@ -71,28 +71,27 @@ public sealed partial class MainWindow : Window
             this.AppWindow.SetIcon("Assets/app-icon.ico");
             this.AppWindow.Closing += CloseApp;
 
-            // Set up bitmap cache
-            bitmapCache.BaseDirectory = Path.GetDirectoryName(viewModel.LastOpenedFilePath);
-
-            // Reload last-used definition
-            this.viewModel.ReloadDefinitionAsync().ContinueWith(task =>
-            {
-                if (task.Exception != null)
-                {
-                    logFailMoment(task.Exception, "Reload");
-                }
-                else
-                {
-                    logOkMoment("Reload");
-                }
-            });
-
             logOk();
         }
         catch (Exception ex)
         {
             logCritical(ex);
         }
+    }
+
+    private async void Root_Loaded(object sender, RoutedEventArgs e)
+    {
+        // Reload last-used definition
+        try
+        {
+            await this.viewModel.ReloadDefinitionAsync();
+
+            logOkMoment("Reload");
+        }
+        catch (Exception ex)
+        {
+            logFail(ex);
+        }        
     }
 
     #endregion
@@ -103,6 +102,9 @@ public sealed partial class MainWindow : Window
     {
         var enqueued = this.DispatcherQueue.TryEnqueue(() =>
         {
+            // Set up bitmap cache
+            bitmapCache.BaseDirectory = Path.GetDirectoryName(viewModel.LastOpenedFilePath);
+
             // TODO: https://microsoft.github.io/Win2D/WinUI2/html/LoadingResourcesOutsideCreateResources.htm
             this.CreateResources(this.canvas);
         });
@@ -363,14 +365,16 @@ public sealed partial class MainWindow : Window
             // generate the drawing primitives so we can render them.
             viewModel.GeneratePrimitives();
 
-            // Now we are really done loading
-            viewModel.IsLoading = false;
-
             logOk();
         }
         catch (Exception ex)
         {
             logFail(ex);
+        }
+        finally
+        {
+            // Now we are really done loading
+            viewModel.IsLoading = false;
         }
     }
 
