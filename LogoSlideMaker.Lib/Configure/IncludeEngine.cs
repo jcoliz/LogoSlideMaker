@@ -1,7 +1,4 @@
-﻿using DocumentFormat.OpenXml.Linq;
-using LogoSlideMaker.Configure;
-
-namespace LogoSlideMaker.Lib.Configure;
+﻿namespace LogoSlideMaker.Configure;
 
 /// <summary>
 /// Manage including other definitions into in a defintition

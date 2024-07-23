@@ -46,6 +46,19 @@ if (string.IsNullOrWhiteSpace(definitions.Files.Output))
     return -1;
 }
 
+if (!string.IsNullOrWhiteSpace(definitions.Files.Include.Logos))
+{
+    var dir = Path.GetDirectoryName(options.Input);
+    var logopath = Path.Combine(dir!, definitions.Files.Include.Logos);
+
+    using var logostream = File.OpenRead(logopath);
+    using var logosr = new StreamReader(logostream);
+    var logotoml = logosr.ReadToEnd();
+    var logos = Toml.ToModel<Definition>(logotoml);
+
+    definitions.IncludeLogosFrom(logos);
+}
+
 //
 // LOAD IMAGES
 //

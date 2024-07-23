@@ -1,7 +1,4 @@
-﻿using DocumentFormat.OpenXml.InkML;
-using LogoSlideMaker.Configure;
-using LogoSlideMaker.Layout;
-using LogoSlideMaker.Lib.Configure;
+﻿using LogoSlideMaker.Configure;
 using System.Reflection;
 using Tomlyn;
 

@@ -1,7 +1,6 @@
 ﻿using LogoSlideMaker.Configure;
 using LogoSlideMaker.Export;
 using LogoSlideMaker.Layout;
-using LogoSlideMaker.Lib.Configure;
 using LogoSlideMaker.Primitives;
 using Microsoft.Extensions.Logging;
 using System;

@@ -1,5 +1,3 @@
-using LogoSlideMaker.Lib.Configure;
-
 namespace LogoSlideMaker.Configure;
 
 /// <summary>

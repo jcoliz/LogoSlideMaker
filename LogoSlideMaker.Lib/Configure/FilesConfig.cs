@@ -1,4 +1,4 @@
-﻿namespace LogoSlideMaker.Lib.Configure;
+﻿namespace LogoSlideMaker.Configure;
 
 /// <summary>
 /// Allows user to set out/template files using TOML file
