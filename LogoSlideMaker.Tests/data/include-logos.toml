@@ -1,0 +1,9 @@
+﻿[files]
+include.logos = "two-pages.toml"
+
+[layout]
+default_width = 10
+
+[[boxes]]
+logos.1 = [ "zero", "one", "two", "three" ]
+yposition = 0
