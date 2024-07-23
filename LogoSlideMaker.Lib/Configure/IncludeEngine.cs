@@ -32,15 +32,15 @@ public static class IncludeEngine
         var logos = source.Logos.Select(x => (x.Key, Value: x.Value with { TextWidth = null })).Where(x => !primary.Contains(x.Key));
 
         // Merge those logos in
-        foreach(var logo in logos)
+        foreach(var (Key, Value) in logos)
         {
-            if (overrides.TryGetValue(logo.Key, out var o))
+            if (overrides.TryGetValue(Key, out var o))
             {
-                target.Logos[logo.Key] = logo.Value with { TextWidth = o.TextWidth };
+                target.Logos[Key] = Value with { TextWidth = o.TextWidth };
             }
             else
             {
-                target.Logos[logo.Key] = logo.Value;
+                target.Logos[Key] = Value;
             }
         }
     }
