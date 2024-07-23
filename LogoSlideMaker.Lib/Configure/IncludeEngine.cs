@@ -1,4 +1,5 @@
-﻿using LogoSlideMaker.Configure;
+﻿using DocumentFormat.OpenXml.Linq;
+using LogoSlideMaker.Configure;
 
 namespace LogoSlideMaker.Lib.Configure;
 
@@ -18,13 +19,13 @@ public static class IncludeEngine
     /// <param name="source">Where the logos will come from</param>
     public static void IncludeLogosFrom(this Definition target, Definition source)
     {
-        // Divide existing logos into those which include primary properites (path or name),
-        // and those which only include secondary properties
-        var existing = target.Logos.GroupBy(x => x.Value.HasPrimaryProperties());
-        var primary = existing.Where(x => x.Key == true).SelectMany(x => x.Select(y => y.Key)).ToHashSet();
-        var overrides = existing
-            .Where(x => x.Key == false)
-            .SelectMany(x => x)
+        // All the logo keys where we already define primary properties in the target, so
+        // we will want to IGNORE them from the source
+        var primary = target.Logos.Where(x => x.Value.HasPrimaryProperties()).Select(x => x.Key).ToHashSet();
+
+        // All the logos which specify overriding properties, focused down to just the overriding properies themselves
+        // As we add more overridable properties, we'd update this.
+        var overrides = target.Logos.Where(x => x.Value.HasOverridableProperties())
             .ToDictionary(x => x.Key, y => new Logo() { TextWidth = y.Value.TextWidth });
 
         // Extract the logos from the source, excluding existing logos, and stripping out the text width
@@ -47,5 +48,10 @@ public static class IncludeEngine
     private static bool HasPrimaryProperties(this Logo logo)
     {
         return logo.Path.Length > 0 || logo.Title.Length > 0;
+    }
+
+    private static bool HasOverridableProperties(this Logo logo)
+    {
+        return logo.TextWidth.HasValue;
     }
 }
