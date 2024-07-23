@@ -36,6 +36,21 @@ public class FilesConfigTests
         Assert.That(definition.Logos, Has.Count.EqualTo(4));
     }
 
+    [Test]
+    public void DontMergeDuplicates()
+    {
+        // Given: A definition file with "include.logos" line, where the included file has
+        // a duplicate logo key
+        var definition = Load("include-logos-duplicate.toml");
+
+        // When: Merging in the logos
+        var included = Load(definition.Files.Include!.Logos!);
+        definition.IncludeLogosFrom(included);
+
+        // Then: Definition contains the original logo for the duplicate (was not overriden by the include)
+        Assert.That(definition.Logos["zero"], Has.Property("Title").EqualTo("Original Zero!"));
+    }
+
     private static Definition Load(string filename)
     {
         var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();

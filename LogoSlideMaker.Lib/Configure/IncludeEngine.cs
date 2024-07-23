@@ -23,8 +23,8 @@ public static class IncludeEngine
         //var existing = target.Logos.GroupBy(x => x.Value.HasPrimaryProperties());
         //var primary = existing.Where(x => x.Key == true).SelectMany(x => x.Select(y => y)).ToDictionary(x => x.Key, x => x.Value);
 
-        // Extract the logos from the source, stripping out the text width
-        var logos = source.Logos.Select(x => (x.Key,Value:x.Value with { TextWidth = null }));
+        // Extract the logos from the source, excluding existing logos, and stripping out the text width
+        var logos = source.Logos.Select(x => (x.Key, Value: x.Value with { TextWidth = null })).Where(x => !target.Logos.ContainsKey(x.Key));
 
         // Merge those logos in
         foreach(var logo in logos)
