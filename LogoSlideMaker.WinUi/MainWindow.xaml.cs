@@ -12,6 +12,7 @@ using Microsoft.UI.Xaml.Controls;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -320,7 +321,7 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    //[SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "UI system requires calling with instance")]
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "UI system requires calling with instance")]
     private void OpenLogsFolder(ContentDialog _, ContentDialogButtonClickEventArgs __)
     {
         Process.Start("explorer.exe", MainViewModel.LogsFolder);
