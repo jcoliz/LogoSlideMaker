@@ -26,7 +26,7 @@ public static class IncludeEngine
         // All the logos which specify overriding properties, focused down to just the overriding properies themselves
         // As we add more overridable properties, we'd update this.
         var overrides = target.Logos.Where(x => x.Value.HasOverridableProperties())
-            .ToDictionary(x => x.Key, y => new Logo() { TextWidth = y.Value.TextWidth });
+            .ToDictionary(x => x.Key, y => new Logo() { TextWidth = y.Value.TextWidth, Scale = y.Value.Scale });
 
         // Extract the logos from the source, excluding existing logos, and stripping out the text width
         var logos = source.Logos.Select(x => (x.Key, Value: x.Value with { TextWidth = null })).Where(x => !primary.Contains(x.Key));
@@ -36,7 +36,8 @@ public static class IncludeEngine
         {
             if (overrides.TryGetValue(Key, out var o))
             {
-                target.Logos[Key] = Value with { TextWidth = o.TextWidth };
+                // TODO: Consider whether these overrides should be applied separately
+                target.Logos[Key] = Value with { TextWidth = o.TextWidth, Scale = o.Scale };
             }
             else
             {
@@ -52,6 +53,9 @@ public static class IncludeEngine
 
     private static bool HasOverridableProperties(this Logo logo)
     {
-        return logo.TextWidth.HasValue;
+        // TODO: Scale should be nullable. Here it DOES matter whether or not scale was
+        // specified
+
+        return logo.TextWidth.HasValue || logo.Scale != default;
     }
 }

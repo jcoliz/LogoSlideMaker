@@ -1,6 +1,7 @@
 ﻿using LogoSlideMaker.Configure;
 using LogoSlideMaker.Export;
 using LogoSlideMaker.Layout;
+using LogoSlideMaker.Lib.Configure;
 using LogoSlideMaker.Primitives;
 using Microsoft.Extensions.Logging;
 using System;
@@ -341,7 +342,53 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
             {
                 try
                 {
-                    LoadDefinition(stream);
+                    // TODO: This method is way too long
+
+                    _primitives.Clear();
+                    IsLoading = true;
+
+                    var sr = new StreamReader(stream);
+                    var toml = sr.ReadToEnd();
+
+                    // This will throw if unable to parse
+                    var loaded = Toml.ToModel<Definition>(toml);
+
+                    // TODO: Need to consider the load the included logos here
+                    // This points to a structural problem. At this point, we
+                    // were given a stream, but we will need to load a FILE, and
+                    // we need access to the original path, which will give us
+                    // a relative directory starting point to find the include
+                    // file.
+
+                    // Parse includes
+                    if (!string.IsNullOrWhiteSpace(loaded.Files.Include.Logos) && path is not null)
+                    {
+                        var dir = Path.GetDirectoryName(path);
+                        var logopath = Path.Combine(dir!, loaded.Files.Include.Logos);
+
+                        using var logostream = File.OpenRead(logopath);
+                        using var logosr = new StreamReader(logostream);
+                        var logotoml = logosr.ReadToEnd();
+                        var logos = Toml.ToModel<Definition>(logotoml);
+
+                        loaded.IncludeLogosFrom(logos);
+                    }
+
+                    _definition = loaded;
+                    _gitVersion = null;
+                    if (SlideNumber >= _definition.Variants.Count)
+                    {
+                        SlideNumber = 0;
+                    }
+
+                    PopulateLayout();
+
+                    logOkDetails(DocumentTitle);
+
+                    DefinitionLoaded?.Invoke(this, new EventArgs());
+                    OnPropertyChanged(nameof(DocumentTitle));
+                    OnPropertyChanged(nameof(DocumentSubtitle));
+
                     LastOpenedFilePath = path;
                     _gitVersion = path is not null ? Utilities.GitVersion.GetForDirectory(path) : null;
 
@@ -577,42 +624,6 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
             return null;
         }
         return Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource)!;
-    }
-
-    /// <summary>
-    /// Load a definition from the specified <paramref name="stream"/>
-    /// </summary>
-    /// <param name="stream">Stream of definition file</param>
-    private void LoadDefinition(Stream stream)
-    {
-        try
-        {
-            _primitives.Clear();
-            IsLoading = true;
-
-            var sr = new StreamReader(stream);
-            var toml = sr.ReadToEnd();
-            
-            // This will throw if unable to parse
-            var loaded = Toml.ToModel<Definition>(toml);
-
-            _definition = loaded;
-            _gitVersion = null;
-            if (SlideNumber >= _definition.Variants.Count)
-            {
-                SlideNumber = 0;
-            }
-
-            PopulateLayout();
-
-            logOkDetails(DocumentTitle);
-        }
-        finally
-        {
-            DefinitionLoaded?.Invoke(this, new EventArgs());
-            OnPropertyChanged(nameof(DocumentTitle));
-            OnPropertyChanged(nameof(DocumentSubtitle));
-        }
     }
 
     /// <summary>
