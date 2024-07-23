@@ -20,21 +20,32 @@ public static class IncludeEngine
     {
         // Divide existing logos into those which include primary properites (path or name),
         // and those which only include secondary properties
-        //var existing = target.Logos.GroupBy(x => x.Value.HasPrimaryProperties());
-        //var primary = existing.Where(x => x.Key == true).SelectMany(x => x.Select(y => y)).ToDictionary(x => x.Key, x => x.Value);
+        var existing = target.Logos.GroupBy(x => x.Value.HasPrimaryProperties());
+        var primary = existing.Where(x => x.Key == true).SelectMany(x => x.Select(y => y.Key)).ToHashSet();
+        var overrides = existing
+            .Where(x => x.Key == false)
+            .SelectMany(x => x)
+            .ToDictionary(x => x.Key, y => new Logo() { TextWidth = y.Value.TextWidth });
 
         // Extract the logos from the source, excluding existing logos, and stripping out the text width
-        var logos = source.Logos.Select(x => (x.Key, Value: x.Value with { TextWidth = null })).Where(x => !target.Logos.ContainsKey(x.Key));
+        var logos = source.Logos.Select(x => (x.Key, Value: x.Value with { TextWidth = null })).Where(x => !primary.Contains(x.Key));
 
         // Merge those logos in
         foreach(var logo in logos)
         {
-            target.Logos[logo.Key] = logo.Value;
+            if (overrides.TryGetValue(logo.Key, out var o))
+            {
+                target.Logos[logo.Key] = logo.Value with { TextWidth = o.TextWidth };
+            }
+            else
+            {
+                target.Logos[logo.Key] = logo.Value;
+            }
         }
     }
 
-    //private static bool HasPrimaryProperties(this Logo logo)
-    //{
-    //    return logo.Path.Length > 0 || logo.Title.Length > 0;
-    //}
+    private static bool HasPrimaryProperties(this Logo logo)
+    {
+        return logo.Path.Length > 0 || logo.Title.Length > 0;
+    }
 }
