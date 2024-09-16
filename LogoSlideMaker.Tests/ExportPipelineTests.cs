@@ -11,7 +11,6 @@ public class ExportPipelineTests
     /// Scenario: Template slides removed from output
     /// </summary>
     [Test]
-    [Explicit("Failing test for feature in progress")]
     public void TemplateSlidesRemoved()
     {
         // Given: A definition with one variant using a template with one slide
@@ -23,6 +22,9 @@ public class ExportPipelineTests
 
         // Then: Result has only one slide
         Assert.That(presentation.Slides,Has.Count.EqualTo(1));
+
+        // And: Resulting slide has contents as specified in definition
+        Assert.That(presentation.Slides[0].Shapes,Has.Count.EqualTo(4));
     }
 
     // TODO: DRY

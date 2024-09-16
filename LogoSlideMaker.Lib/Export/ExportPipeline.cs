@@ -43,6 +43,9 @@ public class ExportPipeline
         // Open template or create new presentation
         var pres = templateStream is not null ? new Presentation(templateStream) : new Presentation();
 
+        // Retain number of slides in template
+        var numTemplateSlides = pres.Slides.Count;
+
         // If there isn't a specified variant, default to an EMPTY one
         // TODO: Perhaps better to do this on LOAD
         var variants = definition.Variants.Count > 0 ? definition.Variants : [new()];
@@ -58,6 +61,13 @@ public class ExportPipeline
 
             // Render
             renderEngine.Render(pres, layout, dataVersion, primitives);
+        }
+
+        // Delete template slides off top of result
+        var removeSlides = pres.Slides.Take(numTemplateSlides).ToArray();
+        foreach(var slide in removeSlides)
+        {
+            pres.Slides.Remove(slide);
         }
 
         return pres;
