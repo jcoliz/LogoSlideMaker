@@ -1,14 +1,12 @@
-using System.Reflection;
 using LogoSlideMaker.Configure;
 using LogoSlideMaker.Layout;
-using Tomlyn;
 
 namespace LogoSlideMaker.Tests;
 
 /// <summary>
 /// Boxes feature: User can group logos into boxes with evenly-spaced space rows
 /// </summary>
-public class LayoutBoxTests
+public class LayoutBoxTests: TestsBase
 {    
     [Test]
     public void Padding()
@@ -155,17 +153,5 @@ public class LayoutBoxTests
 
         // Then: First row of logos all on same line
         Assert.That(layout.Logos[0..5], Has.All.Property("Y").EqualTo(0));
-    }
-
-    private static Definition Load(string filename)
-    {
-        var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
-        var resource = names.Where(x=>x.Contains($".{filename}")).Single();
-        var stream = Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource);
-        var sr = new StreamReader(stream!);
-        var toml = sr.ReadToEnd();
-        var definitions = Toml.ToModel<Definition>(toml);
-
-        return definitions;
     }
 }
