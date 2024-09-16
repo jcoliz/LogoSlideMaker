@@ -31,6 +31,15 @@ public class ExportPipeline
 
     public void Save(Stream? templateStream, string outputPath, string? dataVersion)
     {
+        // Render all slides to a new presentation
+        var pres = RenderAll(templateStream, dataVersion);
+
+        // Save the resulting presentation
+        pres.SaveAs(outputPath);
+    }
+
+    internal Presentation RenderAll(Stream? templateStream, string? dataVersion)
+    {
         // Open template or create new presentation
         var pres = templateStream is not null ? new Presentation(templateStream) : new Presentation();
 
@@ -51,8 +60,7 @@ public class ExportPipeline
             renderEngine.Render(pres, layout, dataVersion, primitives);
         }
 
-        // Save the resulting presentation
-        pres.SaveAs(outputPath);
+        return pres;
     }
 
     private readonly Definition definition;
