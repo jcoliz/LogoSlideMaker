@@ -642,7 +642,22 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
             return;
         }
 
-        var variant = _definition.Variants.Count > 0 ? _definition.Variants[_slideNumber] : new Variant();
+        var existingVariants = _definition.Variants;
+        var slideNumber = _slideNumber;
+
+        // In case of no variants, we'll use a blank
+        if (existingVariants.Count == 0)
+        {
+            existingVariants = [new()];
+        }
+
+        if (slideNumber >= existingVariants.Count)
+        {
+            logWarningSlideOutoFoRange(slideNumber, existingVariants.Count);
+            slideNumber = 0;
+        }
+
+        var variant = existingVariants[slideNumber];
 
         var engine = new LayoutEngine(_definition, variant);
         _layout = engine.CreateSlideLayout();
@@ -735,6 +750,9 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
 
     [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: Slide number {Number} out of range {Count}")]
     public partial void logFailSlideOutoFoRange(int number, int count, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "{Location}: Slide number {Number} out of range {Count}")]
+    public partial void logWarningSlideOutoFoRange(int number, int count, [CallerMemberName] string? location = null);
 
     #endregion
 }
