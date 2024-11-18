@@ -58,7 +58,7 @@ public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
             var description_box = target.TryGetByName<IShape>("Description");
             if (description_box is not null)
             {
-                var tf = description_box.TextFrame;
+                var tf = description_box.TextBox;
 
                 // Ensure there are enough paragraphs to insert text
                 while (tf.Paragraphs.Count < num_description_lines)
@@ -109,15 +109,19 @@ public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
         shape.Width = primitive.Rectangle.Width;
         shape.Height = primitive.Rectangle.Height ?? primitive.Rectangle.Width;
 
-        var tf = shape.TextFrame;
+        var tf = shape.TextBox;
         tf.Text = primitive.Text;
         tf.LeftMargin = 0;
         tf.RightMargin = 0;
         var font = tf.Paragraphs[0].Portions[0].Font;
 
-        font.Size = config.FontSize;
-        font.LatinName = config.FontName;
-        font.Color.Update(config.FontColor);
+        if (font is not null)
+        {
+            font.Size = config.FontSize;
+            font.LatinName = config.FontName;
+            font.Color.Update(config.FontColor);
+        }
+
         shape.Fill.SetNoFill();
         shape.Outline.SetNoOutline();
     }
