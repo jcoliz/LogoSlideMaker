@@ -59,6 +59,8 @@ public class ExportPipeline
             // Primitives
             var primitives = layout.Logos.SelectMany(primitivesEngine.ToPrimitives);
 
+            // #50: Now rending 
+
             // Render
             renderEngine.Render(pres, layout, dataVersion, primitives);
         }
