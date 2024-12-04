@@ -54,8 +54,11 @@
     <EmbeddedResource Include="data/simple.toml" />
 	<Content Remove="data/include-logos.toml" />
 	<None Remove="data\include-logos-duplicate.toml" />
+	<None Remove="data\render-title.toml" />
 	<EmbeddedResource Include="data/include-logos.toml" />
 	<EmbeddedResource Include="data\include-logos-duplicate.toml" />
+	<EmbeddedResource Include="data\render-title.toml" />
+	<Content Remove="data/render-title.toml" />
   </ItemGroup>
 
 </Project>
