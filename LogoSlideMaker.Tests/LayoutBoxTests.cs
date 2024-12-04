@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml.InkML;
 using LogoSlideMaker.Configure;
 using LogoSlideMaker.Layout;
 
@@ -153,5 +154,20 @@ public class LayoutBoxTests: TestsBase
 
         // Then: First row of logos all on same line
         Assert.That(layout.Logos[0..5], Has.All.Property("Y").EqualTo(0));
+    }
+
+    [Test]
+    public void BoxTitles()
+    {
+        // Given: A layout with a title
+        var definition = Load("render-title.toml");
+
+        // When: Creating and populating these into a layout
+        var variant = new Variant();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
+
+        // Then: There is a text layout added
+        Assert.That(layout.Text, Has.Length.EqualTo(1));
     }
 }

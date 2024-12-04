@@ -51,4 +51,9 @@ public record Config
     /// </summary>
     public decimal? PaddingY { get; set; }
 
+    /// <summary>
+    /// Height of title box over logo boxes, in inches, or null if
+    /// titles should not be rendered
+    /// </summary>
+    public decimal? TitleHeight { get; set; }
 }

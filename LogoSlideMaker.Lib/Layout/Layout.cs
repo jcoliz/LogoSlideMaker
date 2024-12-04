@@ -9,11 +9,11 @@ public class LayoutEngine(Definition definition, Variant variant)
 {
     public SlideLayout CreateSlideLayout()
     {
+        // Find the boxes we're including
+        var boxes = definition.Boxes.Where(x => BoxIncludedInVariant(x));
+
         // Add well-defined boxes
-        var logos =
-            definition.Boxes
-                .Where(x => BoxIncludedInVariant(x))
-                .Aggregate<Box, List<LogoLayout>>(new(), LayoutAggregateBox);
+        var logos = boxes.Aggregate<Box, List<LogoLayout>>(new(), LayoutAggregateBox);
 
         // Add loose rows, only if pages are not specified
         if (variant.Pages.Count == 0)
@@ -24,7 +24,30 @@ public class LayoutEngine(Definition definition, Variant variant)
             );
         }
 
-        return new SlideLayout() { Variant = variant, Logos = logos.ToArray() };
+        // Add box titles if we are rendering them
+
+        var text = Enumerable.Empty<TextLayout>();
+        var height = definition.Layout.TitleHeight ?? 0;
+        if (definition.Layout.TitleHeight > 0)
+        {
+            text = boxes
+                .Where(x => !string.IsNullOrWhiteSpace(x.Title))
+                .Select(x => new TextLayout()
+                {
+                    Text = x.Title,
+                    TextSyle = TextSyle.BoxTitle,
+                    Position = new Rectangle()
+                    {
+                        // TODO: Only works (currently) with explicitly specified boxes
+                        X = (x.XPosition ?? 0), // X position of box
+                        Y = 5 - (x.YPosition ?? 0), // Y position of box minus title height
+                        Width = x.Width ?? 0,
+                        Height = height
+                    }
+                });
+        }
+
+        return new SlideLayout() { Variant = variant, Logos = logos.ToArray(), Text = text.ToArray() };
     }
 
     /// <summary>
@@ -394,6 +417,31 @@ public record BoxLayout
     public LogoLayout[] Logos { get; init; } = [];
 }
 
+public enum TextSyle
+{
+    Invisible = 0,
+    Logo = 1,
+    BoxTitle = 2
+}
+
+/// <summary>
+/// Additional text to display
+/// </summary>
+public record TextLayout
+{
+    /// <summary>
+    /// The text to display. A value is expected
+    /// </summary>
+    public string Text { get; init; } = string.Empty;
+
+    /// <summary>
+    /// Location and size of the text box
+    /// </summary>
+    public Rectangle Position { get; init; } = new();
+
+    public TextSyle TextSyle { get; init; } = TextSyle.Invisible;
+}
+
 /// <summary>
 /// All the logos laid out on a given slide, plus details about the variant
 /// </summary>
@@ -404,4 +452,5 @@ public record SlideLayout
 {
     public Variant Variant { get; init; } = new();
     public LogoLayout[] Logos { get; init; } = [];
+    public TextLayout[] Text { get; init; } = [];
 }
