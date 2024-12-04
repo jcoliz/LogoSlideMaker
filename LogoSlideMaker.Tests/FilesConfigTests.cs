@@ -64,7 +64,19 @@ public class FilesConfigTests
 
         // Then: And the text width is as-specified in our original definition
         Assert.That(definition.Logos["one"], Has.Property("TextWidth").EqualTo(100m));
+    }
 
+    [Test]
+    public void TitleRenderParamsLoaded()
+    {
+        // When: Loading A definition file with `title_` rendering properties set
+        var definition = Load("render-title.toml");
+
+        // Then: Definition includes expected values
+        Assert.That(definition.Render.TitleHeight, Is.EqualTo(0.25m));
+        Assert.That(definition.Render.TitleFontName, Is.EqualTo("Segoe UI"));
+        Assert.That(definition.Render.TitleFontSize, Is.EqualTo(24));
+        Assert.That(definition.Render.TitleFontColor, Is.EqualTo("222222"));
     }
 
     private static Definition Load(string filename)
