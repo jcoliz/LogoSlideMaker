@@ -45,3 +45,10 @@ public record Rectangle: Size
     public decimal X { get; set; }
     public decimal? Y { get; set; }
 }
+
+public enum TextSyle
+{
+    Invisible = 0,
+    Logo = 1,
+    BoxTitle = 2
+}

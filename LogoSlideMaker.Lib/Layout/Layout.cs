@@ -30,18 +30,18 @@ public class LayoutEngine(Definition definition, Variant variant)
         var height = definition.Layout.TitleHeight ?? 0;
         if (definition.Layout.TitleHeight > 0)
         {
+            // TODO: Only supported for boxes with explicitly specified outer dimensions
             text = boxes
-                .Where(x => !string.IsNullOrWhiteSpace(x.Title))
+                .Where(x => !string.IsNullOrWhiteSpace(x.Title) && x.Outer != null)
                 .Select(x => new TextLayout()
                 {
                     Text = x.Title,
                     TextSyle = TextSyle.BoxTitle,
                     Position = new Rectangle()
                     {
-                        // TODO: Only works (currently) with explicitly specified boxes
-                        X = (x.XPosition ?? 0), // X position of box
-                        Y = 5 - (x.YPosition ?? 0), // Y position of box minus title height
-                        Width = x.Width ?? 0,
+                        X = x.Outer?.X ?? 0, // X position of box
+                        Y = (x.Outer?.Y ?? 0) - height, // Y position of box minus title height
+                        Width = x.Outer?.Width ?? 0,
                         Height = height
                     }
                 });
@@ -415,13 +415,6 @@ public record BoxLayout
 {
     public string? Heading { get; init; }
     public LogoLayout[] Logos { get; init; } = [];
-}
-
-public enum TextSyle
-{
-    Invisible = 0,
-    Logo = 1,
-    BoxTitle = 2
 }
 
 /// <summary>

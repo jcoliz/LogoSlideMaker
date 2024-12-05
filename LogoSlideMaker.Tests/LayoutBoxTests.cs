@@ -169,5 +169,17 @@ public class LayoutBoxTests: TestsBase
 
         // Then: There is a text layout added
         Assert.That(layout.Text, Has.Length.EqualTo(1));
+
+        // And: The text matches expectations
+        Assert.That(layout.Text[0].Text, Is.EqualTo("Left side"));
+
+        // And: The position matches expectations
+        Assert.That(layout.Text[0].Position, Is.EqualTo(new Rectangle()
+        {
+            X = 2,
+            Y = 3,
+            Width = 5,
+            Height = 1
+        }));
     }
 }
