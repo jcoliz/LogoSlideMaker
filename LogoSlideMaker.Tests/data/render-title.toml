@@ -4,12 +4,13 @@
 
 [layout]
 default_width = 10
-title_height = 1
 
 [render]
+title_height = 1
 title_font_size = 24
 title_font_name = "Segoe UI"
 title_font_color = "222222"
+dpi = 100
 
 [logos.zero]
 title = "zero"
@@ -17,4 +18,4 @@ title = "zero"
 [[boxes]]
 title = "Left side"
 logos.1 = [ "zero", "zero" ]
-outer = { x = 2, y = 4, width = 5, height = 10 }
+outer = { x = 2, y = 3, width = 4, height = 10 }

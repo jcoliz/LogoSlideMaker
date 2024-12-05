@@ -174,12 +174,12 @@ public class LayoutBoxTests: TestsBase
         Assert.That(layout.Text[0].Text, Is.EqualTo("Left side"));
 
         // And: The position matches expectations
-        Assert.That(layout.Text[0].Position, Is.EqualTo(new Rectangle()
+        Assert.That(layout.Text[0].Position, Is.EqualTo(new Edge()
         {
             X = 2,
             Y = 3,
-            Width = 5,
-            Height = 1
+            Length = 4,
+            Kind = EdgeKind.Bottom
         }));
     }
 }

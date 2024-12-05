@@ -24,28 +24,28 @@ public class LayoutEngine(Definition definition, Variant variant)
             );
         }
 
-        // Add box titles if we are rendering them
+        // Add box titles
+        // Note that we always lay them out if they're in the box definition.
+        // It's up to the renderer if we're displaying them or not
 
         var text = Enumerable.Empty<TextLayout>();
-        var height = definition.Layout.TitleHeight ?? 0;
-        if (definition.Layout.TitleHeight > 0)
-        {
-            // TODO: Only supported for boxes with explicitly specified outer dimensions
-            text = boxes
-                .Where(x => !string.IsNullOrWhiteSpace(x.Title) && x.Outer != null)
-                .Select(x => new TextLayout()
+
+        // TODO: Only supported for boxes with explicitly specified outer dimensions
+        text = boxes
+            .Where(x => !string.IsNullOrWhiteSpace(x.Title) && x.Outer != null)
+            .Select(x => new TextLayout()
+            {
+                Text = x.Title,
+                TextSyle = TextSyle.BoxTitle,
+                // Titles have their bottom edge aligned with the top edge of the box
+                Position = new Edge()
                 {
-                    Text = x.Title,
-                    TextSyle = TextSyle.BoxTitle,
-                    Position = new Rectangle()
-                    {
-                        X = x.Outer?.X ?? 0, // X position of box
-                        Y = (x.Outer?.Y ?? 0) - height, // Y position of box minus title height
-                        Width = x.Outer?.Width ?? 0,
-                        Height = height
-                    }
-                });
-        }
+                    X = x.Outer?.X ?? 0,
+                    Y = x.Outer?.Y ?? 0,
+                    Length = x.Outer?.Width ?? 0,
+                    Kind = EdgeKind.Bottom
+                }
+            });
 
         return new SlideLayout() { Variant = variant, Logos = logos.ToArray(), Text = text.ToArray() };
     }
@@ -389,7 +389,16 @@ public class LayoutEngine(Definition definition, Variant variant)
 public record LogoLayout
 {
     public Logo? Logo { get; init; }
+    /// <summary>
+    /// Horizontal origin of where the logo should be placed, in inches
+    /// </summary>
+    /// <remarks>
+    /// Logos currently use center as origin. This could change in the future/
+    /// </remarks>
     public decimal X { get; init; }
+    /// <summary>
+    /// Vertical origin of where the logo should be placed, in inches
+    /// </summary>
     public decimal Y { get; init; }
 
     /// <summary>
@@ -428,10 +437,13 @@ public record TextLayout
     public string Text { get; init; } = string.Empty;
 
     /// <summary>
-    /// Location and size of the text box
+    /// Location and alignment the text box in inches
     /// </summary>
-    public Rectangle Position { get; init; } = new();
+    public Edge Position { get; init; } = new();
 
+    /// <summary>
+    /// Visual style how the text should be rendered
+    /// </summary>
     public TextSyle TextSyle { get; init; } = TextSyle.Invisible;
 }
 
