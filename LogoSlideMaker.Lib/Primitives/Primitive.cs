@@ -10,6 +10,7 @@ public record Primitive
 public record TextPrimitive: Primitive
 {
     public string Text { get; init; } = string.Empty;
+    public TextSyle Style { get; init; } = TextSyle.Logo;
 }
 
 public record ImagePrimitive: Primitive

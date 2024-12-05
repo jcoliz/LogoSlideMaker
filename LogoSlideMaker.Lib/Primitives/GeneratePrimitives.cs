@@ -84,4 +84,14 @@ public class PrimitivesEngine(RenderConfig config, IGetImageAspectRatio getLogoA
 
         return result;
     }
+
+    public Primitive ToPrimitive(TextLayout textLayout)
+    {
+        return new TextPrimitive()
+        {
+            Rectangle = textLayout.Position,
+            Text = textLayout.Text,
+            Style = textLayout.TextSyle
+        };
+    }
 }

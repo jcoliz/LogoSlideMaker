@@ -56,13 +56,14 @@ public class ExportPipeline
             // Layout
             var layout = new LayoutEngine(definition, variant).CreateSlideLayout();
 
-            // Primitives
+            // Logo Primitives
             var primitives = layout.Logos.SelectMany(primitivesEngine.ToPrimitives);
 
-            // #50: Now rending 
+            // Text primitives
+            var textPrimitives = layout.Text.Select(primitivesEngine.ToPrimitive);
 
             // Render
-            renderEngine.Render(pres, layout, dataVersion, primitives);
+            renderEngine.Render(pres, layout, dataVersion, primitives.Concat(textPrimitives));
         }
 
         // Delete template slides off top of result

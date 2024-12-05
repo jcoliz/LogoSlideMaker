@@ -73,7 +73,7 @@ public class FilesConfigTests
         var definition = Load("render-title.toml");
 
         // Then: Definition includes expected values
-        Assert.That(definition.Layout.TitleHeight, Is.EqualTo(0.25m));
+        Assert.That(definition.Layout.TitleHeight, Is.EqualTo(1));
         Assert.That(definition.Render.TitleFontName, Is.EqualTo("Segoe UI"));
         Assert.That(definition.Render.TitleFontSize, Is.EqualTo(24));
         Assert.That(definition.Render.TitleFontColor, Is.EqualTo("222222"));
