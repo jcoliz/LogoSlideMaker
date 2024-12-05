@@ -17,6 +17,10 @@ dpi = 96.0
 font_size = 10.5
 font_name = "Segoe UI"
 font_color = "595959"
+title_height = 0.4
+title_font_size = 18
+title_font_name = "Segoe UI"
+title_font_color = "FFFFFF"
 
 [[variants]]
 name = "Sample Slide"

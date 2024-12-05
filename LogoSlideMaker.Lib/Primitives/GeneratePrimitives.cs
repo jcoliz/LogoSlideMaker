@@ -79,7 +79,7 @@ public class PrimitivesEngine(RenderConfig config, IGetImageAspectRatio getLogoA
         };
 
         result.Add(
-            new TextPrimitive() { Rectangle = textRectangle, Text = logo.Title }
+            new TextPrimitive() { Rectangle = textRectangle, Text = logo.Title, Style = TextSyle.Logo }
         );
 
         return result;
@@ -87,9 +87,25 @@ public class PrimitivesEngine(RenderConfig config, IGetImageAspectRatio getLogoA
 
     public Primitive ToPrimitive(TextLayout textLayout)
     {
+        if (textLayout.Position.Kind != EdgeKind.Bottom)
+        {
+            throw new Exception($"Unknown edge kind {textLayout.Position.Kind}");
+        }
+
+        if (config.TitleHeight == null)
+        {
+            throw new Exception("Title height not specified");
+        }
+
         return new TextPrimitive()
         {
-            Rectangle = textLayout.Position,
+            Rectangle = new Rectangle()
+            {
+                X = textLayout.Position.X * config.Dpi,
+                Y = (textLayout.Position.Y - config.TitleHeight) * config.Dpi,
+                Width = textLayout.Position.Length * config.Dpi,
+                Height = config.TitleHeight * config.Dpi
+            },
             Text = textLayout.Text,
             Style = textLayout.TextSyle
         };

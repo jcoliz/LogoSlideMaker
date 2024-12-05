@@ -101,6 +101,9 @@ public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
     }
     private void Draw(TextPrimitive primitive, ISlideShapes target)
     {
+        if (primitive.Style == TextSyle.Invisible)
+            return;
+
         target.AddRectangle(100, 100, 100, 100);
         var shape = target[^1];
 
@@ -117,9 +120,23 @@ public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
 
         if (font is not null)
         {
-            font.Size = config.FontSize;
-            font.LatinName = config.FontName;
-            font.Color.Update(config.FontColor);
+            switch(primitive.Style)
+            {
+                // TODO: Could expand config to define styles as its own config type
+                // then look them up here in a dictionary.
+                case TextSyle.Logo:
+                    font.Size = config.FontSize;
+                    font.LatinName = config.FontName;
+                    font.Color.Update(config.FontColor);
+                    break;
+                case TextSyle.BoxTitle:
+                    font.Size = config.TitleFontSize;
+                    font.LatinName = config.TitleFontName;
+                    font.Color.Update(config.TitleFontColor);
+                    break;
+                default:
+                    throw new Exception($"Unsupported text style {primitive.Style}");
+            }
         }
 
         shape.Fill.SetNoFill();

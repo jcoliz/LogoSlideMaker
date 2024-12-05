@@ -45,6 +45,12 @@ public record RenderConfig
 
     public string PaddingColorDark { get; set; } = "FFFFFF";
 
+    /// <summary>
+    /// Height of title box over logo boxes, in inches, or null if
+    /// titles should not be rendered
+    /// </summary>
+    public decimal? TitleHeight { get; set; }
+
     public decimal TitleFontSize { get; set; } = 14;
 
     public string TitleFontName { get; set; } = "sans";

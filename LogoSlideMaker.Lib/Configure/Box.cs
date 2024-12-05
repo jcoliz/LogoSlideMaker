@@ -46,6 +46,21 @@ public record Rectangle: Size
     public decimal? Y { get; set; }
 }
 
+public record Edge
+{
+    public decimal X { get; set; }
+    public decimal Y { get; set; }
+    public decimal Length { get; set; }
+    public EdgeKind Kind { get; set; }
+}
+
+// Feel free to define more kinds as more are used!
+public enum EdgeKind
+{
+    Undefined = 0,
+    Bottom = 1
+}
+
 public enum TextSyle
 {
     Invisible = 0,
