@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml.Presentation;
 using LogoSlideMaker.Primitives;
 using LogoSlideMaker.WinUi.Services;
 using LogoSlideMaker.WinUi.ViewModels;
@@ -38,6 +39,7 @@ public sealed partial class MainWindow : Window
 
     // Cached canvas resources
     private CanvasTextFormat? defaultTextFormat;
+    private CanvasTextFormat? titleTextFormat;
     private ICanvasBrush? solidBlack;
 
     // Internal state
@@ -351,6 +353,7 @@ public sealed partial class MainWindow : Window
             }
             needResourceLoad = false;
             defaultTextFormat = new() { FontSize = (float)config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
+            titleTextFormat = new() { FontSize = (float)config.TitleFontSize * 96.0f / 72.0f, FontFamily = config.TitleFontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
             solidBlack = new CanvasSolidColorBrush(sender, Microsoft.UI.Colors.Black);
 
             logDebugLoading();
@@ -427,7 +430,17 @@ public sealed partial class MainWindow : Window
     private void Draw(TextPrimitive primitive, CanvasDrawingSession session)
     {
         // Draw the actual text
-        session.DrawText(primitive.Text, primitive.Rectangle.AsWindowsRect(), solidBlack, defaultTextFormat);
+        session.DrawText(
+            primitive.Text, 
+            primitive.Rectangle.AsWindowsRect(), 
+            solidBlack, 
+            primitive.Style switch
+            {
+                Configure.TextSyle.Logo => defaultTextFormat,
+                Configure.TextSyle.BoxTitle => titleTextFormat,
+                _ => throw new Exception($"Unexpected text style {primitive.Style}")
+            }
+        );
 
         // Draw a text bounding box
         if (viewModel.ShowBoundingBoxes)
