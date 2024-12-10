@@ -195,6 +195,8 @@ public class LayoutEngine(Definition definition, Variant variant)
 
     private Func<List<string>,int,Row> MakeRow(Box box, decimal YPosition)
     {
+        var paddingX = (definition.Layout.PaddingX ?? definition.Layout.Padding ?? 0) + (box.MorePaddingX ?? 0);
+        var paddingY = (definition.Layout.PaddingY ?? definition.Layout.Padding ?? 0);
         Rectangle inner 
             = (box.Outer is null)
             ? new Rectangle() 
@@ -205,9 +207,9 @@ public class LayoutEngine(Definition definition, Variant variant)
                 } 
             : new Rectangle()
             {
-                X = box.Outer.X + (definition.Layout.PaddingX ?? definition.Layout.Padding ?? 0) + definition.Render.TextWidth / 2m,
-                Y = (box.Outer.Y is not null) ? box.Outer.Y + (definition.Layout.PaddingY ?? definition.Layout.Padding ?? 0) + definition.Render.IconSize / 2m : YPosition,
-                Width = box.Outer.Width - (definition.Layout.PaddingX ?? definition.Layout.Padding ?? 0) * 2 - definition.Render.TextWidth
+                X = box.Outer.X + paddingX + definition.Render.TextWidth / 2m,
+                Y = (box.Outer.Y is not null) ? box.Outer.Y + paddingY + definition.Render.IconSize / 2m : YPosition,
+                Width = box.Outer.Width - paddingX * 2 - definition.Render.TextWidth
             };
 
         return (List<string> logos, int col) => new Row() 

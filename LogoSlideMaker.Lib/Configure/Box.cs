@@ -18,6 +18,12 @@ public record Box
     /// those values
     /// </remarks>
     public Rectangle? Outer { get; set; }
+
+    /// <summary>
+    /// Additional Padding on X axis. In addition to definition-wide default padding
+    /// </summary>
+    public decimal? MorePaddingX { get; set; }
+
     public int MinColumns { get; set; }
     public int Page { get; set; }
 
