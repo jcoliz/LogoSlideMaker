@@ -19,6 +19,8 @@ public record Definition
     /// </summary>
     public List<Variant> Variants { get; set; } = new();
 
+    public Dictionary<string,Rectangle> Locations { get; set; } = new();
+
     /// <summary>
     /// The actual logos to be displayed, indexed by id
     /// </summary>
