@@ -28,6 +28,14 @@ public record Box
     public int Page { get; set; }
 
     /// <summary>
+    /// Name of location on this page
+    /// </summary>
+    /// <remarks>
+    /// If set, will pull box size/position from central list of locations
+    /// </remarks>
+    public string? Location { get; set; }
+
+    /// <summary>
     /// Whether row should be re-composed to flow nicely
     /// </summary>
     public bool AutoFlow { get; set; }
