@@ -23,6 +23,7 @@ if (options.Exit)
 var sr = new StreamReader(options.Input!);
 var toml = sr.ReadToEnd();
 var definitions = Toml.ToModel<Definition>(toml);
+definitions.ProcessAfterLoading();
 
 if (!string.IsNullOrWhiteSpace(options.Template))
 {

@@ -373,6 +373,8 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
                         loaded.IncludeLogosFrom(logos);
                     }
 
+                    loaded.ProcessAfterLoading();
+
                     _definition = loaded;
                     _gitVersion = null;
                     if (SlideNumber >= _definition.Variants.Count)

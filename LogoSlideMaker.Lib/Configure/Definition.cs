@@ -38,4 +38,18 @@ public record Definition
     /// Multi-line boxes of logo positions describing how the logos are laid out
     /// </summary>
     public List<Box> Boxes { get; set; } = new();
+
+    /// <summary>
+    /// After loading a definition, call this to complete any post-load processing
+    /// </summary>
+    public void ProcessAfterLoading()
+    {
+        if (Locations.Count > 0)
+        {
+            foreach (var box in Boxes)
+            {
+                box.SetOuterFromLocation(Locations);
+            }
+        }
+    }
 }
