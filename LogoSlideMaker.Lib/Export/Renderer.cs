@@ -104,7 +104,7 @@ public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
         if (primitive.Style == TextSyle.Invisible)
             return;
 
-        target.AddRectangle(100, 100, 100, 100);
+        target.AddShape(100, 100, 100, 100);
         var shape = target[^1];
 
         shape.X = primitive.Rectangle.X;
@@ -158,7 +158,7 @@ public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
 
     private static void Draw(RectanglePrimitive primitive, ISlideShapes target)
     {
-        target.AddRectangle(100, 100, 100, 100);
+        target.AddShape(100, 100, 100, 100);
         var shape = target[^1];
 
         shape.X = primitive.Rectangle.X;
