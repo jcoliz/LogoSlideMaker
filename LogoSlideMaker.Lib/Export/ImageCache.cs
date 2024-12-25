@@ -132,7 +132,7 @@ public class ImageCache : IGetImageAspectRatio
 
         stream.Dispose();
 
-        return result.GetBuffer();
+        return result.ToArray();
     }
 
     private static decimal MeasureImage(bool isSvg, byte[] buffer)
