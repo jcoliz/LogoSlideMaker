@@ -19,7 +19,7 @@ public record Definition
     /// </summary>
     public List<Variant> Variants { get; set; } = new();
 
-    public Dictionary<int,Dictionary<string,Rectangle>> Locations { get; set; } = new();
+    public Dictionary<int,Dictionary<string,Location>> Locations { get; set; } = new();
 
     /// <summary>
     /// The actual logos to be displayed, indexed by id
@@ -48,8 +48,16 @@ public record Definition
         {
             foreach (var box in Boxes)
             {
-                box.SetOuterFromLocation(Locations);
+                box.SetLocationProperties(Locations);
             }
         }
     }
+}
+
+public record Location: Rectangle
+{
+    /// <summary>
+    /// Number of rows this location can handle
+    /// </summary>
+    public int? NumRows { get; set; }
 }

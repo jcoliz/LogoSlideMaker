@@ -47,7 +47,7 @@ public record Box
 
     public Dictionary<int,List<string>> Logos { get; set; } = new Dictionary<int,List<string>>();
 
-    public void SetOuterFromLocation(Dictionary<int, Dictionary<string, Rectangle>> locations)
+    public void SetLocationProperties(Dictionary<int, Dictionary<string, Location>> locations)
     {
         if (!string.IsNullOrEmpty(Location))
         {
