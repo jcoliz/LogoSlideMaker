@@ -53,8 +53,18 @@ public record Box
         if (!string.IsNullOrEmpty(Location))
         {
             Outer = locations[this.Page][this.Location];
+            NumRows = locations[this.Page][this.Location].NumRows;
         }
     }
+
+    /// <summary>
+    /// Number of rows we will have
+    /// </summary>
+    /// <remarks>
+    /// Overrides logos.Count, previously used 
+    /// </remarks>
+    public int? NumRows { get; set; }
+
 }
 
 public record Size

@@ -157,7 +157,7 @@ public class LayoutEngine(Definition definition, Variant variant)
         var entries = IncludedEntries(logos.SelectMany(x => x));
 
         // Initially, we have this many rows
-        var num_rows = logos.Count();
+        var num_rows = box.NumRows ?? logos.Count();
 
         // We have this many logos
         var num_logos = entries.Count;
