@@ -38,7 +38,8 @@ public record Box
     /// <summary>
     /// Whether row should be re-composed to flow nicely
     /// </summary>
-    public bool AutoFlow { get; set; }
+    public bool AutoFlow { get; set; } = true;
+
     public string Title { get; set; } = string.Empty;
     /// <summary>
     /// Localized titles
