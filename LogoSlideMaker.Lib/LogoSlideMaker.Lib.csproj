@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="libgit2sharp" Version="0.31.0" />
-    <PackageReference Include="ShapeCrawler" Version="0.60.0" />
+    <PackageReference Include="ShapeCrawler" Version="0.58.0" />
   </ItemGroup>
 
   <ItemGroup>
