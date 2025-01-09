@@ -60,7 +60,7 @@ public class ExportPipeline
             var primitives = layout.Logos.SelectMany(primitivesEngine.ToPrimitives);
 
             // Text primitives
-            var textPrimitives = layout.Text.Select(primitivesEngine.ToPrimitive);
+            var textPrimitives = layout.Text.SelectMany(primitivesEngine.ToPrimitives);
 
             // Render
             renderEngine.Render(pres, layout, dataVersion, primitives.Concat(textPrimitives));

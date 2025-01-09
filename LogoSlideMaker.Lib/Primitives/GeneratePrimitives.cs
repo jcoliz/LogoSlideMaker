@@ -85,7 +85,7 @@ public class PrimitivesEngine(RenderConfig config, IGetImageAspectRatio getLogoA
         return result;
     }
 
-    public Primitive ToPrimitive(TextLayout textLayout)
+    public IEnumerable<Primitive> ToPrimitives(TextLayout textLayout)
     {
         if (textLayout.Position.Kind != EdgeKind.Bottom)
         {
@@ -94,20 +94,23 @@ public class PrimitivesEngine(RenderConfig config, IGetImageAspectRatio getLogoA
 
         if (config.TitleHeight == null)
         {
-            throw new Exception("Title height not specified");
+            return Enumerable.Empty<Primitive>();
         }
 
-        return new TextPrimitive()
-        {
-            Rectangle = new Rectangle()
+        return 
+        [ 
+            new TextPrimitive()
             {
-                X = textLayout.Position.X * config.Dpi,
-                Y = (textLayout.Position.Y - config.TitleHeight) * config.Dpi,
-                Width = textLayout.Position.Length * config.Dpi,
-                Height = config.TitleHeight * config.Dpi
-            },
-            Text = textLayout.Text,
-            Style = textLayout.TextSyle
-        };
+                Rectangle = new Rectangle()
+                {
+                    X = textLayout.Position.X * config.Dpi,
+                    Y = (textLayout.Position.Y - config.TitleHeight) * config.Dpi,
+                    Width = textLayout.Position.Length * config.Dpi,
+                    Height = config.TitleHeight * config.Dpi
+                },
+                Text = textLayout.Text,
+                Style = textLayout.TextSyle
+            } 
+        ];
     }
 }

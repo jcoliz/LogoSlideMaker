@@ -526,7 +526,7 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
         _primitives.AddRange(_layout.Logos.SelectMany(generator.ToPrimitives));
 
         // Add box title primitives
-        _primitives.AddRange(_layout.Text.Select(generator.ToPrimitive));
+        _primitives.AddRange(_layout.Text.SelectMany(generator.ToPrimitives));
 
         // Add optional primitives to draw 
         _boxPrimitives.AddRange(
