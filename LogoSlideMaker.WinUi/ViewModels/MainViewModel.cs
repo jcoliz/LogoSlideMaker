@@ -76,7 +76,7 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
         {
             try
             {
-                if (_definition is not null && value < _definition.Variants.Count && value != _slideNumber)
+                if (_definition is not null && value < _definition.Variants.Count && value != _slideNumber && value >= 0)
                 {
                     _slideNumber = value;
 
