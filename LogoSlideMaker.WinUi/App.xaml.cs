@@ -32,7 +32,9 @@ public partial class App : Application
             .Enrich.WithProperty("Session", Guid.NewGuid())
             .WriteTo.Debug()
             .WriteTo.File(MainViewModel.LogsFolder+"/log-.txt", rollingInterval: RollingInterval.Day)
+#if DEBUG
             .WriteTo.File(new CompactJsonFormatter(),MainViewModel.LogsFolder+"/log-.json", rollingInterval: RollingInterval.Day)
+#endif
             .CreateLogger();
 
         try
