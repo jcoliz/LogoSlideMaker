@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using LogoSlideMaker.Primitives;
 using LogoSlideMaker.WinUi.Services;
 using LogoSlideMaker.WinUi.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using Serilog;
 using Serilog.Formatting.Compact;
 using Windows.Storage;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace LogoSlideMaker.WinUi;
 /// <summary>
@@ -31,7 +34,10 @@ public partial class App : Application
 
         try
         {
-            Log.Information("----------------------------------");
+            ILoggerFactory factory = new LoggerFactory().AddSerilog(Log.Logger);
+            _logger = factory.CreateLogger<App>();
+
+            logHello();
 
             Application.Current.UnhandledException += Application_UnhandledException;
 
@@ -53,16 +59,16 @@ public partial class App : Application
                     services.AddSingleton<BitmapCache>();
                     services.AddSingleton<IGetImageAspectRatio>(x => x.GetRequiredService<BitmapCache>());
 
-                    Log.Debug("Startup: ConfigureServices OK");
+                    logOkMoment("ConfigureServices");
                 })
 
                 .Build();
 
-            Log.Debug("Startup: Build OK");
+            logOk();
         }
         catch (Exception ex)
         {
-            Log.Fatal(ex, "Startup failed");
+            logCritical(ex);
         }
     }
 
@@ -70,15 +76,15 @@ public partial class App : Application
     {
         if (e.Exception is Microsoft.UI.Xaml.Markup.XamlParseException pex)
         {
-            Log.Fatal(e.Exception, "Unhandled XamlParseException Stack: {Stack} Source: {Source}", pex.StackTrace ?? "null", pex.Source ?? "null");
+            logXamlParseException(pex, pex.StackTrace, pex.Source);
             if (pex.InnerException is not null)
             {
-                Log.Fatal(pex.InnerException, "Inner exception");
+                logCritical(pex.InnerException);
             }
         }
         else
         {
-            Log.Fatal(e.Exception, "Unhandled exception");
+            logCritical(e.Exception);
         }
     }
 
@@ -90,7 +96,7 @@ public partial class App : Application
     {
         try
         {
-            Log.Information("Starting");
+            logStarting();
 
             if (_host is null)
             {
@@ -98,7 +104,7 @@ public partial class App : Application
             }
 
             var folder = ApplicationData.Current.LocalFolder;
-            Log.Debug("Local Folder: {Path}", folder.Path);
+            logDebugFolder(folder.Path);
 
             await _host.StartAsync();
 
@@ -108,11 +114,42 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            Log.Fatal(ex, "Startup failed");
+            logCritical(ex);
             Log.CloseAndFlush();
         }
     }
 
     private Window? m_window;
     private readonly IHost? _host;
+    private readonly ILogger? _logger;
+
+    [LoggerMessage(Level = LogLevel.Information, EventId = 100, Message = "{Location}: ----------------------------------")]
+    public partial void logHello([CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Information, EventId = 110, Message = "{Location}: OK")]
+    public partial void logOk([CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Debug, EventId = 130, Message = "{Location}: {Moment} OK")]
+    public partial void logOkMoment(string moment, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Debug, EventId = 120, Message = "{Location}: Starting")]
+    public partial void logStarting([CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Debug, EventId = 121, Message = "{Location}: Local Folder: {Path}")]
+    public partial void logDebugFolder(string path, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Error, EventId = 108, Message = "{Location}: Failed")]
+    public partial void logFail([CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Error, EventId = 118, Message = "{Location}: {Moment} Failed")]
+    public partial void logFailMoment(Exception ex, string moment, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Error, EventId = 118, Message = "{Location}: {Moment} Failed")]
+    public partial void logFailMoment(string moment, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Critical, EventId = 100, Message = "{Location}: Critical failure")]
+    public partial void logCritical(Exception ex, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Critical, EventId = 199, Message = "{Location}: Unhandled XamlParseException Stack: {Stack} Source: {Source}")]
+    public partial void logXamlParseException(Exception ex, string? stack, string? source, [CallerMemberName] string? location = null);
 }

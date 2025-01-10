@@ -715,48 +715,48 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
 
     // NOTE: These duplicate loggers in the main window. Should think about how to DRY this out!
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: OK")]
+    [LoggerMessage(Level = LogLevel.Information, EventId = 1000, Message = "{Location}: OK")]
     public partial void logOk([CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: {Moment} OK")]
+    [LoggerMessage(Level = LogLevel.Information, EventId = 1010, Message = "{Location}: {Moment} OK")]
     public partial void logOkMoment(string moment, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: OK {Details}")]
+    [LoggerMessage(Level = LogLevel.Information, EventId = 1020, Message = "{Location}: OK {Details}")]
     public partial void logOkDetails(string details, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: {Moment} OK {Path}")]
+    [LoggerMessage(Level = LogLevel.Information, EventId = 1030, Message = "{Location}: {Moment} OK {Path}")]
     public partial void logOkMomentPath(string moment, string path, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: OK {Title} {Details}")]
+    [LoggerMessage(Level = LogLevel.Information, EventId = 1040, Message = "{Location}: OK {Title} {Details}")]
     public partial void logOkTitleDetails(string title, string details, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: Failed")]
+    [LoggerMessage(Level = LogLevel.Error, EventId = 1008, Message = "{Location}: Failed")]
     public partial void logFail(Exception ex, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: Failed")]
+    [LoggerMessage(Level = LogLevel.Error, EventId = 1008, Message = "{Location}: Failed")]
     public partial void logFail([CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: {Moment} Failed")]
+    [LoggerMessage(Level = LogLevel.Error, EventId = 1038, Message = "{Location}: {Moment} Failed")]
     public partial void logFailMoment(Exception ex, string moment, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: {Moment} Failed")]
+    [LoggerMessage(Level = LogLevel.Error, EventId = 1038, Message = "{Location}: {Moment} Failed")]
     public partial void logFailMoment(string moment, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: Failed to set value to {Value}")]
+    [LoggerMessage(Level = LogLevel.Error, EventId = 1058, Message = "{Location}: Failed to set value to {Value}")]
     public partial void logFailSetValue(Exception ex, object value, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Critical, Message = "{Location}: Critical failure")]
+    [LoggerMessage(Level = LogLevel.Critical, EventId = 1009, Message = "{Location}: Critical failure")]
     public partial void logCritical(Exception ex, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Debug, Message = "{Location}: {Moment}")]
+    [LoggerMessage(Level = LogLevel.Debug, EventId = 1031, Message = "{Location}: {Moment}")]
     public partial void logDebugMoment(string moment, [CallerMemberName] string? location = null);
 
     // Application-specific log messages follow
 
-    [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: Slide number {Number} out of range {Count}")]
+    [LoggerMessage(Level = LogLevel.Error, EventId = 1058, Message = "{Location}: Slide number {Number} out of range {Count}")]
     public partial void logFailSlideOutoFoRange(int number, int count, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "{Location}: Slide number {Number} out of range {Count}")]
+    [LoggerMessage(Level = LogLevel.Warning, EventId = 1078, Message = "{Location}: Slide number {Number} out of range {Count}")]
     public partial void logWarningSlideOutoFoRange(int number, int count, [CallerMemberName] string? location = null);
 
     #endregion
