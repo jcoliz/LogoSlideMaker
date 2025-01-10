@@ -12,6 +12,8 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.UI.Xaml;
 using Serilog;
 using Serilog.Formatting.Compact;
+using Serilog.Templates;
+using Windows.Security.Cryptography;
 using Windows.Storage;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -33,7 +35,14 @@ public partial class App : Application
             .WriteTo.Debug()
             .WriteTo.File(MainViewModel.LogsFolder+"/log-.txt", rollingInterval: RollingInterval.Day)
 #if DEBUG
-            .WriteTo.File(new CompactJsonFormatter(),MainViewModel.LogsFolder+"/log-.json", rollingInterval: RollingInterval.Day)
+            .WriteTo.File(
+                new ExpressionTemplate(
+                    "{ {@t, @s: Session, @sc: SourceContext, @loc: Location, @id: EventId, @l: if @l = 'Information' then undefined() else @l, @mt, @x, Properties: rest()} }\n"
+                ),
+                MainViewModel.LogsFolder+"/log-.json",
+                restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information,
+                rollingInterval: RollingInterval.Day
+            )
 #endif
             .CreateLogger();
 
