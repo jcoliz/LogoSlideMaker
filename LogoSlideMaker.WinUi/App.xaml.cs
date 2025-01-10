@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
 using Serilog;
+using Serilog.Formatting.Compact;
 using Windows.Storage;
 
 namespace LogoSlideMaker.WinUi;
@@ -22,8 +23,10 @@ public partial class App : Application
     {
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
+            .Enrich.WithProperty("Session", Guid.NewGuid())
             .WriteTo.Debug()
             .WriteTo.File(MainViewModel.LogsFolder+"/log-.txt", rollingInterval: RollingInterval.Day)
+            .WriteTo.File(new CompactJsonFormatter(),MainViewModel.LogsFolder+"/log-.json", rollingInterval: RollingInterval.Day)
             .CreateLogger();
 
         try
