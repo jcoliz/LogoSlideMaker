@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Management;
 using System.Runtime.CompilerServices;
 using LogoSlideMaker.Primitives;
 using LogoSlideMaker.WinUi.Services;
@@ -9,7 +10,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using Serilog;
 using Serilog.Formatting.Compact;
+using Windows.Security.Cryptography;
 using Windows.Storage;
+using Windows.System.Profile;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace LogoSlideMaker.WinUi;
@@ -38,6 +41,23 @@ public partial class App : Application
             _logger = factory.CreateLogger<App>();
 
             logHello();
+
+            logOsVersion(Environment.OSVersion.Version.ToString());
+
+            try
+            {
+                ManagementObject os = new ManagementObject("Win32_OperatingSystem=@");
+                logMachineSerial(os["SerialNumber"] as string);
+
+                // https://github.com/microsoft/WindowsAppSDK/issues/4840
+                //var token = HardwareIdentification.GetPackageSpecificToken(null);
+                //var base64 = CryptographicBuffer.EncodeToBase64String(token.Id);
+                //logMachineSerial(base64);
+            }
+            catch(Exception ex)
+            {
+                logFailMoment(ex, "Machine Serial");
+            }
 
             Application.Current.UnhandledException += Application_UnhandledException;
 
@@ -123,7 +143,7 @@ public partial class App : Application
     private readonly IHost? _host;
     private readonly ILogger? _logger;
 
-    [LoggerMessage(Level = LogLevel.Information, EventId = 100, Message = "{Location}: ----------------------------------")]
+    [LoggerMessage(Level = LogLevel.Information, EventId = 100, Message = "----------------------------------")]
     public partial void logHello([CallerMemberName] string? location = null);
 
     [LoggerMessage(Level = LogLevel.Information, EventId = 110, Message = "{Location}: OK")]
@@ -132,6 +152,12 @@ public partial class App : Application
     [LoggerMessage(Level = LogLevel.Debug, EventId = 130, Message = "{Location}: {Moment} OK")]
     public partial void logOkMoment(string moment, [CallerMemberName] string? location = null);
 
+    [LoggerMessage(Level = LogLevel.Information, EventId = 101, Message = "{Location}: OS Version {OsVersion}")]
+    public partial void logOsVersion(string osversion, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Information, EventId = 101, Message = "{Location}: Machine Serial # {SerialNum}")]
+    public partial void logMachineSerial(string serialnum, [CallerMemberName] string? location = null);
+    
     [LoggerMessage(Level = LogLevel.Debug, EventId = 120, Message = "{Location}: Starting")]
     public partial void logStarting([CallerMemberName] string? location = null);
 

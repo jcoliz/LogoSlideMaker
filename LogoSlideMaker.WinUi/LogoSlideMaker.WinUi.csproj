@@ -71,6 +71,7 @@
 	<PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
 	<PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
 	<PackageReference Include="Svg" Version="3.4.7" />
+	<PackageReference Include="System.Management" Version="9.0.0" />
 	<PackageReference Include="Tomlyn" Version="0.18.0" />
 	  <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>

@@ -74,6 +74,8 @@ public sealed partial class MainWindow : Window
             this.AppWindow.SetIcon("Assets/app-icon.ico");
             this.AppWindow.Closing += CloseApp;
 
+            logAppVersion(viewModel.BuildVersion);
+
             logOk();
         }
         catch (Exception ex)
@@ -493,7 +495,7 @@ public sealed partial class MainWindow : Window
 
     #region Logging
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: OK")]
+    [LoggerMessage(Level = LogLevel.Information, EventId = 2000, Message = "{Location}: OK")]
     public partial void logOk([CallerMemberName] string? location = null);
 
     [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: OK {Path}")]
@@ -507,6 +509,9 @@ public sealed partial class MainWindow : Window
 
     [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: OK {Title} {Details}")]
     public partial void logOkTitleDetails(string title, string details, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Information, EventId = 2000, Message = "{Location}: Version {AppVersion}")]
+    public partial void logAppVersion(string appversion, [CallerMemberName] string? location = null);
 
     [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: Failed")]
     public partial void logFail(Exception ex, [CallerMemberName] string? location = null);
