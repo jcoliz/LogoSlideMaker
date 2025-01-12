@@ -44,7 +44,16 @@
                 <Run Text="{x:Bind viewModel.DocumentSubtitle, Mode=OneWay}"/>
             </TextBlock>
         </Border>
-        <win2dcanvas:CanvasControl Width="1280" Height="720" Grid.Row="1" Grid.ColumnSpan="2" x:Name="canvas" Draw="DrawCanvas" ClearColor="#333333" CreateResources="CreateResourcesEvent"/>
+        <ScrollViewer ZoomMode="Enabled" 
+                      HorizontalScrollMode="Enabled"
+                      HorizontalScrollBarVisibility="Visible"
+                      VerticalScrollMode="Enabled"                      
+                      VerticalScrollBarVisibility="Visible"
+                      Grid.Row="1" Grid.ColumnSpan="2" >
+            <Grid>
+                <win2dcanvas:CanvasControl Width="1280" Height="720" x:Name="canvas" Draw="DrawCanvas" ClearColor="#333333" CreateResources="CreateResourcesEvent"/>
+            </Grid>
+        </ScrollViewer>
         <ProgressRing Grid.Row="1" Grid.ColumnSpan="2" IsActive="{x:Bind viewModel.IsLoading, Mode=OneWay}" Foreground="White"/>
         <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Background="#333333" VerticalAlignment="Center" Padding="40" Visibility="{Binding IsExporting, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
             <TextBlock Margin="0,0,0,20" HorizontalAlignment="Center" FontSize="20">Exporting...</TextBlock>
