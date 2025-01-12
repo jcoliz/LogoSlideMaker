@@ -564,27 +564,18 @@ public sealed partial class MainWindow : Window
             {
                 var deltaX = pt.Position.X - lastPanningPoint.Value.X;
                 var deltaY = pt.Position.Y - lastPanningPoint.Value.Y;
-                //logger.LogDebug("Pointer: Updated Position ({X},{Y}) Delta ({dX},{dY})", pt.Position.X, pt.Position.Y, deltaX, deltaY);
 
                 var newX = canvasScrollViewer.HorizontalOffset - deltaX;
                 var newY = canvasScrollViewer.VerticalOffset - deltaY;
                 canvasScrollViewer.ScrollToHorizontalOffset(newX);
                 canvasScrollViewer.ScrollToVerticalOffset(newY);
-
-                logger.LogDebug("Scroll: Desired Offset ({X},{Y}) Actual ({aX},{aY})", newX, newY, canvasScrollViewer.HorizontalOffset, canvasScrollViewer.VerticalOffset);
             }
-            else
-            {
-                logger.LogDebug("Pointer: New Position ({X},{Y})", pt.Position.X, pt.Position.Y);
-            }
-
             lastPanningPoint = pt.Position;
         }
         else
         {
             lastPanningPoint = null;
         }
-
     }
 
     private void Window_SizeChanged(object sender, WindowSizeChangedEventArgs args)
