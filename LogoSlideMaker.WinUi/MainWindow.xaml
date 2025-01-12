@@ -11,6 +11,7 @@
     xmlns:converters="using:CommunityToolkit.WinUI.Converters"
     mc:Ignorable="d"
     Closed="Window_Closed"
+    SizeChanged="Window_SizeChanged"
     >
     <Grid x:Name="Root">
         <Grid.Resources>
@@ -58,7 +59,7 @@
                       PointerPressed="ScrollViewer_ResetPanning"
                       PointerReleased="ScrollViewer_ResetPanning"
                       >
-            <controls:CursorGrid>
+            <controls:CursorGrid Width="1280" Height="720">
                 <win2dcanvas:CanvasControl Width="1280" Height="720" x:Name="canvas" Draw="DrawCanvas" ClearColor="#333333" CreateResources="CreateResourcesEvent"/>
             </controls:CursorGrid>
         </ScrollViewer>

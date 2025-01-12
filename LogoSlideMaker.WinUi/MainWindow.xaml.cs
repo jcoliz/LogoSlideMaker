@@ -1,4 +1,3 @@
-using DocumentFormat.OpenXml.Presentation;
 using LogoSlideMaker.Primitives;
 using LogoSlideMaker.WinUi.Services;
 using LogoSlideMaker.WinUi.ViewModels;
@@ -567,8 +566,12 @@ public sealed partial class MainWindow : Window
                 var deltaY = pt.Position.Y - lastPanningPoint.Value.Y;
                 //logger.LogDebug("Pointer: Updated Position ({X},{Y}) Delta ({dX},{dY})", pt.Position.X, pt.Position.Y, deltaX, deltaY);
 
-                canvasScrollViewer.ScrollToHorizontalOffset(canvasScrollViewer.HorizontalOffset - deltaX);
-                canvasScrollViewer.ScrollToVerticalOffset(canvasScrollViewer.VerticalOffset - deltaY);
+                var newX = canvasScrollViewer.HorizontalOffset - deltaX;
+                var newY = canvasScrollViewer.VerticalOffset - deltaY;
+                canvasScrollViewer.ScrollToHorizontalOffset(newX);
+                canvasScrollViewer.ScrollToVerticalOffset(newY);
+
+                logger.LogDebug("Scroll: Desired Offset ({X},{Y}) Actual ({aX},{aY})", newX, newY, canvasScrollViewer.HorizontalOffset, canvasScrollViewer.VerticalOffset);
             }
             else
             {
@@ -582,6 +585,14 @@ public sealed partial class MainWindow : Window
             lastPanningPoint = null;
         }
 
+    }
+
+    private void Window_SizeChanged(object sender, WindowSizeChangedEventArgs args)
+    {
+        var zoomWidth = args.Size.Width / 1280.0;
+        var zoomHeight = (args.Size.Height-64) / 720.0;
+        var zoom = Math.Min(zoomWidth, zoomHeight);
+        canvasScrollViewer.ZoomToFactor((float)zoom);
     }
 }
 
