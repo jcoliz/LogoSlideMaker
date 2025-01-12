@@ -547,6 +547,54 @@ public sealed partial class MainWindow : Window
     public partial void logDebugBusy([CallerMemberName] string? location = null);
 
     #endregion
+
+    private Point? lastPanningPoint;
+
+    private void ScrollViewer_PointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        lastPanningPoint = null;
+    }
+
+    private void ScrollViewer_PointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        lastPanningPoint = null;
+    }
+
+    private void ScrollViewer_PointerMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        var pt = e.GetCurrentPoint(canvas);
+
+        if (pt.IsInContact)
+        {
+            if (lastPanningPoint.HasValue)
+            {
+                var deltaX = pt.Position.X - lastPanningPoint.Value.X;
+                var deltaY = pt.Position.Y - lastPanningPoint.Value.Y;
+                logger.LogDebug("Pointer: Updated Position ({X},{Y}) Delta ({dX},{dY})", pt.Position.X, pt.Position.Y, deltaX, deltaY);
+            }
+            else
+            {
+                logger.LogDebug("Pointer: New Position ({X},{Y})", pt.Position.X, pt.Position.Y);
+            }
+
+            lastPanningPoint = pt.Position;
+        }
+        else
+        {
+            lastPanningPoint = null;
+        }
+
+    }
+
+    private void ScrollViewer_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        lastPanningPoint = null;
+    }
+
+    private void ScrollViewer_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        lastPanningPoint = null;
+    }
 }
 
 internal static class Converters
