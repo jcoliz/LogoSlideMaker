@@ -550,12 +550,7 @@ public sealed partial class MainWindow : Window
 
     private Point? lastPanningPoint;
 
-    private void ScrollViewer_PointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-    {
-        lastPanningPoint = null;
-    }
-
-    private void ScrollViewer_PointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    private void ScrollViewer_ResetPanning(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
         lastPanningPoint = null;
     }
@@ -587,16 +582,6 @@ public sealed partial class MainWindow : Window
             lastPanningPoint = null;
         }
 
-    }
-
-    private void ScrollViewer_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-    {
-        lastPanningPoint = null;
-    }
-
-    private void ScrollViewer_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-    {
-        lastPanningPoint = null;
     }
 }
 

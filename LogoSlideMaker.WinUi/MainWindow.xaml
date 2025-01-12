@@ -53,10 +53,10 @@
                       VerticalScrollBarVisibility="Visible"
                       Grid.Row="1" Grid.ColumnSpan="2"
                       PointerMoved="ScrollViewer_PointerMoved"
-                      PointerExited="ScrollViewer_PointerExited"
-                      PointerEntered="ScrollViewer_PointerEntered"
-                      PointerPressed="ScrollViewer_PointerPressed"
-                      PointerReleased="ScrollViewer_PointerReleased"
+                      PointerExited="ScrollViewer_ResetPanning"
+                      PointerEntered="ScrollViewer_ResetPanning"
+                      PointerPressed="ScrollViewer_ResetPanning"
+                      PointerReleased="ScrollViewer_ResetPanning"
                       >
             <controls:CursorGrid>
                 <win2dcanvas:CanvasControl Width="1280" Height="720" x:Name="canvas" Draw="DrawCanvas" ClearColor="#333333" CreateResources="CreateResourcesEvent"/>
