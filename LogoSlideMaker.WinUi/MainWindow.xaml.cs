@@ -562,7 +562,7 @@ public sealed partial class MainWindow : Window
 
     private void ScrollViewer_PointerMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
-        var pt = e.GetCurrentPoint(canvas);
+        var pt = e.GetCurrentPoint(canvasScrollViewer);
 
         if (pt.IsInContact)
         {
@@ -570,7 +570,10 @@ public sealed partial class MainWindow : Window
             {
                 var deltaX = pt.Position.X - lastPanningPoint.Value.X;
                 var deltaY = pt.Position.Y - lastPanningPoint.Value.Y;
-                logger.LogDebug("Pointer: Updated Position ({X},{Y}) Delta ({dX},{dY})", pt.Position.X, pt.Position.Y, deltaX, deltaY);
+                //logger.LogDebug("Pointer: Updated Position ({X},{Y}) Delta ({dX},{dY})", pt.Position.X, pt.Position.Y, deltaX, deltaY);
+
+                canvasScrollViewer.ScrollToHorizontalOffset(canvasScrollViewer.HorizontalOffset - deltaX);
+                canvasScrollViewer.ScrollToVerticalOffset(canvasScrollViewer.VerticalOffset - deltaY);
             }
             else
             {

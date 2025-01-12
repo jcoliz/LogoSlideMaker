@@ -45,7 +45,8 @@
                 <Run Text="{x:Bind viewModel.DocumentSubtitle, Mode=OneWay}"/>
             </TextBlock>
         </Border>
-        <ScrollViewer ZoomMode="Enabled" 
+        <ScrollViewer x:Name="canvasScrollViewer"
+                      ZoomMode="Enabled" 
                       HorizontalScrollMode="Enabled"
                       HorizontalScrollBarVisibility="Visible"
                       VerticalScrollMode="Enabled"                      
