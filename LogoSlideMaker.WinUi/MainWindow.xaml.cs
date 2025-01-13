@@ -69,7 +69,7 @@ public sealed partial class MainWindow : Window
 
             // Set up app window
             var dpi = GetDpiForWindow(hWnd);
-            this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32(dpi * viewModel.PlatenSize.Width / 96, dpi * (viewModel.PlatenSize.Height + 64) / 96));
+            this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32(dpi * viewModel.PlatenSize.Width / 96, dpi * (viewModel.PlatenSize.Height + (int)commandBar.Height) / 96));
             this.AppWindow.SetIcon("Assets/app-icon.ico");
             this.AppWindow.Closing += CloseApp;
 
@@ -225,7 +225,7 @@ public sealed partial class MainWindow : Window
     private void Window_SizeChanged(object sender, WindowSizeChangedEventArgs args)
     {
         var zoomWidth = args.Size.Width / viewModel.PlatenSize.Width;
-        var zoomHeight = (args.Size.Height - 64) / viewModel.PlatenSize.Height;
+        var zoomHeight = (args.Size.Height - commandBar.Height) / viewModel.PlatenSize.Height;
         var zoom = Math.Min(zoomWidth, zoomHeight);
         canvasScrollViewer.ZoomToFactor((float)zoom);
     }

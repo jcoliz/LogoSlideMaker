@@ -26,7 +26,7 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
-        <StackPanel Orientation="Horizontal" Background="#333333">
+        <StackPanel x:Name="commandBar" Orientation="Horizontal" Background="#333333" Height="64">
             <AppBarButton Icon="OpenFile" Label="Open" Click="OpenDocument" IsEnabled="{Binding IsExporting, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"/>
             <AppBarButton Icon="Refresh" Label="Reload" Command="{x:Bind viewModel.Reload}" IsEnabled="{Binding IsExporting, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}" />
             <AppBarButton Icon="Back" Label="Previous" Command="{x:Bind viewModel.PreviousSlide}" />
@@ -39,8 +39,8 @@
             </AppBarButton>
             <AppBarButton Icon="Download" Label="Export" Click="ExportSlides" IsEnabled="{Binding IsExporting, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"/>
         </StackPanel>
-        <Border Grid.Column="1" Background="#333333" Height="64">
-            <TextBlock Foreground="White" Height="64" FontFamily="Segoe UI" FontSize="14" HorizontalTextAlignment="Right" Margin="20,3,20,0">
+        <Border Grid.Column="1" Background="#333333" Height="{x:Bind commandBar.Height, Mode=OneWay}">
+            <TextBlock Foreground="White" Height="{x:Bind commandBar.Height, Mode=OneWay}" FontFamily="Segoe UI" FontSize="14" HorizontalTextAlignment="Right" Margin="20,3,20,0">
                 <Run FontWeight="Bold" Text="{x:Bind viewModel.DocumentTitle, Mode=OneWay}"/>
                 <LineBreak/>
                 <Run Text="{x:Bind viewModel.DocumentSubtitle, Mode=OneWay}"/>
