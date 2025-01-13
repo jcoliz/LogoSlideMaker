@@ -1,0 +1,3 @@
+﻿[[variants]]
+name = "Test Variant"
+description = [ "one", "two" ]
