@@ -19,6 +19,32 @@ namespace LogoSlideMaker.Tests
         }
 
         /// <summary>
+        /// Scenario: Loader loads file with no title
+        /// </summary>
+        [Test]
+        public void LoadsOkNoTitle()
+        {
+            // When: Loading a definition with no title
+            var definition = Loader.Load(GetStream("simple.toml"));
+
+            // Then: Title is null
+            Assert.That(definition.Title, Is.Null);
+        }
+
+        /// <summary>
+        /// Scenario: Loader loads file with title
+        /// </summary>
+        [Test]
+        public void LoadsOkTitle()
+        {
+            // When: Loading a definition with a title
+            var definition = Loader.Load(GetStream("title.toml"));
+
+            // Then: Title is as expected
+            Assert.That(definition.Title, Is.EqualTo("Document Title"));
+        }
+
+        /// <summary>
         /// Scenario: Loader loads file with no variant
         /// </summary>
         [Test]

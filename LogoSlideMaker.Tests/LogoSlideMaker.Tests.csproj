@@ -55,10 +55,12 @@
 	<Content Remove="data/include-logos.toml" />
 	<None Remove="data\include-logos-duplicate.toml" />
 	<None Remove="data\render-title.toml" />
+	<None Remove="data\title.toml" />
 	<None Remove="data\variant.toml" />
 	<EmbeddedResource Include="data/include-logos.toml" />
 	<EmbeddedResource Include="data\include-logos-duplicate.toml" />
 	<EmbeddedResource Include="data\render-title.toml" />
+	<EmbeddedResource Include="data\title.toml" />
 	<EmbeddedResource Include="data\variant.toml" />
 	<Content Remove="data/render-title.toml" />
   </ItemGroup>
