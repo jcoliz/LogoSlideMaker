@@ -44,7 +44,6 @@ public sealed partial class MainWindow : Window
     // Internal state
     private bool needResourceLoad = false;
     private Point? lastPanningPoint;
-
     #endregion
 
     #region Constructor
@@ -70,7 +69,7 @@ public sealed partial class MainWindow : Window
 
             // Set up app window
             var dpi = GetDpiForWindow(hWnd);
-            this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32(dpi * 1280 / 96, dpi * (720 + 64) / 96));
+            this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32(dpi * viewModel.PlatenSize.Width / 96, dpi * (viewModel.PlatenSize.Height + 64) / 96));
             this.AppWindow.SetIcon("Assets/app-icon.ico");
             this.AppWindow.Closing += CloseApp;
 
@@ -225,8 +224,8 @@ public sealed partial class MainWindow : Window
 
     private void Window_SizeChanged(object sender, WindowSizeChangedEventArgs args)
     {
-        var zoomWidth = args.Size.Width / 1280.0;
-        var zoomHeight = (args.Size.Height - 64) / 720.0;
+        var zoomWidth = args.Size.Width / viewModel.PlatenSize.Width;
+        var zoomHeight = (args.Size.Height - 64) / viewModel.PlatenSize.Height;
         var zoom = Math.Min(zoomWidth, zoomHeight);
         canvasScrollViewer.ZoomToFactor((float)zoom);
     }

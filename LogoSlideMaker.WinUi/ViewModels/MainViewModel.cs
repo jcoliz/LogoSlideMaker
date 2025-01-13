@@ -1,4 +1,5 @@
-﻿using LogoSlideMaker.Configure;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using LogoSlideMaker.Configure;
 using LogoSlideMaker.Export;
 using LogoSlideMaker.Layout;
 using LogoSlideMaker.Primitives;
@@ -39,6 +40,12 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
     #endregion
 
     #region Properties
+
+    /// <summary>
+    /// Size of the drawing area
+    /// </summary>
+    public System.Drawing.Size PlatenSize { get; } = new(1280,720);
+
     /// <summary>
     /// View needs to give us a way to dispatch onto the UI Thread
     /// </summary>
@@ -498,7 +505,7 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
         var config = _definition.Render;
 
         // Add primitives for a background
-        var bgRect = new Configure.Rectangle() { X = 0, Y = 0, Width = 1280, Height = 720 };
+        var bgRect = new Configure.Rectangle() { X = 0, Y = 0, Width = PlatenSize.Width, Height = PlatenSize.Height };
 
         // If there is a bitmap template, draw that
         var definedBitmaps = _definition.Files.Template.Bitmaps;
