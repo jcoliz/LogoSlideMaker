@@ -556,10 +556,9 @@ public sealed partial class MainWindow : Window
 
     private void ScrollViewer_PointerMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
-        var pt = e.GetCurrentPoint(canvasScrollViewer);
-
-        if (pt.IsInContact)
+        if (e.Pointer.IsInContact && e.Pointer.PointerDeviceType is Microsoft.UI.Input.PointerDeviceType.Mouse or Microsoft.UI.Input.PointerDeviceType.Touchpad)
         {
+            var pt = e.GetCurrentPoint(canvasScrollViewer);
             if (lastPanningPoint.HasValue)
             {
                 var deltaX = pt.Position.X - lastPanningPoint.Value.X;
