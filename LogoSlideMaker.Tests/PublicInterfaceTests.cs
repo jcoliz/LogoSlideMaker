@@ -31,6 +31,22 @@ namespace LogoSlideMaker.Tests
             Assert.That(definition.Variants, Has.Count.EqualTo(1));
         }
 
+        /// <summary>
+        /// Scenario: Loader loads variant name and descriptions
+        /// </summary>
+        [Test]
+        public void VariantProperties()
+        {
+            // When: Loading a definition with one variant
+            var definition = Loader.Load(GetStream("variant.toml"));
+
+            // Then: Variant name is as expected
+            Assert.That(definition.Variants.First().Name, Is.EqualTo("Test Variant"));
+
+            // And: Variant description is as expected
+            Assert.That(definition.Variants.First().Description, Is.EquivalentTo(["one","two"]));
+        }
+
         private static Stream GetStream(string filename)
         {
             var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
