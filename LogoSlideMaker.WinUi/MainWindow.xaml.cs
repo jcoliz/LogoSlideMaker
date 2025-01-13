@@ -533,52 +533,52 @@ public sealed partial class MainWindow : Window
     [LoggerMessage(Level = LogLevel.Information, EventId = 2000, Message = "{Location}: OK")]
     public partial void logOk([CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: OK {Path}")]
+    [LoggerMessage(Level = LogLevel.Information, EventId = 2010, Message = "{Location}: OK {Path}")]
     public partial void logOkPath(string path, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: {Moment} OK")]
+    [LoggerMessage(Level = LogLevel.Information, EventId = 2020, Message = "{Location}: {Moment} OK")]
     public partial void logOkMoment(string moment, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: {Moment} OK {Path}")]
+    [LoggerMessage(Level = LogLevel.Information, EventId = 2030, Message = "{Location}: {Moment} OK {Path}")]
     public partial void logOkMomentPath(string moment, string path, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: OK {Title} {Details}")]
+    [LoggerMessage(Level = LogLevel.Information, EventId = 2040, Message = "{Location}: OK {Title} {Details}")]
     public partial void logOkTitleDetails(string title, string details, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Information, EventId = 2000, Message = "{Location}: Version {AppVersion}")]
+    [LoggerMessage(Level = LogLevel.Information, EventId = 2001, Message = "{Location}: Version {AppVersion}")]
     public partial void logAppVersion(string appversion, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: Failed")]
+    [LoggerMessage(Level = LogLevel.Error, EventId = 2008, Message = "{Location}: Failed")]
     public partial void logFail(Exception ex, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: Failed")]
+    [LoggerMessage(Level = LogLevel.Error, EventId = 2018, Message = "{Location}: Failed")]
     public partial void logFail([CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: {Moment} Failed")]
+    [LoggerMessage(Level = LogLevel.Error, EventId = 2028, Message = "{Location}: {Moment} Failed")]
     public partial void logFailMoment(Exception ex, string moment, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: {Moment} Failed")]
+    [LoggerMessage(Level = LogLevel.Error, EventId = 2038, Message = "{Location}: {Moment} Failed")]
     public partial void logFailMoment(string moment, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Critical, Message = "{Location}: Critical failure")]
+    [LoggerMessage(Level = LogLevel.Critical, EventId = 2009, Message = "{Location}: Critical failure")]
     public partial void logCritical(Exception ex, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Debug, Message = "{Location}: Loading...")]
+    [LoggerMessage(Level = LogLevel.Debug, EventId = 2011, Message = "{Location}: Loading...")]
     public partial void logDebugLoading([CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Debug, Message = "{Location}: Skipping, no render config")]
+    [LoggerMessage(Level = LogLevel.Debug, EventId = 2012, Message = "{Location}: Skipping, no render config")]
     public partial void logDebugNoRenderConfig([CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Debug, Message = "{Location}: Skipping, canvas not loaded")]
+    [LoggerMessage(Level = LogLevel.Debug, EventId = 2013, Message = "{Location}: Skipping, canvas not loaded")]
     public partial void logDebugNotLoaded([CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Debug, Message = "{Location}: No file chosen")]
+    [LoggerMessage(Level = LogLevel.Debug, EventId = 2014, Message = "{Location}: No file chosen")]
     public partial void logDebugNoFile([CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Debug, Message = "{Location}: No resource load needed at this time")]
+    [LoggerMessage(Level = LogLevel.Debug, EventId = 2015, Message = "{Location}: No resource load needed at this time")]
     public partial void logDebugNoLoadNeeded([CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Debug, Message = "{Location}: No action taken, because busy")]
+    [LoggerMessage(Level = LogLevel.Debug, EventId = 2016, Message = "{Location}: No action taken, because busy")]
     public partial void logDebugBusy([CallerMemberName] string? location = null);
 
     #endregion
