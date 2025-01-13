@@ -43,6 +43,7 @@ public sealed partial class MainWindow : Window
 
     // Internal state
     private bool needResourceLoad = false;
+    private Point? lastPanningPoint;
 
     #endregion
 
@@ -192,6 +193,42 @@ public sealed partial class MainWindow : Window
         }
 
         CreateResources(sender);
+    }
+
+    private void ScrollViewer_ResetPanning(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        lastPanningPoint = null;
+    }
+
+    private void ScrollViewer_PointerMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        if (e.Pointer.IsInContact && e.Pointer.PointerDeviceType is Microsoft.UI.Input.PointerDeviceType.Mouse or Microsoft.UI.Input.PointerDeviceType.Touchpad)
+        {
+            var pt = e.GetCurrentPoint(canvasScrollViewer);
+            if (lastPanningPoint.HasValue)
+            {
+                var deltaX = pt.Position.X - lastPanningPoint.Value.X;
+                var deltaY = pt.Position.Y - lastPanningPoint.Value.Y;
+
+                var newX = canvasScrollViewer.HorizontalOffset - deltaX;
+                var newY = canvasScrollViewer.VerticalOffset - deltaY;
+                canvasScrollViewer.ScrollToHorizontalOffset(newX);
+                canvasScrollViewer.ScrollToVerticalOffset(newY);
+            }
+            lastPanningPoint = pt.Position;
+        }
+        else
+        {
+            lastPanningPoint = null;
+        }
+    }
+
+    private void Window_SizeChanged(object sender, WindowSizeChangedEventArgs args)
+    {
+        var zoomWidth = args.Size.Width / 1280.0;
+        var zoomHeight = (args.Size.Height - 64) / 720.0;
+        var zoom = Math.Min(zoomWidth, zoomHeight);
+        canvasScrollViewer.ZoomToFactor((float)zoom);
     }
 
     private void Window_Closed(object _, WindowEventArgs __)
@@ -546,44 +583,6 @@ public sealed partial class MainWindow : Window
     public partial void logDebugBusy([CallerMemberName] string? location = null);
 
     #endregion
-
-    private Point? lastPanningPoint;
-
-    private void ScrollViewer_ResetPanning(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-    {
-        lastPanningPoint = null;
-    }
-
-    private void ScrollViewer_PointerMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-    {
-        if (e.Pointer.IsInContact && e.Pointer.PointerDeviceType is Microsoft.UI.Input.PointerDeviceType.Mouse or Microsoft.UI.Input.PointerDeviceType.Touchpad)
-        {
-            var pt = e.GetCurrentPoint(canvasScrollViewer);
-            if (lastPanningPoint.HasValue)
-            {
-                var deltaX = pt.Position.X - lastPanningPoint.Value.X;
-                var deltaY = pt.Position.Y - lastPanningPoint.Value.Y;
-
-                var newX = canvasScrollViewer.HorizontalOffset - deltaX;
-                var newY = canvasScrollViewer.VerticalOffset - deltaY;
-                canvasScrollViewer.ScrollToHorizontalOffset(newX);
-                canvasScrollViewer.ScrollToVerticalOffset(newY);
-            }
-            lastPanningPoint = pt.Position;
-        }
-        else
-        {
-            lastPanningPoint = null;
-        }
-    }
-
-    private void Window_SizeChanged(object sender, WindowSizeChangedEventArgs args)
-    {
-        var zoomWidth = args.Size.Width / 1280.0;
-        var zoomHeight = (args.Size.Height-64) / 720.0;
-        var zoom = Math.Min(zoomWidth, zoomHeight);
-        canvasScrollViewer.ZoomToFactor((float)zoom);
-    }
 }
 
 internal static class Converters
