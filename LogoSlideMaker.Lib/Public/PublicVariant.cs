@@ -142,3 +142,50 @@ internal class PublicVariant(PublicDefinition definition, Variant variant, int i
         return layout;
     }
 }
+
+internal class PublicVariantEmpty(IDefinition definition, int index) : IVariant
+{
+    public string Name => string.Empty;
+
+    public ICollection<string> Description => [];
+
+    public ICollection<string> Notes => [];
+
+    public int Source => 0;
+
+    public IReadOnlyDictionary<TextSyle, ITextStyle> TextStyles { get; } = new Dictionary<TextSyle, ITextStyle>();
+
+    public int Index => index;
+
+    public IVariant Next
+    {
+        get
+        {
+            if (index + 1 >= definition.Variants.Count)
+            {
+                return definition.Variants[0];
+            }
+            else
+            {
+                return definition.Variants[index + 1];
+            }
+        }
+    }
+
+    public IVariant Previous
+    {
+        get
+        {
+            if (index == 0)
+            {
+                return definition.Variants[^1];
+            }
+            else
+            {
+                return definition.Variants[index - 1];
+            }
+        }
+    }
+
+    public ICollection<Primitive> GeneratePrimitives(IGetImageAspectRatio bitmaps) => [];
+}

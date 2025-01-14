@@ -376,12 +376,6 @@ public sealed partial class MainWindow : Window
         {
             // Create some static resource we'll use as part of drawing
             // Not in view model because we don't want any UI namespaces in there
-            var config = viewModel.RenderConfig;
-            if (config is null)
-            {
-                logDebugNoRenderConfig();
-                return;
-            }
             if (!canvas.IsLoaded)
             {
                 needResourceLoad = true;
@@ -389,10 +383,27 @@ public sealed partial class MainWindow : Window
                 return;
             }
             needResourceLoad = false;
-            defaultTextFormat = new() { FontSize = (float)config.FontSize * 96.0f / 72.0f, FontFamily = config.FontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
-            titleTextFormat = new() { FontSize = (float)config.TitleFontSize * 96.0f / 72.0f, FontFamily = config.TitleFontName, VerticalAlignment = CanvasVerticalAlignment.Center, HorizontalAlignment = CanvasHorizontalAlignment.Center };
-            solidBlack = new CanvasSolidColorBrush(sender, Microsoft.UI.Colors.Black);
 
+            // NOTE: This is only called once per LOAD, so we don't currently support changing
+            // text styles per variant. Ergo, there is a subtle bug here right now.
+            var logoStyle = viewModel.TextStyles[Configure.TextSyle.Logo];
+            defaultTextFormat = new() 
+            { 
+                FontSize = (float)logoStyle.FontSize * 96.0f / 72.0f, 
+                FontFamily = logoStyle.FontName, 
+                VerticalAlignment = CanvasVerticalAlignment.Center, 
+                HorizontalAlignment = CanvasHorizontalAlignment.Center 
+            };
+
+            var tytleStyle = viewModel.TextStyles[Configure.TextSyle.BoxTitle];
+            titleTextFormat = new() 
+            { 
+                FontSize = (float)tytleStyle.FontSize * 96.0f / 72.0f, 
+                FontFamily = tytleStyle.FontName, 
+                VerticalAlignment = CanvasVerticalAlignment.Center, 
+                HorizontalAlignment = CanvasHorizontalAlignment.Center 
+            };
+            solidBlack = new CanvasSolidColorBrush(sender, Microsoft.UI.Colors.Black);
             logDebugLoading();
 
             // Load (and measure) all the bitmaps
@@ -424,8 +435,8 @@ public sealed partial class MainWindow : Window
         try
         {
             var primitives = viewModel.ShowBoundingBoxes ?
-                viewModel.Primitives.Concat(viewModel.BoxPrimitives) :
-                viewModel.Primitives;
+                viewModel.Primitives :
+                viewModel.Primitives.Where(x => x.Purpose != PrimitivePurpose.Extents);
 
             if (primitives is null)
             {
@@ -514,7 +525,7 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    #endregion
+#endregion
 
     #region Windows Internals
 

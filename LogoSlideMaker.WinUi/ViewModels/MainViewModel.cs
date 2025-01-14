@@ -1,8 +1,8 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
-using LogoSlideMaker.Configure;
+﻿using LogoSlideMaker.Configure;
 using LogoSlideMaker.Export;
 using LogoSlideMaker.Layout;
 using LogoSlideMaker.Primitives;
+using LogoSlideMaker.Public;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -57,20 +57,14 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
     public IReadOnlyList<Primitive> Primitives => _primitives;
 
     /// <summary>
-    /// Drawing primitives needed to render bounding boxes for the current slide
-    /// </summary>
-    public IReadOnlyList<Primitive> BoxPrimitives => _boxPrimitives;
-
-    /// <summary>
     /// All the image paths we would need to render
     /// </summary>
-    public IEnumerable<string> ImagePaths =>
-        _definition?.Logos.Select(x => x.Value.Path).Concat(_definition.Files.Template.Bitmaps) ?? [];
+    public IEnumerable<string> ImagePaths => _definition.ImagePaths;
 
     /// <summary>
-    /// Current rendering configuration
+    /// The styles which should be used to render text on this slide
     /// </summary>
-    public RenderConfig? RenderConfig => _definition?.Render;
+    public IReadOnlyDictionary<TextSyle, ITextStyle> TextStyles => _currentVariant is not null ? _currentVariant.TextStyles : new Dictionary<TextSyle, ITextStyle>();
 
     /// <summary>
     /// Of the slides (variants) defined in the definition, which one are we showing
@@ -78,16 +72,16 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
     /// </summary>
     public int SlideNumber
     {
-        get => _slideNumber;
+        get => _currentVariant.Index;
         set
         {
             try
             {
-                if (_definition is not null && value < _definition.Variants.Count && value != _slideNumber && value >= 0)
+                if (_definition is not null && value < _definition.Variants.Count && value != _currentVariant.Index && value >= 0)
                 {
-                    _slideNumber = value;
+                    _currentVariant = _definition.Variants[value];
 
-                    PopulateLayout();
+                    // TODO: How do we know that the images have been loaded??
                     GeneratePrimitives();
 
                     OnPropertyChanged();
@@ -181,15 +175,21 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
     {
         get
         {
-            if (_definition is null)
+            if (_definition.Variants.Count == 0)
             {
                 return null;            
             }
-            if (_definition.Files?.Output is not null)
+            if (_definition.OutputFileName is not null)
             {
                 // output path is relative to the current definition file
                 var directory = Path.GetDirectoryName(LastOpenedFilePath) ?? "./";
-                var result = Path.Combine(directory, _definition.Files.Output);
+                var result = Path.Combine(directory, _definition.OutputFileName);
+
+                if (result?.Contains("$Version") ?? false)
+                {
+                    result = result.Replace("$Version", _gitVersion);
+                }
+
                 return result;
             }
             else
@@ -210,15 +210,15 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
     {
         get
         {
-            if (_definition?.Layout.Title == null && LastOpenedFilePath == null)
+            if (_definition.Title == null && LastOpenedFilePath == null)
             {
                 return string.Empty;
             }
-            if (_definition?.Layout.Title == null)
+            if (_definition.Title == null)
             {
                 return Path.GetFileName(LastOpenedFilePath!);
             }
-            return _definition.Layout.Title;
+            return _definition.Title;
         }
     }
 
@@ -230,30 +230,19 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
     {
         get
         {
-            if (_definition is null)
+            if (_definition.Variants.Count == 0)
             {
                 return string.Empty;
             }
-            if (_definition.Variants.Count == 0)
-            {
-                return "Only slide";
-            }
-            var variant = _definition.Variants[SlideNumber];
 
-            if (SlideNumber < 0 || SlideNumber >= _definition.Variants.Count)
+            var result = $"Slide {_currentVariant.Index + 1} of {_definition.Variants.Count}";
+            if (!string.IsNullOrWhiteSpace(_currentVariant.Name))
             {
-                logFailSlideOutoFoRange(SlideNumber, _definition.Variants.Count);
-                return "???";
+                result += ": " + _currentVariant.Name;
             }
-
-            var result = $"Slide {SlideNumber + 1} of {_definition.Variants.Count}";
-            if (!string.IsNullOrWhiteSpace(variant.Name))
+            if (_currentVariant.Description.Count > 0)
             {
-                result += ": " + variant.Name;
-            }
-            if (variant.Description.Count > 0)
-            {
-                result += Environment.NewLine + string.Join(" / ", variant.Description);
+                result += Environment.NewLine + string.Join(" / ", _currentVariant.Description);
             }
             return result;
         }
@@ -331,7 +320,7 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
     /// </summary>
     public ICommand PreviousSlide => _PreviousSlide ??= new RelayCommand(_ => BackToPreviousSlide());
     private ICommand? _PreviousSlide = null;
-    #endregion
+#endregion
 
     #region Methods
 
@@ -348,56 +337,17 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
             {
                 try
                 {
-                    // TODO: This method is way too long
-
                     _primitives.Clear();
                     IsLoading = true;
 
-                    var sr = new StreamReader(stream);
-                    var toml = sr.ReadToEnd();
+                    var currentSlideIndex = _currentVariant?.Index ?? 0;
 
-                    // This will throw if unable to parse
-                    var loaded = Toml.ToModel<Definition>(toml);
-
-                    // TODO: Need to consider the load the included logos here
-                    // This points to a structural problem. At this point, we
-                    // were given a stream, but we will need to load a FILE, and
-                    // we need access to the original path, which will give us
-                    // a relative directory starting point to find the include
-                    // file.
-
-                    // Parse includes
-                    if (!string.IsNullOrWhiteSpace(loaded.Files.Include.Logos) && path is not null)
-                    {
-                        var dir = Path.GetDirectoryName(path);
-                        var logopath = Path.Combine(dir!, loaded.Files.Include.Logos);
-
-                        using var logostream = File.OpenRead(logopath);
-                        using var logosr = new StreamReader(logostream);
-                        var logotoml = logosr.ReadToEnd();
-                        var logos = Toml.ToModel<Definition>(logotoml);
-
-                        loaded.IncludeLogosFrom(logos);
-                    }
-
-                    loaded.ProcessAfterLoading();
-
-                    _definition = loaded;
+                    _definition = Loader.Load(stream, path is not null ? Path.GetDirectoryName(path) : null);
                     _gitVersion = null;
-                    if (SlideNumber >= _definition.Variants.Count)
-                    {
-                        SlideNumber = 0;
-                    }
-
-                    PopulateLayout();
+                    _currentVariant = _definition.Variants[currentSlideIndex < _definition.Variants.Count ? currentSlideIndex : 0];
 
                     LastOpenedFilePath = path;
                     _gitVersion = path is not null ? Utilities.GitVersion.GetForDirectory(path) : null;
-
-                    if (_definition?.Files.Output?.Contains("$Version") ?? false)
-                    {
-                        _definition.Files.Output = _definition.Files.Output.Replace("$Version", _gitVersion);
-                    }
 
                     logOkDetails(DocumentTitle);
 
@@ -452,10 +402,7 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
     /// </summary>
     public void AdvanceToNextSlide()
     {
-        if (_definition is null)
-        {
-            return;        
-        }
+
         if (SlideNumber >= _definition.Variants.Count - 1)
         {
             SlideNumber = 0;
@@ -471,10 +418,6 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
     /// </summary>
     public void BackToPreviousSlide()
     {
-        if (_definition is null)
-        {
-            return;
-        }
         if (SlideNumber <= 0)
         {
             SlideNumber = _definition.Variants.Count - 1;
@@ -483,74 +426,6 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
         {
             --SlideNumber;
         }
-    }
-
-    /// <summary>
-    /// Generate and retain all primitives needed to display this slide
-    /// </summary>
-    /// <remarks>
-    /// Note that we can't generate primitives until we've loaded and (more importantly)
-    /// measured all the images
-    /// </remarks>
-    public void GeneratePrimitives()
-    {
-        _primitives.Clear();
-        _boxPrimitives.Clear();
-
-        if (_definition is null || _layout is null)
-        {
-            return;
-        }
-
-        var config = _definition.Render;
-
-        // Add primitives for a background
-        var bgRect = new Configure.Rectangle() { X = 0, Y = 0, Width = PlatenSize.Width, Height = PlatenSize.Height };
-
-        // If there is a bitmap template, draw that
-        var definedBitmaps = _definition.Files.Template.Bitmaps;
-        var sourceBitmap = _layout.Variant.Source;
-        if (definedBitmaps is not null && definedBitmaps.Count > sourceBitmap && bitmaps.Contains(definedBitmaps[sourceBitmap]))
-        {
-            _primitives.Add(new ImagePrimitive()
-            {
-                Rectangle = bgRect,
-                Path = definedBitmaps[sourceBitmap]
-            });
-        }
-        else
-        {
-            // Else Draw a white background
-            _primitives.Add(new RectanglePrimitive()
-            {
-                Rectangle = bgRect,
-                Fill = true
-            });
-        }
-
-        // Add needed primitives for each logo
-        var generator = new PrimitivesEngine(config, bitmaps);
-        _primitives.AddRange(_layout.Logos.SelectMany(generator.ToPrimitives));
-
-        // Add box title primitives
-        _primitives.AddRange(_layout.Text.SelectMany(generator.ToPrimitives));
-
-        // Add optional primitives to draw 
-        _boxPrimitives.AddRange(
-            _definition.Boxes
-                .Where(x => x.Outer is not null)
-                .Select(x => new RectanglePrimitive()
-                {
-                    Rectangle = x.Outer! with
-                    {
-                        X = x.Outer.X * 96m,
-                        Y = x.Outer.Y * 96m,
-                        Width = x.Outer.Width * 96m,
-                        Height = x.Outer.Height * 96m
-                    }
-                }
-                )
-        );
     }
 
     /// <summary>
@@ -569,15 +444,9 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
 
             IsExporting = true;
 
-            var exportPipeline = new ExportPipeline(_definition);
-
             var directory = LastOpenedFilePath is not null ? Path.GetDirectoryName(LastOpenedFilePath) : null;
 
-            // TODO: Would be much better to do this when the definition is LOADED, because we'll
-            // already be on a loading screen at that point!
-            await exportPipeline.LoadAndMeasureAsync(directory);
-
-            var templatePath = _definition.Files?.Template?.Slides;
+            var templatePath = _definition.TemplateSlidesFileName;
             if (templatePath is not null)
             {
                 if (directory is not null)
@@ -595,7 +464,20 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
                 }
             }
 
-            exportPipeline.Save(templateStream, outPath, _gitVersion);
+            //
+            // LOAD IMAGES
+            //
+
+            var imageCache = new ImageCache() { BaseDirectory = directory };
+            await imageCache.LoadAsync(_definition.ImagePaths);
+
+            //
+            // EXPORT
+            //
+
+            ExportPipelineEx.Export(_definition, imageCache, templateStream, outPath, _gitVersion);
+
+            IsExporting = false;
         }
         catch (DirectoryNotFoundException ex)
         {
@@ -618,7 +500,14 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
         }
     }
 
-#endregion
+    public void GeneratePrimitives()
+    {
+        var latest = _currentVariant.GeneratePrimitives(bitmaps);
+        _primitives.Clear();
+        _primitives.AddRange(latest);
+    }
+
+    #endregion
 
     #region Internals
 
@@ -642,37 +531,6 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
             return null;
         }
         return Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource)!;
-    }
-
-    /// <summary>
-    /// Create a slide layout for the current slide
-    /// </summary>
-    private void PopulateLayout()
-    {
-        if (_definition is null)
-        {
-            return;
-        }
-
-        var existingVariants = _definition.Variants;
-        var slideNumber = _slideNumber;
-
-        // In case of no variants, we'll use a blank
-        if (existingVariants.Count == 0)
-        {
-            existingVariants = [new()];
-        }
-
-        if (slideNumber >= existingVariants.Count)
-        {
-            logWarningSlideOutoFoRange(slideNumber, existingVariants.Count);
-            slideNumber = 0;
-        }
-
-        var variant = existingVariants[slideNumber];
-
-        var engine = new LayoutEngine(_definition, variant);
-        _layout = engine.CreateSlideLayout();
     }
 
     /// <summary>
@@ -708,11 +566,10 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
 
     #region Fields
 
-    private Definition? _definition;
-    private SlideLayout? _layout;
+    private IDefinition _definition = Loader.Empty();
+    private IVariant _currentVariant = Loader.Empty().Variants[0];
     private string? _gitVersion;
     private readonly List<Primitive> _primitives = [];
-    private readonly List<Primitive> _boxPrimitives = [];
 
     // Needed because .NET 8 can't get logger from default parameters. Will be fixed in .NET 9, so they say.
     private readonly ILogger _logger = logger;

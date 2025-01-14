@@ -27,4 +27,9 @@ public static class Loader
 
         return new PublicDefinition(definition);
     }
+
+    public static IDefinition Empty()
+    {
+        return new PublicDefinitionEmpty();
+    }
 }
