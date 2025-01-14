@@ -22,9 +22,12 @@ var basePath = Path.GetDirectoryName(options.Input);
 
 using var stream = File.OpenRead(options.Input!);
 var definition = Loader.Load(stream, basePath);
-definition.OverrideWithOptions(options.Template, options.Listing, options.Output);
 
-if (string.IsNullOrWhiteSpace(definition.OutputFileName))
+var template = options.Template ?? definition.TemplateSlidesFileName;
+var listing = options.Listing || definition.Listing;
+var output = options.Output ?? definition.OutputFileName;
+
+if (string.IsNullOrWhiteSpace(output))
 {
     Console.WriteLine();
     Console.WriteLine($"ERROR: Must specify output file");
@@ -35,21 +38,22 @@ if (string.IsNullOrWhiteSpace(definition.OutputFileName))
 // LOAD IMAGES
 //
 
-var exportPipeline = new ExportPipelineEx(definition);
-await exportPipeline.LoadAndMeasureAsync(Path.GetDirectoryName(options.Input)!);
+var imageCache = new ImageCache() { BaseDirectory = basePath };
+await imageCache.LoadAsync(definition.ImagePaths);
 
 //
 // EXPORT
 //
 
-using var templateStream = definition.TemplateSlidesFileName is not null ? File.OpenRead(definition.TemplateSlidesFileName) : null;
-exportPipeline.Save(templateStream, definition.OutputFileName, options.Version);
+using var templateStream = template is not null ? File.OpenRead(template) : null;
+var export = new ExportPipelineEx(definition, imageCache);
+export.Export(templateStream, output, options.Version);
 
 //
 // LISTING
 //
 
-if (definition.Listing)
+if (listing)
 {
     definition.RenderListing(Console.Out);
 }
