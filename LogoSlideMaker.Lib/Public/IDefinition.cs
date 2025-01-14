@@ -12,6 +12,8 @@ public interface IDefinition
 
     string? OutputFileName { get; }
 
+    string? TemplateSlidesFileName { get; }
+
     bool Listing { get; }
 
     /// <summary>

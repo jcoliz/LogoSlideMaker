@@ -2,6 +2,7 @@ using ShapeCrawler;
 using LogoSlideMaker.Configure;
 using LogoSlideMaker.Layout;
 using LogoSlideMaker.Primitives;
+using LogoSlideMaker.Public;
 
 namespace LogoSlideMaker.Export;
 
@@ -15,6 +16,46 @@ namespace LogoSlideMaker.Export;
 /// </remarks>
 public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
 {
+    public void Render(Presentation pres, IVariant variant, string? dataVersion)
+    {
+        // Generate primitives, but we are only goint to render 'base' primitives to PPTX
+        var primitives = variant
+            .GeneratePrimitives(imageCache)
+            .Where(x => x.Purpose == PrimitivePurpose.Base)
+            .ToList();
+
+        var copyingSlide = pres.Slides[variant.Source];
+        pres.Slides.Add(copyingSlide);
+        var slide = pres.Slides[^1];
+
+        //
+        // Update Description Field
+        //
+
+        SetDescription(variant.Description, slide.Shapes);
+
+        //
+        // Set Slide Notes
+        //
+
+        List<string> notes = [$"Updated: {DateTime.Now:M/dd/yyyy h:mm tt K}"];
+        if (dataVersion is not null)
+        {
+            notes.Add($"Version: {dataVersion}");
+        }
+        notes.AddRange(variant.Notes);
+        slide.AddNotes(notes);
+
+        //
+        // Draw primitives
+        //
+
+        foreach (var p in primitives)
+        {
+            Draw(p, slide.Shapes);
+        }
+    }
+
     public void Render(Presentation pres, SlideLayout layout, string? dataVersion, IEnumerable<Primitive> primitives)
     {
         var copyingSlide = pres.Slides[layout.Variant.Source];
@@ -25,7 +66,7 @@ public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
         // Update Description Field
         //
 
-        SetDescription(layout,slide.Shapes);
+        SetDescription(layout.Variant.Description, slide.Shapes);
 
         //
         // Set Slide Notes
@@ -49,10 +90,10 @@ public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
         }
     }
 
-    private static void SetDescription(SlideLayout layout, ISlideShapes target)
+    private static void SetDescription(ICollection<string> description, ISlideShapes target)
     {
         // Fill in description field
-        var num_description_lines = layout.Variant.Description.Count;
+        var num_description_lines = description.Count;
         if (num_description_lines > 0)
         {
             var description_box = target.TryGetByName<IShape>("Description");
@@ -66,7 +107,7 @@ public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
                     tf.Paragraphs.Add();
                 }
 
-                var queue = new Queue<string>(layout.Variant.Description);
+                var queue = new Queue<string>(description);
                 foreach(var para in tf.Paragraphs)
                 {
                     if (queue.Count == 0)
@@ -78,6 +119,37 @@ public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
             }
         }        
     }
+
+    private static void SetDescription(IVariant variant, ISlideShapes target)
+    {
+        // Fill in description field
+        var num_description_lines = variant.Description.Count;
+        if (num_description_lines > 0)
+        {
+            var description_box = target.TryGetByName<IShape>("Description");
+            if (description_box is not null)
+            {
+                var tf = description_box.TextBox;
+
+                // Ensure there are enough paragraphs to insert text
+                while (tf.Paragraphs.Count < num_description_lines)
+                {
+                    tf.Paragraphs.Add();
+                }
+
+                var queue = new Queue<string>(variant.Description);
+                foreach (var para in tf.Paragraphs)
+                {
+                    if (queue.Count == 0)
+                    {
+                        break;
+                    }
+                    para.Text = queue.Dequeue();
+                }
+            }
+        }
+    }
+
 
     private void Draw(Primitive primitive, ISlideShapes target)
     {

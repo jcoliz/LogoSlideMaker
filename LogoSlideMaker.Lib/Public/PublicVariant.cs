@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.InkML;
-using LogoSlideMaker.Configure;
+﻿using LogoSlideMaker.Configure;
 using LogoSlideMaker.Layout;
 using LogoSlideMaker.Primitives;
 
@@ -11,6 +10,19 @@ internal class PublicVariant(Definition definition, Variant variant) : IVariant
 
     public ICollection<string> Description => variant.Description;
 
+    public ICollection<string> Notes
+    {
+        get
+        {
+            _layout ??= PopulateLayout();
+            return [$"Logo count: {_layout.Logos.Count(y => y.Logo != null)}"];
+        }
+    }
+
+    public int Source => variant.Source;
+
+    private SlideLayout? _layout;
+
     /// <summary>
     /// Generate all primitives needed to display this slide
     /// </summary>
@@ -19,7 +31,7 @@ internal class PublicVariant(Definition definition, Variant variant) : IVariant
         var result = new List<Primitive>();
 
         // Layout slide
-        var layout = PopulateLayout();
+        _layout = PopulateLayout();
 
         //
         // Add background primitives
@@ -29,7 +41,7 @@ internal class PublicVariant(Definition definition, Variant variant) : IVariant
 
         // If there is a bitmap template, draw that
         var definedBitmaps = definition.Files.Template.Bitmaps;
-        var sourceBitmap = layout.Variant.Source;
+        var sourceBitmap = _layout.Variant.Source;
         if (definedBitmaps is not null && definedBitmaps.Count > sourceBitmap && bitmaps.Contains(definedBitmaps[sourceBitmap]))
         {
             result.Add(new ImagePrimitive()
@@ -56,10 +68,10 @@ internal class PublicVariant(Definition definition, Variant variant) : IVariant
 
         // Add needed primitives for each logo
         var generator = new PrimitivesEngine(definition.Render, bitmaps);
-        result.AddRange(layout.Logos.SelectMany(generator.ToPrimitives));
+        result.AddRange(_layout.Logos.SelectMany(generator.ToPrimitives));
 
         // Add box title primitives
-        result.AddRange(layout.Text.SelectMany(generator.ToPrimitives));
+        result.AddRange(_layout.Text.SelectMany(generator.ToPrimitives));
 
         //
         // Add extents primitives

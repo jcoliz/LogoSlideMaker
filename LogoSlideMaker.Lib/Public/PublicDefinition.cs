@@ -19,6 +19,9 @@ internal class PublicDefinition(Definition definition) : IDefinition
 
     public string? OutputFileName => definition.Files.Output;
 
+    public string? TemplateSlidesFileName => definition.Files.Template.Slides;
+
+
     public bool Listing => definition.Render.Listing;
 
     public void OverrideWithOptions(string? template, bool? listing, string? output)
