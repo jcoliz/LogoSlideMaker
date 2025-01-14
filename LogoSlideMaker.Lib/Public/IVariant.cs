@@ -3,6 +3,9 @@ using LogoSlideMaker.Primitives;
 
 namespace LogoSlideMaker.Public;
 
+/// <summary>
+/// Defines a single slide to be output
+/// </summary>
 public interface IVariant
 {
     /// <summary>

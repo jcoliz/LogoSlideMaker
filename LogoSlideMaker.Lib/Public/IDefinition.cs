@@ -1,5 +1,8 @@
 ﻿namespace LogoSlideMaker.Public;
 
+/// <summary>
+/// Defines a document containing multiple slides to be output to a PowerPoint presentation
+/// </summary>
 public interface IDefinition
 {
     /// <summary>
@@ -8,7 +11,7 @@ public interface IDefinition
     string? Title { get; }
 
     /// <summary>
-    /// All the variants (slides) in this document
+    /// The individual slide to be output
     /// </summary>
     IList<IVariant> Variants { get; }
 
