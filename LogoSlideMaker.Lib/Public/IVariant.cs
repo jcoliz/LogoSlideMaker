@@ -6,5 +6,5 @@ public interface IVariant
 {
     string Name { get; }
     ICollection<string> Description { get; }
-    ICollection<Primitive> GeneratePrimitives();
+    ICollection<Primitive> GeneratePrimitives(IGetImageAspectRatio bitmaps);
 }

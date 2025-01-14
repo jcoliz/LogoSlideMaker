@@ -1,4 +1,6 @@
-﻿using LogoSlideMaker.Public;
+﻿using LogoSlideMaker.Primitives;
+using LogoSlideMaker.Public;
+using LogoSlideMaker.Tests.Helpers;
 using System.Reflection;
 
 namespace LogoSlideMaker.Tests
@@ -71,6 +73,28 @@ namespace LogoSlideMaker.Tests
 
             // And: Variant description is as expected
             Assert.That(definition.Variants.First().Description, Is.EquivalentTo(["one","two"]));
+        }
+
+        [Test]
+        public void VariantGeneratePrimitives()
+        {
+            // Given: A definition with one variant using a template with one slide
+            var definition = Loader.Load(GetStream("simple.toml"));
+
+            // When: Generating the primitives
+            var primitives = definition.Variants.First().GeneratePrimitives(new TestImageSource());
+
+            // Then: Has 5 primitives
+            Assert.That(primitives.Count(), Is.EqualTo(5));
+
+            // Then: Has 1 BG primitive
+            Assert.That(primitives.Where(x=>x.Purpose==Primitives.PrimitivePurpose.Background).Count(), Is.EqualTo(1));
+
+            // Then: Has 2 Image Primitives
+            Assert.That(primitives.Where(x => x.GetType() == typeof(ImagePrimitive)).Count(), Is.EqualTo(2));
+
+            // Then: Has 2 Image Primitives
+            Assert.That(primitives.Where(x => x.GetType() == typeof(TextPrimitive)).Count(), Is.EqualTo(2));
         }
 
         private static Stream GetStream(string filename)
