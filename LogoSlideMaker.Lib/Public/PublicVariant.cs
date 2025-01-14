@@ -4,7 +4,7 @@ using LogoSlideMaker.Primitives;
 
 namespace LogoSlideMaker.Public;
 
-internal class PublicVariant(PublicDefinition definition, Variant variant) : IVariant
+internal class PublicVariant(PublicDefinition definition, Variant variant, int index) : IVariant
 {
     public string Name => variant.Name;
 
@@ -22,6 +22,38 @@ internal class PublicVariant(PublicDefinition definition, Variant variant) : IVa
     public int Source => variant.Source;
 
     public IReadOnlyDictionary<TextSyle, ITextStyle> TextStyles => definition.TextStyles;
+
+    public int Index => index;
+
+    public IVariant Next
+    {
+        get
+        {
+            if (index + 1 >= definition.Variants.Count)
+            {
+                return definition.Variants[0];
+            }
+            else
+            {
+                return definition.Variants[index + 1];
+            }
+        }
+    }
+
+    public IVariant Previous
+    {
+        get
+        {
+            if (index == 0)
+            {
+                return definition.Variants[^1];
+            }
+            else
+            {
+                return definition.Variants[index-1];
+            }
+        }
+    }
 
     private SlideLayout? _layout;
 
@@ -85,9 +117,9 @@ internal class PublicVariant(PublicDefinition definition, Variant variant) : IVa
                 .Where(x => x.Outer is not null)
                 .Select(x => new RectanglePrimitive()
                 {
-                    Rectangle = x.Outer! with
+                    Rectangle = new Rectangle()
                     {
-                        X = x.Outer.X * 96m,
+                        X = x.Outer!.X * 96m, // TODO: Respect definition DPI!!
                         Y = x.Outer.Y * 96m,
                         Width = x.Outer.Width * 96m,
                         Height = x.Outer.Height * 96m

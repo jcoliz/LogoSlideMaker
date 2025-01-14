@@ -19,7 +19,7 @@ internal class PublicDefinition : IDefinition
             definition.Variants = [new Variant()];
         }
 
-        Variants = definition.Variants.Select(x => new PublicVariant(this,x)).Cast<IVariant>().ToImmutableList();
+        Variants = definition.Variants.Select((x,i) => new PublicVariant(this,x,i)).Cast<IVariant>().ToImmutableList();
 
         TextStyles = new Dictionary<TextSyle, ITextStyle>()
         {
@@ -39,7 +39,7 @@ internal class PublicDefinition : IDefinition
 
     public string? Title => definition.Layout.Title;
 
-    public ICollection<IVariant> Variants {
+    public IList<IVariant> Variants {
         get; private init;
      }
 

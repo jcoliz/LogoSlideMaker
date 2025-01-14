@@ -10,7 +10,7 @@ public interface IDefinition
     /// <summary>
     /// All the variants (slides) in this document
     /// </summary>
-    ICollection<IVariant> Variants { get; }
+    IList<IVariant> Variants { get; }
 
     /// <summary>
     /// Paths for all the images we will need to render

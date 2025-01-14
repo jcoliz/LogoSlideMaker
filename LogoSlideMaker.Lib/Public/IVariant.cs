@@ -27,7 +27,22 @@ public interface IVariant
     /// <summary>
     /// The styles which should be used to render text on this slide
     /// </summary>
-    IReadOnlyDictionary<TextSyle, ITextStyle> TextStyles { get;}
+    IReadOnlyDictionary<TextSyle, ITextStyle> TextStyles { get; }
+
+    /// <summary>
+    /// Index of this slide within the larger definition, 0-based
+    /// </summary>
+    int Index { get; }
+
+    /// <summary>
+    /// The variant (slide) which follows this one, wrapping around if needed
+    /// </summary>
+    IVariant Next { get; }
+
+    /// <summary>
+    /// The variant (slide) which precedes this one, wrapping around if needed
+    /// </summary>
+    IVariant Previous { get; }
 
     /// <summary>
     /// Generate the primitives needed to render this slide
