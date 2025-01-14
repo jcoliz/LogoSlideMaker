@@ -13,13 +13,6 @@ public static class Loader
         var toml = sr.ReadToEnd();
         var definition = Toml.ToModel<Definition>(toml) ?? throw new Exception("Unable to parse");
 
-        definition.ProcessAfterLoading();
-
-        if (definition.Variants.Count == 0)
-        {
-            definition.Variants = [new Variant()];
-        }
-
         if (basePath is not null && !string.IsNullOrWhiteSpace(definition.Files.Include.Logos))
         {
             var logopath = Path.Combine(basePath, definition.Files.Include.Logos);

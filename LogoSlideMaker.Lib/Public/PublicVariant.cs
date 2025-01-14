@@ -4,7 +4,7 @@ using LogoSlideMaker.Primitives;
 
 namespace LogoSlideMaker.Public;
 
-internal class PublicVariant(Definition definition, Variant variant) : IVariant
+internal class PublicVariant(PublicDefinition definition, Variant variant) : IVariant
 {
     public string Name => variant.Name;
 
@@ -20,6 +20,8 @@ internal class PublicVariant(Definition definition, Variant variant) : IVariant
     }
 
     public int Source => variant.Source;
+
+    public IReadOnlyDictionary<TextSyle, ITextStyle> TextStyles => definition.TextStyles;
 
     private SlideLayout? _layout;
 
@@ -40,7 +42,7 @@ internal class PublicVariant(Definition definition, Variant variant) : IVariant
         var bgRect = new Rectangle() { X = 0, Y = 0, Width = 1280 /*PlatenSize.Width*/, Height = 720 /*PlatenSize.Height*/ };
 
         // If there is a bitmap template, draw that
-        var definedBitmaps = definition.Files.Template.Bitmaps;
+        var definedBitmaps = definition.Definition.Files.Template.Bitmaps;
         var sourceBitmap = _layout.Variant.Source;
         if (definedBitmaps is not null && definedBitmaps.Count > sourceBitmap && bitmaps.Contains(definedBitmaps[sourceBitmap]))
         {
@@ -67,7 +69,7 @@ internal class PublicVariant(Definition definition, Variant variant) : IVariant
         //
 
         // Add needed primitives for each logo
-        var generator = new PrimitivesEngine(definition.Render, bitmaps);
+        var generator = new PrimitivesEngine(definition.Definition.Render, bitmaps);
         result.AddRange(_layout.Logos.SelectMany(generator.ToPrimitives));
 
         // Add box title primitives
@@ -79,7 +81,7 @@ internal class PublicVariant(Definition definition, Variant variant) : IVariant
 
         // TODO: Need to reduce to only on this slide!!
         result.AddRange(
-            definition.Boxes
+            definition.Definition.Boxes
                 .Where(x => x.Outer is not null)
                 .Select(x => new RectanglePrimitive()
                 {
@@ -103,7 +105,7 @@ internal class PublicVariant(Definition definition, Variant variant) : IVariant
     /// </summary>
     private SlideLayout PopulateLayout()
     {
-        var engine = new LayoutEngine(definition, variant);
+        var engine = new LayoutEngine(definition.Definition, variant);
         var layout = engine.CreateSlideLayout();
         return layout;
     }
