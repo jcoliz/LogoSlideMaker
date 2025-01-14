@@ -50,9 +50,10 @@ public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
         // Draw primitives
         //
 
+        TextStyles = variant.TextStyles; // Not the best way to get this in, is it??
         foreach (var p in primitives)
         {
-            Draw(p, slide.Shapes);
+            DrawEx(p, slide.Shapes);
         }
     }
 
@@ -150,6 +151,63 @@ public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
         }
     }
 
+    private void DrawEx(Primitive primitive, ISlideShapes target)
+    {
+        switch (primitive)
+        {
+            case TextPrimitive text:
+                DrawEx(text, target);
+                break;
+
+            case ImagePrimitive image:
+                Draw(image, target);
+                break;
+
+            case RectanglePrimitive rect:
+                Draw(rect, target);
+                break;
+
+            default:
+                throw new NotImplementedException();
+        }
+    }
+
+    private void DrawEx(TextPrimitive primitive, ISlideShapes target)
+    {
+        if (primitive.Style == TextSyle.Invisible)
+            return;
+
+        target.AddShape(100, 100, 100, 100);
+        var shape = target[^1];
+
+        shape.X = primitive.Rectangle.X;
+        shape.Y = primitive.Rectangle.Y ?? 0;
+        shape.Width = primitive.Rectangle.Width;
+        shape.Height = primitive.Rectangle.Height ?? primitive.Rectangle.Width;
+
+        var tf = shape.TextBox;
+        tf.Text = primitive.Text;
+        tf.LeftMargin = 0;
+        tf.RightMargin = 0;
+        var font = tf.Paragraphs[0].Portions[0].Font;
+
+        if (font is not null)
+        {
+            if (TextStyles.TryGetValue(primitive.Style, out var textStyle))
+            {
+                font.Size = textStyle.FontSize;
+                font.LatinName = textStyle.FontName;
+                font.Color.Update(textStyle.FontColor);
+            }
+            else
+            {
+                throw new Exception($"Unsupported text style {primitive.Style}");
+            }
+        }
+
+        shape.Fill.SetNoFill();
+        shape.Outline.SetNoOutline();
+    }
 
     private void Draw(Primitive primitive, ISlideShapes target)
     {
@@ -171,6 +229,7 @@ public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
                 throw new NotImplementedException();
         }
     }
+
     private void Draw(TextPrimitive primitive, ISlideShapes target)
     {
         if (primitive.Style == TextSyle.Invisible)
@@ -243,4 +302,6 @@ public class ExportRenderEngine(RenderConfig config, ImageCache imageCache)
             shape.Fill.SetNoFill();
         }
     }
+
+    private IReadOnlyDictionary<TextSyle, ITextStyle> TextStyles = new Dictionary<TextSyle, ITextStyle>();
 }
