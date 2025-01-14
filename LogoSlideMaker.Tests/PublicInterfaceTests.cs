@@ -85,7 +85,7 @@ namespace LogoSlideMaker.Tests
             var primitives = definition.Variants.First().GeneratePrimitives(new TestImageSource());
 
             // Then: Has 5 primitives
-            Assert.That(primitives.Count(), Is.EqualTo(5));
+            Assert.That(primitives, Has.Count.EqualTo(5));
 
             // Then: Has 1 BG primitive
             Assert.That(primitives.Where(x=>x.Purpose==Primitives.PrimitivePurpose.Background).Count(), Is.EqualTo(1));
