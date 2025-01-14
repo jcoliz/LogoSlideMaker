@@ -1,6 +1,6 @@
-﻿using DocumentFormat.OpenXml.InkML;
-using LogoSlideMaker.Configure;
+﻿using LogoSlideMaker.Configure;
 using LogoSlideMaker.Layout;
+using LogoSlideMaker.Models;
 using System.Collections.Immutable;
 
 namespace LogoSlideMaker.Public;

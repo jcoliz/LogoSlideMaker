@@ -1,4 +1,5 @@
 using LogoSlideMaker.Configure;
+using LogoSlideMaker.Models;
 
 namespace LogoSlideMaker.Layout;
 

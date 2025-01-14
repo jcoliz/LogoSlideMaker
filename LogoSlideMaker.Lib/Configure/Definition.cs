@@ -1,3 +1,5 @@
+using LogoSlideMaker.Models;
+
 namespace LogoSlideMaker.Configure;
 
 /// <summary>
@@ -64,7 +66,7 @@ internal record Definition
     }
 }
 
-public record Location: Rectangle
+internal record Location: Rectangle
 {
     /// <summary>
     /// Number of rows this location can handle

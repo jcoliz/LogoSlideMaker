@@ -1,4 +1,5 @@
 ﻿using LogoSlideMaker.Configure;
+using LogoSlideMaker.Models;
 using LogoSlideMaker.Primitives;
 using LogoSlideMaker.Public;
 using ShapeCrawler;

@@ -1,13 +1,14 @@
 using DocumentFormat.OpenXml.InkML;
 using LogoSlideMaker.Configure;
 using LogoSlideMaker.Layout;
+using LogoSlideMaker.Models;
 
 namespace LogoSlideMaker.Tests;
 
 /// <summary>
 /// Boxes feature: User can group logos into boxes with evenly-spaced space rows
 /// </summary>
-public class LayoutBoxTests: TestsBase
+internal class LayoutBoxTests: TestsBase
 {    
     [Test]
     public void Padding()

@@ -386,7 +386,7 @@ public sealed partial class MainWindow : Window
 
             // NOTE: This is only called once per LOAD, so we don't currently support changing
             // text styles per variant. Ergo, there is a subtle bug here right now.
-            var logoStyle = viewModel.TextStyles[Configure.TextSyle.Logo];
+            var logoStyle = viewModel.TextStyles[Models.TextSyle.Logo];
             defaultTextFormat = new() 
             { 
                 FontSize = (float)logoStyle.FontSize * 96.0f / 72.0f, 
@@ -395,7 +395,7 @@ public sealed partial class MainWindow : Window
                 HorizontalAlignment = CanvasHorizontalAlignment.Center 
             };
 
-            var tytleStyle = viewModel.TextStyles[Configure.TextSyle.BoxTitle];
+            var tytleStyle = viewModel.TextStyles[Models.TextSyle.BoxTitle];
             titleTextFormat = new() 
             { 
                 FontSize = (float)tytleStyle.FontSize * 96.0f / 72.0f, 
@@ -484,8 +484,8 @@ public sealed partial class MainWindow : Window
             solidBlack, 
             primitive.Style switch
             {
-                Configure.TextSyle.Logo => defaultTextFormat,
-                Configure.TextSyle.BoxTitle => titleTextFormat,
+                Models.TextSyle.Logo => defaultTextFormat,
+                Models.TextSyle.BoxTitle => titleTextFormat,
                 _ => throw new Exception($"Unexpected text style {primitive.Style}")
             }
         );
@@ -597,7 +597,7 @@ public sealed partial class MainWindow : Window
 
 internal static class Converters
 {
-    internal static Rect AsWindowsRect(this Configure.Rectangle source)
+    internal static Rect AsWindowsRect(this Models.Rectangle source)
     {
         return new Rect() { X = (double)source.X, Y = (double)(source.Y ?? 0), Width = (double)source.Width, Height = (double)(source.Height ?? 0)};
     }

@@ -10,7 +10,7 @@ namespace LogoSlideMaker.Tests;
 /// <remarks>
 /// Logos can be filtered by tag or by page
 /// </remarks>
-public class LayoutVariantTests: TestsBase
+internal class LayoutVariantTests: TestsBase
 {
     /// <summary>
     /// Scenario: By default, logos with tags are not included

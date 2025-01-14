@@ -1,5 +1,6 @@
-﻿using LogoSlideMaker.Configure;
+﻿using LogoSlideMaker.Models;
 using LogoSlideMaker.Primitives;
+
 namespace LogoSlideMaker.Public;
 
 public interface IVariant

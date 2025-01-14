@@ -1,3 +1,5 @@
+using LogoSlideMaker.Models;
+
 namespace LogoSlideMaker.Configure;
 
 /// <summary>
@@ -67,18 +69,6 @@ internal record Box
 
 }
 
-public record Size
-{
-    public decimal Width { get; set; }
-    public decimal? Height { get; set; }
-}
-
-public record Rectangle: Size
-{
-    public decimal X { get; set; }
-    public decimal? Y { get; set; }
-}
-
 internal record Edge
 {
     public decimal X { get; set; }
@@ -92,11 +82,4 @@ internal enum EdgeKind
 {
     Undefined = 0,
     Bottom = 1
-}
-
-public enum TextSyle
-{
-    Invisible = 0,
-    Logo = 1,
-    BoxTitle = 2
 }
