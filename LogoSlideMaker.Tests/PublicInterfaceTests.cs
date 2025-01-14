@@ -97,6 +97,19 @@ namespace LogoSlideMaker.Tests
             Assert.That(primitives.Where(x => x.GetType() == typeof(TextPrimitive)).Count(), Is.EqualTo(2));
         }
 
+        [Test]
+        public void ImagePaths()
+        {
+            // Given: A definition with logo and template image paths
+            var definition = Loader.Load(GetStream("image-paths.toml"));
+
+            // When: Getting image paths
+            var paths = definition.ImagePaths;
+
+            // Then: Has 4 image paths
+            Assert.That(paths, Has.Count.EqualTo(4));
+        }
+
         private static Stream GetStream(string filename)
         {
             var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();

@@ -1,0 +1,14 @@
+[files.template]
+bitmaps = [ "./two", "./three" ]
+
+[logos.zero]
+title = "zero"
+path = "./zero"
+
+[logos.one]
+title = "one"
+path = "./one"
+
+[logos.one-more]
+title = "one-more"
+path = "./one"
