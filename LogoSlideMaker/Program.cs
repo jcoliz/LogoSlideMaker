@@ -46,8 +46,7 @@ await imageCache.LoadAsync(definition.ImagePaths);
 //
 
 using var templateStream = template is not null ? File.OpenRead(template) : null;
-var exporter = new ExportPipelineEx(definition, imageCache);
-exporter.Export(templateStream, output, options.Version);
+ExportPipelineEx.Export(definition, imageCache, templateStream, output, options.Version);
 
 //
 // LISTING

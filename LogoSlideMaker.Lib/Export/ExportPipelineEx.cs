@@ -13,9 +13,9 @@ namespace LogoSlideMaker.Export;
 /// This is an attempt to package the exporting currently done in the
 /// command-line tool, and make it accessible to the UI.
 /// </remarks>
-public class ExportPipelineEx(IDefinition definition, ImageCache imageCache)
+public static class ExportPipelineEx
 {
-    public void Export(Stream? templateStream, string outputPath, string? dataVersion)
+    public static void Export(IDefinition definition, ImageCache imageCache, Stream? templateStream, string outputPath, string? dataVersion)
     {
         // Open template or create new presentation
         var pres = templateStream is not null ? new Presentation(templateStream) : new Presentation();
