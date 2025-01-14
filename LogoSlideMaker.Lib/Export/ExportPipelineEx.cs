@@ -31,15 +31,6 @@ public class ExportPipelineEx
 
     public void Save(Stream? templateStream, string outputPath, string? dataVersion)
     {
-        // Render all slides to a new presentation
-        var pres = RenderAll(templateStream, dataVersion);
-
-        // Save the resulting presentation
-        pres.SaveAs(outputPath);
-    }
-
-    internal Presentation RenderAll(Stream? templateStream, string? dataVersion)
-    {
         // Open template or create new presentation
         var pres = templateStream is not null ? new Presentation(templateStream) : new Presentation();
 
@@ -60,7 +51,8 @@ public class ExportPipelineEx
             pres.Slides.Remove(slide);
         }
 
-        return pres;
+        // Save the resulting presentation
+        pres.SaveAs(outputPath);
     }
 
     private readonly IDefinition definition;

@@ -61,24 +61,6 @@ internal class PublicDefinition : IDefinition
 
     internal Definition Definition => definition;
 
-    public void OverrideWithOptions(string? template, bool? listing, string? output)
-    {
-        if (!string.IsNullOrWhiteSpace(template))
-        {
-            definition.Files.Template.Slides = template;
-        }
-
-        if (listing.HasValue)
-        {
-            definition.Render.Listing = listing.Value;
-        }
-
-        if (!string.IsNullOrWhiteSpace(output))
-        {
-            definition.Files.Output = output;
-        }
-    }
-
     public void RenderListing(TextWriter output)
     {
         var markdown = new List<string>([$"# {definition.Layout.Title}"]);

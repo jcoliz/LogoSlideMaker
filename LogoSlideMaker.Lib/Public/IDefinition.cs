@@ -16,10 +16,5 @@ public interface IDefinition
 
     bool Listing { get; }
 
-    /// <summary>
-    /// Override certain definition values based on user-selected options
-    /// </summary>
-    void OverrideWithOptions(string? template, bool? listing, string? output);
-
     void RenderListing(TextWriter output);
 }
