@@ -12,7 +12,7 @@ namespace LogoSlideMaker.Tests;
 /// Contains shared logic used by many tests
 /// </remarks>
 
-public abstract class TestsBase
+internal abstract class TestsBase
 {
     /// <summary>
     /// Load this definition file from embedded resources

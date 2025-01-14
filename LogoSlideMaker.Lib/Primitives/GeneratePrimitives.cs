@@ -11,7 +11,7 @@ namespace LogoSlideMaker.Primitives;
 /// </remarks>
 /// <param name="config">Rendering configuration to covern detailed sizing</param>
 /// <param name="getLogoAspect">Provides image size for any given image path</param>
-public class PrimitivesEngine(RenderConfig config, IGetImageAspectRatio getLogoAspect)
+internal class PrimitivesEngine(RenderConfig config, IGetImageAspectRatio getLogoAspect)
 {
     /// <summary>
     /// Breakdown a single logolayout into drawing primitives

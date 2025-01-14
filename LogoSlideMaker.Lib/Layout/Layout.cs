@@ -5,7 +5,7 @@ namespace LogoSlideMaker.Layout;
 /// <summary>
 /// Creates slide layouts for a specified slide definition (i.e. variant)
 /// </summary>
-public class LayoutEngine(Definition definition, Variant variant)
+internal class LayoutEngine(Definition definition, Variant variant)
 {
     public SlideLayout CreateSlideLayout()
     {
@@ -388,7 +388,7 @@ public class LayoutEngine(Definition definition, Variant variant)
 /// <summary>
 /// A single logo with positioning
 /// </summary>
-public record LogoLayout
+internal record LogoLayout
 {
     public Logo? Logo { get; init; }
     /// <summary>
@@ -422,7 +422,7 @@ public record LogoLayout
 /// be broken out into its own pipeline, and NOT done as part of the slide
 /// rendering pipeline
 /// </remarks>
-public record BoxLayout
+internal record BoxLayout
 {
     public string? Heading { get; init; }
     public LogoLayout[] Logos { get; init; } = [];
@@ -431,7 +431,7 @@ public record BoxLayout
 /// <summary>
 /// Additional text to display
 /// </summary>
-public record TextLayout
+internal record TextLayout
 {
     /// <summary>
     /// The text to display. A value is expected
@@ -455,7 +455,7 @@ public record TextLayout
 /// <remarks>
 /// TODO: Much of this is needed for text rendering, which should be separated
 /// </remarks>
-public record SlideLayout
+internal record SlideLayout
 {
     public Variant Variant { get; init; } = new();
     public LogoLayout[] Logos { get; init; } = [];

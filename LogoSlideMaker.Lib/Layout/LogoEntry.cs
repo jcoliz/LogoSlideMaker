@@ -9,7 +9,7 @@ namespace LogoSlideMaker.Layout;
 /// The `logos=` line in a row can encode a lot of information. This breaks
 /// it apart into well-defined symbols.
 /// </remarks>
-public record Entry
+internal record Entry
 {
     /// <summary>
     /// Construct from a row logo entry
@@ -67,4 +67,4 @@ public record Entry
     public string[] NotTags { get; }
 }
 
-public enum Commands { Invalid = 0, End = 1 }
+internal enum Commands { Invalid = 0, End = 1 }

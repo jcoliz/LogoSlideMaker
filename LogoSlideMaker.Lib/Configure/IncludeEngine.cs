@@ -3,7 +3,7 @@
 /// <summary>
 /// Manage including other definitions into in a defintition
 /// </summary>
-public static class IncludeEngine
+internal static class IncludeEngine
 {
     /// <summary>
     /// Include logos from the <paramref name="source"/> definition into this definition
@@ -14,7 +14,7 @@ public static class IncludeEngine
     /// </remarks>
     /// <param name="target">Where the logos will be merged into</param>
     /// <param name="source">Where the logos will come from</param>
-    public static void IncludeLogosFrom(this Definition target, Definition source)
+    internal static void IncludeLogosFrom(this Definition target, Definition source)
     {
         // All the logo keys where we already define primary properties in the target, so
         // we will want to IGNORE them from the source

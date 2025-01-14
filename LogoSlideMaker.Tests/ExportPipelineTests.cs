@@ -4,7 +4,7 @@ using ShapeCrawler;
 
 namespace LogoSlideMaker.Tests;
 
-public class ExportPipelineTests: TestsBase
+internal class ExportPipelineTests: TestsBase
 {
     /// <summary>
     /// Scenario: Rendering functions OK

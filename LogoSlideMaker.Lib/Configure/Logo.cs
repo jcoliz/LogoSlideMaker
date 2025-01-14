@@ -7,7 +7,7 @@ namespace LogoSlideMaker.Configure;
 /// Specify each logo once. Refer to it in as many rows, boxes, and/or
 /// variants as needed.
 /// </remarks>
-public record Logo
+internal record Logo
 {
     /// <summary>
     /// Human-readble title to show under the logo

@@ -3,7 +3,7 @@ namespace LogoSlideMaker.Configure;
 /// <summary>
 /// A collection of rows specified in a single declaration
 /// </summary>
-public record Box
+internal record Box
 {
     // TODO refactor to a rectqngle
     public decimal? XPosition { get; set; }
@@ -79,7 +79,7 @@ public record Rectangle: Size
     public decimal? Y { get; set; }
 }
 
-public record Edge
+internal record Edge
 {
     public decimal X { get; set; }
     public decimal Y { get; set; }
@@ -88,7 +88,7 @@ public record Edge
 }
 
 // Feel free to define more kinds as more are used!
-public enum EdgeKind
+internal enum EdgeKind
 {
     Undefined = 0,
     Bottom = 1

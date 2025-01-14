@@ -7,7 +7,7 @@ namespace LogoSlideMaker.Configure;
 /// I've now been referring to `Variant` interchangeabley with `Slide`. In
 /// the future, I'll rename this to `Slide`, as it describes a single slide.
 /// </remarks>
-public record Variant
+internal record Variant
 {
     /// <summary>
     /// Human-readable name
@@ -83,7 +83,7 @@ public record Variant
 /// <remarks>
 /// Logos with these tags will be replaced by the mask logo
 /// </remarks>
-public record Masking 
+internal record Masking 
 {
     /// <summary>
     /// Which logo to use as the mask

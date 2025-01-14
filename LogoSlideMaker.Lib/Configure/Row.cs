@@ -6,7 +6,7 @@ namespace LogoSlideMaker.Configure;
 /// <remarks>
 /// This is largely obsolete now. Use Box instead.
 /// </remarks>
-public record Row
+internal record Row
 {
     public decimal XPosition { get; set; }
     public decimal YPosition { get; set; }

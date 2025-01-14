@@ -1,6 +1,6 @@
 namespace LogoSlideMaker.Configure;
 
-public record Config
+internal record Config
 {
     /// <summary>
     /// Title of the overall document

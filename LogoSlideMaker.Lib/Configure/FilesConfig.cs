@@ -3,7 +3,7 @@
 /// <summary>
 /// Allows user to set out/template files using TOML file
 /// </summary>
-public record FilesConfig
+internal record FilesConfig
 {
     /// <summary>
     /// Powerpoint output
@@ -22,7 +22,7 @@ public record FilesConfig
     public IncludeConfig Include { get; set; } = new();
 }
 
-public record TemplateConfig
+internal record TemplateConfig
 {
     /// <summary>
     /// Powerpoint presentation template
@@ -32,7 +32,7 @@ public record TemplateConfig
     public List<string> Bitmaps { get; set; } = new();
 }
 
-public record IncludeConfig
+internal record IncludeConfig
 {
     /// <summary>
     /// Filename of definition where we should extract logos from

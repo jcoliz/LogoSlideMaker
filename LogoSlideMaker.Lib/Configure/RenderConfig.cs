@@ -3,7 +3,7 @@ namespace LogoSlideMaker.Configure;
 /// <summary>
 /// Configuration which affects rendering
 /// </summary>
-public record RenderConfig
+internal record RenderConfig
 {
     /// <summary>
     /// Vertical distance from middle of icon to top of text, in inches
