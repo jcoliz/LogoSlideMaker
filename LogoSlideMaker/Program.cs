@@ -3,6 +3,7 @@ using LogoSlideMaker.Configure;
 using LogoSlideMaker.Layout;
 using LogoSlideMaker.Export;
 using Tomlyn;
+using LogoSlideMaker.Public;
 
 //
 // OPTIONS
