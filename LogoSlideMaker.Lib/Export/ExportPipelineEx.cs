@@ -38,6 +38,7 @@ public static class ExportPipelineEx
         }
 
         // Save the resulting presentation
+        // TODO: Should save to a stream to improve testability
         pres.SaveAs(outputPath);
     }
 }

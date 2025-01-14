@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace LogoSlideMaker.Tests
 {
-    internal class PublicInterfaceTests
+    internal class PublicInterfaceTests: TestsBase
     {
         /// <summary>
         /// Scenario: Loader loads file with variant
@@ -108,15 +108,6 @@ namespace LogoSlideMaker.Tests
 
             // Then: Has 4 image paths
             Assert.That(paths, Has.Count.EqualTo(4));
-        }
-
-        private static Stream GetStream(string filename)
-        {
-            var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
-            var resource = names.Where(x => x.Contains($".{filename}")).Single();
-            var stream = Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource);
-
-            return stream!;
         }
     }
 }

@@ -30,4 +30,14 @@ public abstract class TestsBase
 
         return definitions;
     }
+
+    protected static Stream GetStream(string filename)
+    {
+        var names = Assembly.GetExecutingAssembly()!.GetManifestResourceNames();
+        var resource = names.Where(x => x.Contains($".{filename}")).Single();
+        var stream = Assembly.GetExecutingAssembly()!.GetManifestResourceStream(resource);
+
+        return stream!;
+    }
+
 }

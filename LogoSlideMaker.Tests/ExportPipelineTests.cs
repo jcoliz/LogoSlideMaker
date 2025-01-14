@@ -1,26 +1,31 @@
 using LogoSlideMaker.Export;
+using LogoSlideMaker.Public;
+using ShapeCrawler;
 
 namespace LogoSlideMaker.Tests;
 
 public class ExportPipelineTests: TestsBase
 {
     /// <summary>
-    /// Scenario: Template slides removed from output
+    /// Scenario: Rendering functions OK
     /// </summary>
     [Test]
-    public void TemplateSlidesRemoved()
+    public void RendersOk()
     {
         // Given: A definition with one variant using a template with one slide
-        var definition = Load("simple.toml");
+        var definition = Loader.Load(GetStream("simple.toml"));
+
+        // And: A presentation to export to
+        var presentation = new Presentation();
 
         // When: Exporting it
-        var pipeline = new ExportPipeline(definition);
-        var presentation = pipeline.RenderAll(null, null);
+        var renderer = new ExportRenderEngineEx(presentation, definition.Variants[0], new(), null);
+        renderer.Render();
 
-        // Then: Result has only one slide
-        Assert.That(presentation.Slides,Has.Count.EqualTo(1));
+        // Then: Result has two slide (because we haven't chopped off the original slides yet)
+        Assert.That(presentation.Slides,Has.Count.EqualTo(2));
 
         // And: Resulting slide has contents as specified in definition
-        Assert.That(presentation.Slides[0].Shapes,Has.Count.EqualTo(4));
+        Assert.That(presentation.Slides[1].Shapes,Has.Count.EqualTo(4));
     }
 }
