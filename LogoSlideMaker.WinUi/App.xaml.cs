@@ -10,9 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using Serilog;
 using Serilog.Formatting.Compact;
-using Windows.Security.Cryptography;
 using Windows.Storage;
-using Windows.System.Profile;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace LogoSlideMaker.WinUi;

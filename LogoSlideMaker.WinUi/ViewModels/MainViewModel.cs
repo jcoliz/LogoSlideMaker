@@ -21,7 +21,7 @@ using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace LogoSlideMaker.WinUi.ViewModels;
 
-public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> logger): INotifyPropertyChanged
+public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> logger) : INotifyPropertyChanged
 {
     #region Events
     /// <summary>
@@ -32,7 +32,7 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
     /// <summary>
     /// A new definition has been loaded
     /// </summary>
-    public event EventHandler<EventArgs>? DefinitionLoaded = delegate { }; 
+    public event EventHandler<EventArgs>? DefinitionLoaded = delegate { };
 
     /// <summary>
     /// User action has resulted in an error
@@ -45,7 +45,7 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
     /// <summary>
     /// Size of the drawing area
     /// </summary>
-    public System.Drawing.Size PlatenSize { get; } = new(1280,720);
+    public System.Drawing.Size PlatenSize { get; } = new(1280, 720);
 
     /// <summary>
     /// View needs to give us a way to dispatch onto the UI Thread
@@ -78,7 +78,7 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
         {
             try
             {
-                if (_definition is not null && value < _definition.Variants.Count && value != _currentVariant.Index && value >= 0)
+                if (value < _definition.Variants.Count && value != _currentVariant.Index && value >= 0)
                 {
                     _currentVariant = _definition.Variants[value];
 
@@ -97,7 +97,6 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
             }
         }
     }
-    private int _slideNumber = 0;
 
     /// <summary>
     /// Whether we are undergoing a loading operation
@@ -111,8 +110,8 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
             {
                 _IsLoading = value;
                 OnPropertyChanged();
-            }        
-        }    
+            }
+        }
     }
     private bool _IsLoading = true;
 
@@ -137,21 +136,11 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
     /// <summary>
     /// Display names of the slides
     /// </summary>
-    public IEnumerable<string> SlideNames
-    {
-        get
-        {
-            if (_definition is null)
-            {
-                return ["N/A"];
-            }
-            if (_definition.Variants.Count == 0)
-            {
-                return ["Default"];
-            }
-            return _definition.Variants.Select((x,i) => $"{i}. {x.Name}");
-        }
-    }
+    /// <remarks>
+    /// This is for a future slide picker
+    /// </remarks>
+    public IEnumerable<string> SlideNames =>
+        _definition.Variants.Select((x, i) => $"{i}. {x.Name}");
 
     /// <summary>
     /// Path to input file, last time we opened a file from file system
@@ -176,10 +165,6 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
     {
         get
         {
-            if (_definition.Variants.Count == 0)
-            {
-                return null;            
-            }
             if (_definition.OutputFileName is not null)
             {
                 // output path is relative to the current definition file
@@ -201,27 +186,18 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
                 var result = Path.Combine(directory, file + ".pptx");
                 return result;
             }
-        }    
+        }
     }
 
     /// <summary>
     /// Name of the overall document (definition) being shown
     /// </summary>
-    public string DocumentTitle
+    public string DocumentTitle => (_definition.Title, LastOpenedFilePath) switch
     {
-        get
-        {
-            if (_definition.Title == null && LastOpenedFilePath == null)
-            {
-                return string.Empty;
-            }
-            if (_definition.Title == null)
-            {
-                return Path.GetFileName(LastOpenedFilePath!);
-            }
-            return _definition.Title;
-        }
-    }
+        (null, null) => string.Empty,
+        (null, _) => Path.GetFileName(LastOpenedFilePath),
+        _ => _definition.Title
+    };
 
     /// <summary>
     /// Subtitle of the overall document (definition) being shown
@@ -231,11 +207,6 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
     {
         get
         {
-            if (_definition.Variants.Count == 0)
-            {
-                return string.Empty;
-            }
-
             var result = $"Slide {_currentVariant.Index + 1} of {_definition.Variants.Count}";
             if (!string.IsNullOrWhiteSpace(_currentVariant.Name))
             {
@@ -248,8 +219,9 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
             return result;
         }
     }
-
-    //    // [User Can] Turn visual display of bounding boxes on and off in preview
+    /// <summary>
+    /// Turn visual display of bounding boxes on and off 
+    /// </summary>
     public bool ShowBoundingBoxes
     {
         get => _ShowBoundingBoxes;
@@ -403,7 +375,6 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
     /// </summary>
     public void AdvanceToNextSlide()
     {
-
         if (SlideNumber >= _definition.Variants.Count - 1)
         {
             SlideNumber = 0;
@@ -438,11 +409,6 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
         var templateStream = default(Stream);
         try
         {
-            if (_definition is null)
-            {
-                return;
-            }
-
             IsExporting = true;
 
             var directory = LastOpenedFilePath is not null ? Path.GetDirectoryName(LastOpenedFilePath) : null;
@@ -477,8 +443,6 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
             //
 
             ExportPipelineEx.Export(_definition, imageCache, templateStream, outPath, _gitVersion);
-
-            IsExporting = false;
         }
         catch (DirectoryNotFoundException ex)
         {
@@ -566,14 +530,10 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
     #endregion
 
     #region Fields
-
     private IDefinition _definition = Loader.Empty();
     private IVariant _currentVariant = Loader.Empty().Variants[0];
     private string? _gitVersion;
     private readonly List<Primitive> _primitives = [];
-
-    // Needed because .NET 8 can't get logger from default parameters. Will be fixed in .NET 9, so they say.
-    private readonly ILogger _logger = logger;
     #endregion
 
     #region Logging
