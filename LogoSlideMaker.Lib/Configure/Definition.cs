@@ -40,30 +40,6 @@ internal record Definition
     /// Multi-line boxes of logo positions describing how the logos are laid out
     /// </summary>
     public List<Box> Boxes { get; set; } = new();
-
-    /// <summary>
-    /// After loading a definition, call this to complete any post-load processing
-    /// </summary>
-    public void ProcessAfterLoading()
-    {
-        foreach (var box in Boxes)
-        {
-            if (Locations.Count > 0)
-            {
-                box.SetLocationProperties(Locations);
-            }
-
-            // If a box has no logos, grab them from first box with same title
-            if (box.Logos.Keys.Count == 0)
-            {
-                var found = Boxes.First(x=>x.Title == box.Title);
-                if (found.Logos.Keys.Count > 0)
-                {
-                    box.Logos = found.Logos;                    
-                }
-            }
-        }
-    }
 }
 
 internal record Location: Rectangle

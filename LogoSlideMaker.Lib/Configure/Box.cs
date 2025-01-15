@@ -50,15 +50,6 @@ internal record Box
 
     public Dictionary<int,List<string>> Logos { get; set; } = new Dictionary<int,List<string>>();
 
-    public void SetLocationProperties(Dictionary<int, Dictionary<string, Location>> locations)
-    {
-        if (!string.IsNullOrEmpty(Location))
-        {
-            Outer = locations[this.Page][this.Location];
-            NumRows = locations[this.Page][this.Location].NumRows;
-        }
-    }
-
     /// <summary>
     /// Number of rows we will have
     /// </summary>

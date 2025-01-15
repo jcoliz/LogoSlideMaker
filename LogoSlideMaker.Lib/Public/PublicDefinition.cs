@@ -12,7 +12,7 @@ internal class PublicDefinition : IDefinition
     {
         definition = _definition;
 
-        definition.ProcessAfterLoading();
+        ProcessAfterLoading();
 
         if (definition.Variants.Count == 0)
         {
@@ -72,4 +72,32 @@ internal class PublicDefinition : IDefinition
             output.WriteLine(line);
         }
     }
+
+    /// <summary>
+    /// After loading a definition, call this to complete any post-load processing
+    /// </summary>
+    private void ProcessAfterLoading()
+    {
+        foreach (var box in definition.Boxes)
+        {
+            if (definition.Locations.Count > 0)
+            {
+                if (!string.IsNullOrEmpty(box.Location))
+                {
+                    box.Outer = definition.Locations[box.Page][box.Location];
+                    box.NumRows = definition.Locations[box.Page][box.Location].NumRows;
+                }
+            }
+
+            // If a box has no logos, grab them from first box with same title
+            if (box.Logos.Keys.Count == 0)
+            {
+                var found = definition.Boxes.First(x=>x.Title == box.Title);
+                if (found.Logos.Keys.Count > 0)
+                {
+                    box.Logos = found.Logos;                    
+                }
+            }
+        }
+    }    
 }
