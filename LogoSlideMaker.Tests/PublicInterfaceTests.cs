@@ -126,5 +126,22 @@ namespace LogoSlideMaker.Tests
             Assert.That(styles[Models.TextSyle.BoxTitle].FontSize,Is.EqualTo(24));
             Assert.That(styles[Models.TextSyle.BoxTitle].FontName,Is.EqualTo("Segoe UI"));
         }
+
+        [Test]
+        public void RemapLocations()
+        {
+            // Given: Loading A definition with locations and boxes that reference them
+            var definition = Loader.Load(GetStream("locations.toml"));
+
+            // When: Getting primitives
+            var primitives = definition.Variants[0].GeneratePrimitives(new TestImageSource()).ToList();
+
+            // Then: Boxes have extents as expected
+            Assert.That(primitives[1].Rectangle.Width,Is.EqualTo(400m).Within(0.01m));
+            Assert.That(primitives[2].Rectangle.Height,Is.EqualTo(284m).Within(0.01m));
+            Assert.That(primitives[3].Rectangle.Y,Is.EqualTo(476m).Within(0.01m));
+
+            // TODO: Need to test numrows somehow
+        }
     }
 }

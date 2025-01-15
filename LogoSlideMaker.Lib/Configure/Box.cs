@@ -27,13 +27,28 @@ internal record Box
     public decimal? MorePaddingX { get; set; }
 
     public int MinColumns { get; set; }
+
+    /// <summary>
+    /// Which page is this on?
+    /// </summary>
+    /// <remarks>
+    /// Think of a 'page' as a logical grouping of boxes. 
+    /// 
+    /// This box will be included in the layout if the variants include this page, or
+    /// if this is zero and the variant specifies no pages, then it will also be
+    /// included.
+    /// 
+    /// Furthermore, this is used for locations. If a location is specified, this
+    /// page value is used as a lookup into the locations table to find locatino
+    /// information for this page.
+    /// </remarks>
     public int Page { get; set; }
 
     /// <summary>
     /// Name of location on this page
     /// </summary>
     /// <remarks>
-    /// If set, will pull box size/position from central list of locations
+    /// If set, will pull box size/position from central list of locations. 
     /// </remarks>
     public string? Location { get; set; }
 

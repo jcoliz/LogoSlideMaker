@@ -42,14 +42,28 @@ internal record Variant
     /// <summary>
     /// Which slide # to use as the basis, starting from 0
     /// </summary>
+    /// <remarks>
+    /// In practice, this has become confusing with 'page'. 'Page' tells where to get boxes, 
+    /// 'Source' tells us what to put them on. Not super clear. 
+    /// 
+    /// This came about for the light/dark slides. light/dark need the same boxes, but have
+    /// a different background.
+    /// </remarks>
     public int Source { get; set; }
 
     /// <summary>
     /// Which pages of boxes to include
     /// </summary>
-    /// <remarks>
-    /// By default, only includes 'loose' boxes, not assigned to any
+    /// <remarks>W
+    /// If not specificed, will only includes 'loose' boxes, not assigned to any
     /// particular page.
+    /// 
+    /// I think page is specified backware. The idea behind having multiple 'pages' here is that we could
+    /// duplicate boxes on multiple different slides. We really haven't been using that, although
+    /// it might be a good idea to start.
+    /// 
+    /// Instead of using this facility, I've added the ability to steal logos from the previous
+    /// box with the same name. This is a more flexible approach anyway.
     /// </remarks>
     public List<int> Pages { get; set; } = new();
 

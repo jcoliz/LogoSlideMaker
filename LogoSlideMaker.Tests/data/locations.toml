@@ -1,0 +1,33 @@
+﻿[locations.1]
+"Upper Left" = { x = 0.29167, y = 0.70833, width = 4.16667, height = 2.95833, num_rows = 4 }
+"Lower Left" = { x = 0.29167, y = 4.25000, width = 4.16667, height = 2.95833, num_rows = 4 }
+"Center" = { x = 4.58333, y = 2.12500, width = 4.16667, height = 5.08333, num_rows = 7 }
+"Upper Right" = { x = 8.87500, y = 0.70833, width = 4.16667, height = 3.66667, num_rows = 5 }
+"Lower Right" = { x = 8.87500, y = 4.95833, width = 4.16667, height = 2.25000, num_rows = 3 }
+
+[locations.2]
+"Upper Left" = { x = 0.29167, y = 0.70833, width = 4.16667, height = 2.95833, num_rows = 4 }
+"Lower Left" = { x = 0.29167, y = 4.25000, width = 4.16667, height = 2.95833, num_rows = 4 }
+"Center" = { x = 4.58333, y = 2.12500, width = 4.16667, height = 5.08333, num_rows = 7 }
+"Upper Right" = { x = 8.87500, y = 0.70833, width = 4.16667, height = 4.37500, num_rows = 6 }
+"Lower Right" = { x = 8.87500, y = 5.66667, width = 4.16667, height = 1.54167, num_rows = 2 }
+
+[locations.3]
+"Upper Left" = { x = 0.29167, y = 0.70833, width = 4.16667, height = 2.25000, num_rows = 3 }
+"Middle Left" = { x = 0.29167, y = 3.54167, width = 4.16667, height = 2.25000, num_rows = 3 }
+"Lower Left" = { x = 0.29167, y = 6.37500, width = 4.16667, height = 0.83333, num_rows = 1 }
+"Center" = { x = 4.58333, y = 2.12500, width = 4.16667, height = 5.08333, num_rows = 7 }
+"Upper Right" = { x = 8.87500, y = 0.70833, width = 4.16667, height = 3.66667, num_rows = 5 }
+"Lower Right" = { x = 8.87500, y = 4.95833, width = 4.16667, height = 2.25000, num_rows = 3 }
+
+[[boxes]]
+page = 1
+location = "Center"
+
+[[boxes]]
+page = 2
+location = "Upper Left"
+
+[[boxes]]
+page = 3
+location = "Lower Right"

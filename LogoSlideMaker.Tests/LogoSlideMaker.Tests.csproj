@@ -54,6 +54,8 @@
     <EmbeddedResource Include="data/simple.toml" />
     <Content Remove="data/text-styles.toml" />
     <EmbeddedResource Include="data/text-styles.toml" />
+    <Content Remove="data/locations.toml" />
+    <EmbeddedResource Include="data/locations.toml" />
 	<Content Remove="data/include-logos.toml" />
 	<None Remove="data\image-paths.toml" />
 	<None Remove="data\include-logos-duplicate.toml" />
