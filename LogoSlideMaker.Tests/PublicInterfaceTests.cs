@@ -2,6 +2,7 @@
 using LogoSlideMaker.Public;
 using LogoSlideMaker.Tests.Helpers;
 using System.Reflection;
+using System.Xml.Serialization;
 
 namespace LogoSlideMaker.Tests
 {
@@ -108,6 +109,22 @@ namespace LogoSlideMaker.Tests
 
             // Then: Has 4 image paths
             Assert.That(paths, Has.Count.EqualTo(4));
+        }
+
+        [Test]
+        public void TextStyles()
+        {
+            // Given: A definition which defines text styles
+            var definition = Loader.Load(GetStream("text-styles.toml"));
+
+            // When: Getting the styles through the default variant
+            var styles = definition.Variants[0].TextStyles;
+
+            // Then: The values are as expected
+            Assert.That(styles[Models.TextSyle.Logo].FontName,Is.EqualTo("Logo Font"));
+            Assert.That(styles[Models.TextSyle.Logo].FontColor,Is.EqualTo("111111"));
+            Assert.That(styles[Models.TextSyle.BoxTitle].FontSize,Is.EqualTo(24));
+            Assert.That(styles[Models.TextSyle.BoxTitle].FontName,Is.EqualTo("Segoe UI"));
         }
     }
 }
