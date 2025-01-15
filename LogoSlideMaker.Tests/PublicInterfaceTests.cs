@@ -143,5 +143,40 @@ namespace LogoSlideMaker.Tests
 
             // TODO: Need to test numrows somehow
         }
+
+        [Test]
+        [Explicit("Failing test for #55")]
+        public void BoxTitleLanguage()
+        {
+            // Given: A definition with a localized variant
+            var definition = Loader.Load(GetStream("lang.toml"));
+
+            // When: Getting primitives for 2nd variant
+            var primitives = definition.Variants[1].GeneratePrimitives(new TestImageSource()).ToList();
+
+            Assert.Multiple(()=>
+            {
+                // Then: Box title is in language two
+                Assert.That(
+                    primitives
+                    .Where(x=> x is TextPrimitive)
+                    .Cast<TextPrimitive>()
+                    .Where(x=>x.Style == Models.TextSyle.BoxTitle)
+                    .Single().Text,
+                    Is.EqualTo("title two")
+                );
+
+                // And: Logo title is in language two
+                Assert.That(
+                    primitives
+                    .Where(x=> x is TextPrimitive)
+                    .Cast<TextPrimitive>()
+                    .Where(x=>x.Style == Models.TextSyle.Logo)
+                    .Single().Text,
+                    Is.EqualTo("logo two")
+                );
+            });
+
+        }
     }
 }
