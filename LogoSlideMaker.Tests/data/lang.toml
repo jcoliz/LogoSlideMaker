@@ -1,0 +1,19 @@
+﻿[render]
+title_height = 10
+
+[[variants]]
+name = "vsariant one"
+
+[[variants]]
+name = "variant two"
+lang = "two"
+
+[[boxes]]
+title = "title one"
+outer = { x = 100, y = 100 }
+lang.two = "title two"
+logos.1 = [ "zero" ]
+
+[logos.zero]
+title = "logo one"
+lang.two = "logo two"

@@ -36,7 +36,10 @@ internal class LayoutEngine(Definition definition, Variant variant)
             .Where(x => !string.IsNullOrWhiteSpace(x.Title) && x.Outer != null)
             .Select(x => new TextLayout()
             {
-                Text = x.Title,
+                Text = 
+                    variant.Lang is not null && x.Lang.TryGetValue(variant.Lang, out var loctitle) 
+                    ? loctitle 
+                    : x.Title,
                 TextSyle = TextSyle.BoxTitle,
                 // Titles have their bottom edge aligned with the top edge of the box
                 Position = new Edge()
@@ -60,6 +63,7 @@ internal class LayoutEngine(Definition definition, Variant variant)
         // Collect boxes and rows into boxlayouts
 
         // Add well-defined boxes
+        // TODO: #55 Localize box title here too
         var boxes =
             definition.Boxes
                 .Where(x => BoxIncludedInVariant(x))
@@ -233,7 +237,13 @@ internal class LayoutEngine(Definition definition, Variant variant)
             .TakeWhile(x=>x.Command != Commands.End)
             .Select((x,i)=>(logo:LookupLogo(x.Id),column:i))
             .Where(x=> LogoShownInVariant(x.logo))
-            .Select(x=>new LogoLayout() { Logo = x.logo, X = row.XPosition + x.column * row.Spacing , Y = row.YPosition, DefaultTextWidth = variant.TextWidth });
+            .Select(x=>new LogoLayout() 
+            { 
+                Logo = x.logo, 
+                X = row.XPosition + x.column * row.Spacing , 
+                Y = row.YPosition, 
+                DefaultTextWidth = variant.TextWidth 
+            });
 
         // If row ends up being empty, we still need to placehold vertical space for it
         return layout.Any() ? layout : [ new() { Y = row.YPosition } ];
@@ -381,6 +391,10 @@ internal class LayoutEngine(Definition definition, Variant variant)
         {
             logo = new Logo() { Title = $"Missing Logo: {Id}" };
             definition.Logos[Id] = logo;
+        }
+        if (variant.Lang is not null && logo.Lang.TryGetValue(variant.Lang, out var logoLang))
+        {
+            return logo with { Title = logoLang };
         }
         return logo;
     }
