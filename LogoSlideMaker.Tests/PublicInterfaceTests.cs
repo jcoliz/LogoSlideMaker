@@ -145,13 +145,12 @@ namespace LogoSlideMaker.Tests
         }
 
         [Test]
-        [Explicit("Failing test for #55")]
         public void BoxTitleLanguage()
         {
             // Given: A definition with a localized variant
             var definition = Loader.Load(GetStream("lang.toml"));
 
-            // When: Getting primitives for 2nd variant
+            // When: Getting primitives for 2nd variant (which is localized)
             var primitives = definition.Variants[1].GeneratePrimitives(new TestImageSource()).ToList();
 
             Assert.Multiple(()=>
@@ -178,5 +177,40 @@ namespace LogoSlideMaker.Tests
             });
 
         }
+
+        [Test]
+        public void BoxTitleMainLanguage()
+        {
+            // Given: A definition with a localized variant
+            var definition = Loader.Load(GetStream("lang.toml"));
+
+            // When: Getting primitives for 1st variant (which is not localized)
+            var primitives = definition.Variants[0].GeneratePrimitives(new TestImageSource()).ToList();
+
+            Assert.Multiple(()=>
+            {
+                // Then: Box title is in language one
+                Assert.That(
+                    primitives
+                    .Where(x=> x is TextPrimitive)
+                    .Cast<TextPrimitive>()
+                    .Where(x=>x.Style == Models.TextSyle.BoxTitle)
+                    .Single().Text,
+                    Is.EqualTo("title one")
+                );
+
+                // And: Logo title is in language two
+                Assert.That(
+                    primitives
+                    .Where(x=> x is TextPrimitive)
+                    .Cast<TextPrimitive>()
+                    .Where(x=>x.Style == Models.TextSyle.Logo)
+                    .Single().Text,
+                    Is.EqualTo("logo one")
+                );
+            });
+
+        }
+
     }
 }
