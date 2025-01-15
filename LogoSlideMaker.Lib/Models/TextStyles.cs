@@ -8,7 +8,18 @@
 /// </remarks>
 public enum TextSyle
 {
+    /// <summary>
+    /// The text is not to be drawn
+    /// </summary>
     Invisible = 0,
+
+    /// <summary>
+    /// Text annotating a logo
+    /// </summary>
     Logo = 1,
+
+    /// <summary>
+    /// Text annotating a group of logos
+    /// </summary>
     BoxTitle = 2
 }

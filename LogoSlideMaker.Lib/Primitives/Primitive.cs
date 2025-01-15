@@ -5,7 +5,23 @@ namespace LogoSlideMaker.Primitives;
 /// <summary>
 /// Conceptually what does this primitive represent
 /// </summary>
-public enum PrimitivePurpose { Base = 0, Background, Extents }
+public enum PrimitivePurpose 
+{
+    /// <summary>
+    /// Primitive is fundamental to all visualizations and should always be included
+    /// </summary>
+    Base = 0, 
+
+    /// <summary>
+    /// Primitive forms the background, so would not be included if background is coming from slide template
+    /// </summary>
+    Background, 
+
+    /// <summary>
+    /// Primitive displays the extents of bounding regions, which user may decide to show or hide
+    /// </summary>
+    Extents 
+}
 
 /// <summary>
 /// Base drawing primitive
@@ -28,8 +44,14 @@ public record Primitive
 /// </summary>
 public record TextPrimitive: Primitive
 {
+    /// <summary>
+    /// The text to be drawn
+    /// </summary>
     public string Text { get; init; } = string.Empty;
 
+    /// <summary>
+    /// The style in which to draw the text
+    /// </summary>
     public TextSyle Style { get; init; } = TextSyle.Invisible;
 }
 

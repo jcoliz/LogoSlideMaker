@@ -2,6 +2,9 @@
 
 namespace LogoSlideMaker.Utilities;
 
+/// <summary>
+/// Provides introspection into current git project at a given path
+/// </summary>
 public static class GitVersion
 {
     /// <summary>
@@ -17,7 +20,7 @@ public static class GitVersion
     /// null: When the <paramref name="path"/> is not contained in any repo
     /// </remarks>
     /// <param name="path">Directory path to look in</param>
-    /// <returns></returns>
+    /// <returns>The applicable git version</returns>
     public static string? GetForDirectory(string path)
     {
         var root = GetRepositoryRootForDirectory(path);

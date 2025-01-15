@@ -21,7 +21,7 @@ internal record RenderConfig
     public decimal TextHeight { get; set; } = 0.5m;
 
     /// <summary>
-    /// Width & height of square icons, in inches
+    /// Width &amp; height of square icons, in inches
     /// </summary>
 
     public decimal IconSize { get; set; } = 0.5m;

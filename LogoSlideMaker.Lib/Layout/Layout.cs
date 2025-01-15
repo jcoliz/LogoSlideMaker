@@ -48,7 +48,7 @@ internal class LayoutEngine(Definition definition, Variant variant)
                 }
             });
 
-        return new SlideLayout() { Variant = variant, Logos = logos.ToArray(), Text = text.ToArray() };
+        return new SlideLayout() { Variant = variant, Logos = [ ..logos ], Text = [ ..text] };
     }
 
     /// <summary>
@@ -113,11 +113,9 @@ internal class LayoutEngine(Definition definition, Variant variant)
         decimal YPosition = 0m;
         if (box.YPosition is null && box.Outer?.Y is null)
         {
-            var last = layouts.LastOrDefault();
-            if (last is null)
-            {
+            var last = layouts.LastOrDefault() ??
                 throw new ApplicationException("Must set explicit YPosition on first box");
-            }
+
             YPosition = last.Y + definition.Layout.LineSpacing + definition.Layout.BoxSpacing;
         }
 
@@ -128,9 +126,11 @@ internal class LayoutEngine(Definition definition, Variant variant)
     /// <summary>
     /// Layout a single box
     /// </summary>
+    /// <param name="box">The box being laid out</param>
     /// <param name="YPosition">
     /// Default yposition to use if box has no intrinsic position defined
     /// </param>
+    /// <returns>THe decomposed logolayouts for that box</returns>
     private IEnumerable<LogoLayout> LayoutBox(Box box, decimal YPosition)
     {
         var logos = box.Logos
@@ -242,8 +242,8 @@ internal class LayoutEngine(Definition definition, Variant variant)
     /// <summary>
     /// Transform to entries, and filter out non-included entries
     /// </summary>
-    /// <param name="row"></param>
-    /// <returns></returns>
+    /// <param name="logos">Which logos to transform</param>
+    /// <returns>Transformed logos</returns>
     private ICollection<Entry> IncludedEntries(IEnumerable<string> logos)
     {
         return logos

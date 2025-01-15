@@ -46,7 +46,7 @@ public partial class App : Application
 
             try
             {
-                ManagementObject os = new ManagementObject("Win32_OperatingSystem=@");
+                ManagementObject os = new("Win32_OperatingSystem=@");
                 logMachineSerial(os["SerialNumber"] as string);
 
                 // https://github.com/microsoft/WindowsAppSDK/issues/4840
@@ -143,7 +143,7 @@ public partial class App : Application
     private readonly IHost? _host;
     private readonly ILogger? _logger;
 
-    [LoggerMessage(Level = LogLevel.Information, EventId = 100, Message = "----------------------------------")]
+    [LoggerMessage(Level = LogLevel.Information, EventId = 100, Message = "---------------------------------- {Location}")]
     public partial void logHello([CallerMemberName] string? location = null);
 
     [LoggerMessage(Level = LogLevel.Information, EventId = 110, Message = "{Location}: OK")]
@@ -155,7 +155,7 @@ public partial class App : Application
     [LoggerMessage(Level = LogLevel.Information, EventId = 101, Message = "{Location}: OS Version {OsVersion}")]
     public partial void logOsVersion(string osversion, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Information, EventId = 101, Message = "{Location}: Machine Serial # {SerialNum}")]
+    [LoggerMessage(Level = LogLevel.Information, EventId = 102, Message = "{Location}: Machine Serial # {SerialNum}")]
     public partial void logMachineSerial(string serialnum, [CallerMemberName] string? location = null);
     
     [LoggerMessage(Level = LogLevel.Debug, EventId = 120, Message = "{Location}: Starting")]
@@ -173,7 +173,7 @@ public partial class App : Application
     [LoggerMessage(Level = LogLevel.Error, EventId = 118, Message = "{Location}: {Moment} Failed")]
     public partial void logFailMoment(string moment, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Critical, EventId = 100, Message = "{Location}: Critical failure")]
+    [LoggerMessage(Level = LogLevel.Critical, EventId = 109, Message = "{Location}: Critical failure")]
     public partial void logCritical(Exception ex, [CallerMemberName] string? location = null);
 
     [LoggerMessage(Level = LogLevel.Critical, EventId = 199, Message = "{Location}: Unhandled XamlParseException Stack: {Stack} Source: {Source}")]

@@ -16,6 +16,14 @@ namespace LogoSlideMaker.Export;
 /// </remarks>
 public static class ExportPipelineEx
 {
+    /// <summary>
+    /// Export a document to a presentation file
+    /// </summary>
+    /// <param name="definition">Document definition</param>
+    /// <param name="imageCache">Source of images</param>
+    /// <param name="templateStream">Source of initial slides template (optional)</param>
+    /// <param name="outputPath">Path to target output file</param>
+    /// <param name="dataVersion">Version to annotate on slides (optional)</param>
     public static void Export(IDefinition definition, ImageCache imageCache, Stream? templateStream, string outputPath, string? dataVersion)
     {
         // Open template or create new presentation

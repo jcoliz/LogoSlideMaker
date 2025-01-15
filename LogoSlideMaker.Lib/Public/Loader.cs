@@ -5,8 +5,18 @@ using Tomlyn;
 
 namespace LogoSlideMaker.Public;
 
+/// <summary>
+/// Manages creation of document definitions
+/// </summary>
 public static class Loader
 {
+    /// <summary>
+    /// Load a document definition from a stream
+    /// </summary>
+    /// <param name="stream">Data containing a TOML definition for a document</param>
+    /// <param name="basePath">Path where the file was located (optional)</param>
+    /// <returns>The loaded document definition</returns>
+    /// <exception cref="Exception">Loading errors</exception>
     public static IDefinition Load(Stream stream, string? basePath = null)
     {
         var sr = new StreamReader(stream);
@@ -28,6 +38,13 @@ public static class Loader
         return new PublicDefinition(definition);
     }
 
+    /// <summary>
+    /// Returns an empty document defintion
+    /// </summary>
+    /// <remarks>
+    /// Useful to avoid having a null reference for 'empty' doc
+    /// </remarks>
+    /// <returns>Empty document definition</returns>
     public static IDefinition Empty()
     {
         return new PublicDefinitionEmpty();

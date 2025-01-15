@@ -558,13 +558,13 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
     [LoggerMessage(Level = LogLevel.Error, EventId = 1008, Message = "{Location}: Failed")]
     public partial void logFail(Exception ex, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Error, EventId = 1008, Message = "{Location}: Failed")]
+    [LoggerMessage(Level = LogLevel.Error, EventId = 1018, Message = "{Location}: Failed")]
     public partial void logFail([CallerMemberName] string? location = null);
 
     [LoggerMessage(Level = LogLevel.Error, EventId = 1038, Message = "{Location}: {Moment} Failed")]
     public partial void logFailMoment(Exception ex, string moment, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Error, EventId = 1038, Message = "{Location}: {Moment} Failed")]
+    [LoggerMessage(Level = LogLevel.Error, EventId = 1048, Message = "{Location}: {Moment} Failed")]
     public partial void logFailMoment(string moment, [CallerMemberName] string? location = null);
 
     [LoggerMessage(Level = LogLevel.Error, EventId = 1058, Message = "{Location}: Failed to set value to {Value}")]
@@ -578,7 +578,7 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
 
     // Application-specific log messages follow
 
-    [LoggerMessage(Level = LogLevel.Error, EventId = 1058, Message = "{Location}: Slide number {Number} out of range {Count}")]
+    [LoggerMessage(Level = LogLevel.Error, EventId = 1059, Message = "{Location}: Slide number {Number} out of range {Count}")]
     public partial void logFailSlideOutoFoRange(int number, int count, [CallerMemberName] string? location = null);
 
     [LoggerMessage(Level = LogLevel.Warning, EventId = 1078, Message = "{Location}: Slide number {Number} out of range {Count}")]
