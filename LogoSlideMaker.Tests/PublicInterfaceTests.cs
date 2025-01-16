@@ -215,7 +215,6 @@ namespace LogoSlideMaker.Tests
         /// Scenario: Loader loads file with title
         /// </summary>
         [Test]
-        [Explicit("Failing test for #60")]
         public void DocumentTitleLanguage()
         {
             // When: Loading a definition with a localized title in a variant
