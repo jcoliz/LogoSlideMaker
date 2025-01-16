@@ -85,7 +85,8 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
                     // TODO: How do we know that the images have been loaded??
                     GeneratePrimitives();
 
-                    OnPropertyChanged();
+                    OnPropertyChanged();                    
+                    OnPropertyChanged(nameof(DocumentTitle));
                     OnPropertyChanged(nameof(DocumentSubtitle));
                 }
             }

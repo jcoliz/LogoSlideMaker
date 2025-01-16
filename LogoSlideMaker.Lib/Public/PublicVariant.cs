@@ -26,7 +26,10 @@ internal class PublicVariant(PublicDefinition definition, Variant variant, int i
 
     public int Index => index;
 
-    public string? DocumentTitle => definition.Definition.Layout.Title;
+    public string? DocumentTitle => 
+        variant.Lang is not null && definition.Definition.Layout.Lang.TryGetValue(variant.Lang, out var loctitle) 
+        ? loctitle 
+        : definition.Definition.Layout.Title;
 
     private SlideLayout? _layout;
 
