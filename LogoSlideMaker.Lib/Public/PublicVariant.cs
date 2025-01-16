@@ -26,36 +26,6 @@ internal class PublicVariant(PublicDefinition definition, Variant variant, int i
 
     public int Index => index;
 
-    public IVariant Next
-    {
-        get
-        {
-            if (index + 1 >= definition.Variants.Count)
-            {
-                return definition.Variants[0];
-            }
-            else
-            {
-                return definition.Variants[index + 1];
-            }
-        }
-    }
-
-    public IVariant Previous
-    {
-        get
-        {
-            if (index == 0)
-            {
-                return definition.Variants[^1];
-            }
-            else
-            {
-                return definition.Variants[index-1];
-            }
-        }
-    }
-
     private SlideLayout? _layout;
 
     /// <summary>

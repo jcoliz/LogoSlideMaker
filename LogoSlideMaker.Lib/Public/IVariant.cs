@@ -39,16 +39,6 @@ public interface IVariant
     int Index { get; }
 
     /// <summary>
-    /// The variant (slide) which follows this one, wrapping around if needed
-    /// </summary>
-    IVariant Next { get; }
-
-    /// <summary>
-    /// The variant (slide) which precedes this one, wrapping around if needed
-    /// </summary>
-    IVariant Previous { get; }
-
-    /// <summary>
     /// Generate the primitives needed to render this slide
     /// </summary>
     /// <param name="bitmaps"></param>
