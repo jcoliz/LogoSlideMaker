@@ -209,8 +209,20 @@ namespace LogoSlideMaker.Tests
                     Is.EqualTo("logo one")
                 );
             });
-
         }
 
+        /// <summary>
+        /// Scenario: Loader loads file with title
+        /// </summary>
+        [Test]
+        [Explicit("Failing test for #60")]
+        public void DocumentTitleLanguage()
+        {
+            // When: Loading a definition with a localized title in a variant
+            var definition = Loader.Load(GetStream("title.toml"));
+
+            // Then: Title is localized when accessed through that variant
+            Assert.That(definition.Variants[1].DocumentTitle, Is.EqualTo("Language Two"));
+        }
     }
 }

@@ -1,2 +1,10 @@
 ﻿[layout]
 title = "Document Title"
+lang.two = "Language Two"
+
+[[variants]]
+name = "one"
+
+[[variants]]
+name = "two"
+lang = "two"
