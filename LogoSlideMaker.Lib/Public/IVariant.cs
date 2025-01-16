@@ -24,6 +24,11 @@ public interface IVariant
     ICollection<string> Notes { get; }
 
     /// <summary>
+    /// Title of the overall document
+    /// </summary>
+    string? DocumentTitle { get; }
+
+    /// <summary>
     /// The slide number upon which this page should be placed
     /// </summary>
     int Source { get; }

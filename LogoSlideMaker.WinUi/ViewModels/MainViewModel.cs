@@ -192,11 +192,11 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
     /// <summary>
     /// Name of the overall document (definition) being shown
     /// </summary>
-    public string DocumentTitle => (_definition.Title, LastOpenedFilePath) switch
+    public string DocumentTitle => (_currentVariant.DocumentTitle, LastOpenedFilePath) switch
     {
         (null, null) => string.Empty,
         (null, _) => Path.GetFileName(LastOpenedFilePath),
-        _ => _definition.Title
+        _ => _currentVariant.DocumentTitle
     };
 
     /// <summary>

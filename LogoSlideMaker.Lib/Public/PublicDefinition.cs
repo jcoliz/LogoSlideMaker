@@ -37,8 +37,6 @@ internal class PublicDefinition : IDefinition
         };
     }
 
-    public string? Title => definition.Layout.Title;
-
     public IList<IVariant> Variants {
         get; private init;
      }

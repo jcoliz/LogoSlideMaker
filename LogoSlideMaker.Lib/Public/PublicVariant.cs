@@ -26,6 +26,8 @@ internal class PublicVariant(PublicDefinition definition, Variant variant, int i
 
     public int Index => index;
 
+    public string? DocumentTitle => definition.Definition.Layout.Title;
+
     private SlideLayout? _layout;
 
     /// <summary>
@@ -157,6 +159,8 @@ internal class PublicVariantEmpty(IDefinition definition, int index) : IVariant
             }
         }
     }
+
+    public string? DocumentTitle => "Untitled";
 
     public ICollection<Primitive> GeneratePrimitives(IGetImageAspectRatio bitmaps) => [];
 }

@@ -31,7 +31,7 @@ namespace LogoSlideMaker.Tests
             var definition = Loader.Load(GetStream("simple.toml"));
 
             // Then: Title is null
-            Assert.That(definition.Title, Is.Null);
+            Assert.That(definition.Variants[0].DocumentTitle, Is.Null);
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace LogoSlideMaker.Tests
             var definition = Loader.Load(GetStream("title.toml"));
 
             // Then: Title is as expected
-            Assert.That(definition.Title, Is.EqualTo("Document Title"));
+            Assert.That(definition.Variants[0].DocumentTitle, Is.EqualTo("Document Title"));
         }
 
         /// <summary>

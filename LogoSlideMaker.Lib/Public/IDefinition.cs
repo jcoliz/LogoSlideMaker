@@ -6,11 +6,6 @@
 public interface IDefinition
 {
     /// <summary>
-    /// Title of the overall document
-    /// </summary>
-    string? Title { get; }
-
-    /// <summary>
     /// The individual slide to be output
     /// </summary>
     IList<IVariant> Variants { get; }
