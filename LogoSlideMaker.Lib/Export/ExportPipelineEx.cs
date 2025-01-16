@@ -121,7 +121,20 @@ internal class ExportRenderEngineEx(Presentation pres, IVariant variant, ImageCa
                     para.Text = queue.Dequeue();
                 }
             }
-        }        
+        }
+
+        // Fill in title field
+        var docTitle = variant.DocumentTitle;
+        if (!string.IsNullOrWhiteSpace(docTitle))
+        {
+            var title_box = target.TryGetByName<IShape>("Title");
+            if (title_box is not null)
+            {
+                var tf = title_box.TextBox;
+
+                tf.Text = docTitle;
+            }
+        }
     }
 
     private void Draw(Primitive primitive, ISlideShapes target)
