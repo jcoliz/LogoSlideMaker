@@ -1,0 +1,6 @@
+[logos.zero]
+title = "zero"
+
+[logos.one]
+title = "one"
+path = "./one"

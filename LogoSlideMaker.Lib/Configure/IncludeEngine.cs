@@ -18,7 +18,7 @@ internal static class IncludeEngine
     {
         // All the logo keys where we already define primary properties in the target, so
         // we will want to IGNORE them from the source
-        var primary = target.Logos.Where(x => x.Value.HasPrimaryProperties()).Select(x => x.Key).ToHashSet();
+        var primary = target.Logos.Where(x => !string.IsNullOrWhiteSpace(x.Value.Title)).Select(x => x.Key).ToHashSet();
 
         // All the logos which specify overriding properties, focused down to just the overriding properies themselves
         // As we add more overridable properties, we'd update this.
@@ -41,11 +41,6 @@ internal static class IncludeEngine
                 target.Logos[Key] = Value;
             }
         }
-    }
-
-    private static bool HasPrimaryProperties(this Logo logo)
-    {
-        return logo.Path.Length > 0 || logo.Title.Length > 0;
     }
 
     private static bool HasOverridableProperties(this Logo logo)

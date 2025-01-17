@@ -111,6 +111,22 @@ namespace LogoSlideMaker.Tests
             Assert.That(paths, Has.Count.EqualTo(4));
         }
 
+        /// <summary>
+        /// Scenario: Image Paths should not contain empty paths
+        /// </summary>
+        [Test]
+        public void EmptyPathsNotInImagePaths()
+        {
+            // Given: A definition containing a logo with no path specified
+            var definition = Loader.Load(GetStream("image-paths-empty.toml"));
+
+            // When: Getting the image paths
+            var paths = definition.ImagePaths;
+
+            // Then: There are no empty paths
+            Assert.That(paths, Has.None.EqualTo(string.Empty));
+        }
+
         [Test]
         public void TextStyles()
         {

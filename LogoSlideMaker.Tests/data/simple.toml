@@ -3,6 +3,7 @@ default_width = 10
 
 [logos.zero]
 title = "zero"
+path = "zero.svg"
 
 [[boxes]]
 logos.1 = [ "zero", "zero" ]

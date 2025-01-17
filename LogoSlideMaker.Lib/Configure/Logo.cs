@@ -22,7 +22,10 @@ internal record Logo
     /// <summary>
     /// Where to find the image data
     /// </summary>
-    public string Path { get; set; } = string.Empty;
+    /// <remarks>
+    /// If null, then we just want to put a placeholder here for now
+    /// </remarks>
+    public string? Path { get; set; }
 
     /// <summary>
     /// Where to find the image data when displaying on a dark background

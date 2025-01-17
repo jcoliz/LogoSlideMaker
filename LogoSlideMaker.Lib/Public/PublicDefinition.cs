@@ -45,7 +45,7 @@ internal class PublicDefinition : IDefinition
     /// All the image paths we would need to render
     /// </summary>
     public ICollection<string> ImagePaths =>
-        definition.Logos.Select(x => x.Value.Path).Concat(definition.Files.Template.Bitmaps).ToHashSet();
+        definition.Logos.Where(x=>!string.IsNullOrWhiteSpace(x.Value.Path)).Select(x => x.Value.Path!).Concat(definition.Files.Template.Bitmaps).ToHashSet();
 
     public string? OutputFileName => definition.Files.Output;
 
