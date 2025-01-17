@@ -94,10 +94,33 @@ namespace LogoSlideMaker.Tests
             // Then: Has 2 Image Primitives
             Assert.That(primitives.Where(x => x.GetType() == typeof(ImagePrimitive)).Count(), Is.EqualTo(2));
 
-            // Then: Has 2 Image Primitives
+            // Then: Has 2 Text Primitives
             Assert.That(primitives.Where(x => x.GetType() == typeof(TextPrimitive)).Count(), Is.EqualTo(2));
         }
 
+        [Test]
+        public void VariantGenerateEmptyPrimitives()
+        {
+            // Given: A definition with two logos, one of wihch has no image path specified
+            var definition = Loader.Load(GetStream("image-paths-empty.toml"));
+
+            // When: Generating the primitives
+            var primitives = definition.Variants.First().GeneratePrimitives(new TestImageSource());
+
+            // Then: Has 1 Image Primitives
+            Assert.That(primitives.Where(x => x.GetType() == typeof(ImagePrimitive)).Count(), Is.EqualTo(1));
+
+            // And: Has 1 Base Rectangle Primitive
+            Assert.That(
+                primitives
+                .Where(x => x.GetType() == typeof(RectanglePrimitive) && x.Purpose == PrimitivePurpose.Base)
+                .Count(), 
+                Is.EqualTo(1)
+            );
+
+            // And: Has 2 Text Primitives
+            Assert.That(primitives.Where(x => x.GetType() == typeof(TextPrimitive)).Count(), Is.EqualTo(2));
+        }
         [Test]
         public void ImagePaths()
         {
