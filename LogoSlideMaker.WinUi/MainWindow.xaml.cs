@@ -307,9 +307,27 @@ public sealed partial class MainWindow : Window
                 })
                 .ContinueWith(t => 
                 {
+                    if (t.Exception is AggregateException aex)
+                    {
+                        foreach(var ex in aex.InnerExceptions)
+                        {
+                            if (ex is UserErrorException uex)
+                            {
+                                // Ok, we need to get BACK on the ui thread to show this error!!
+                                this.DispatcherQueue.TryEnqueue(async () =>
+                                {
+                                    await ShowErrorAsync(uex);
+                                });
+                            }
+                            else
+                            {
+                                logFailMoment(ex,"Export aggregate");
+                            }
+                        }
+                    }
                     if (t.Exception is not null)
                     {
-                        logFail(t.Exception);
+                        logFailMoment(t.Exception,"Export single exception");
                     }
                     else
                     {
