@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Management;
 using System.Runtime.CompilerServices;
 using LogoSlideMaker.Primitives;
@@ -7,6 +8,7 @@ using LogoSlideMaker.WinUi.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.UI.Xaml;
 using Serilog;
 using Serilog.Formatting.Compact;
@@ -37,7 +39,7 @@ public partial class App : Application
 
         try
         {
-            ILoggerFactory factory = new LoggerFactory().AddSerilog(Log.Logger);
+            var factory = new LoggerFactory().AddSerilog(Log.Logger);
             _logger = factory.CreateLogger<App>();
 
             logHello();
@@ -46,8 +48,11 @@ public partial class App : Application
 
             try
             {
-                ManagementObject os = new("Win32_OperatingSystem=@");
-                logMachineSerial(os["SerialNumber"] as string);
+                var mo = new ManagementObject("Win32_OperatingSystem=@");
+                if (mo["SerialNumber"] is string serial)
+                {
+                    logMachineSerial(serial);
+                }
 
                 // https://github.com/microsoft/WindowsAppSDK/issues/4840
                 //var token = HardwareIdentification.GetPackageSpecificToken(null);
@@ -61,7 +66,7 @@ public partial class App : Application
 
             Application.Current.UnhandledException += Application_UnhandledException;
 
-            this.InitializeComponent();
+            InitializeComponent();
 
             //
             // Set up .NET generic host
@@ -141,7 +146,8 @@ public partial class App : Application
 
     private Window? m_window;
     private readonly IHost? _host;
-    private readonly ILogger? _logger;
+    [SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "This is to quiet logger message warnings")]
+    private ILogger _logger = NullLogger.Instance;
 
     [LoggerMessage(Level = LogLevel.Information, EventId = 100, Message = "---------------------------------- {Location}")]
     public partial void logHello([CallerMemberName] string? location = null);
@@ -170,7 +176,7 @@ public partial class App : Application
     [LoggerMessage(Level = LogLevel.Error, EventId = 118, Message = "{Location}: {Moment} Failed")]
     public partial void logFailMoment(Exception ex, string moment, [CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Error, EventId = 118, Message = "{Location}: {Moment} Failed")]
+    [LoggerMessage(Level = LogLevel.Error, EventId = 128, Message = "{Location}: {Moment} Failed")]
     public partial void logFailMoment(string moment, [CallerMemberName] string? location = null);
 
     [LoggerMessage(Level = LogLevel.Critical, EventId = 109, Message = "{Location}: Critical failure")]

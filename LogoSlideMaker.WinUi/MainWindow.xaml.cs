@@ -56,22 +56,22 @@ public sealed partial class MainWindow : Window
 
         try
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             // Set up view model
-            viewModel.UIAction = x => this.DispatcherQueue.TryEnqueue(() => x());
+            viewModel.UIAction = x => DispatcherQueue.TryEnqueue(() => x());
             viewModel.PropertyChanged += ViewModel_PropertyChanged;
             viewModel.DefinitionLoaded += ViewModel_DefinitionLoaded;
             viewModel.ErrorFound += DisplayViewModelError;
-            this.Root.DataContext = viewModel;
-            this.Title = MainViewModel.AppDisplayName;
-            this.Root.Loaded += Root_Loaded;
+            Root.DataContext = viewModel;
+            Title = MainViewModel.AppDisplayName;
+            Root.Loaded += Root_Loaded;
 
             // Set up app window
             var dpi = GetDpiForWindow(hWnd);
-            this.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32(dpi * viewModel.PlatenSize.Width / 96, dpi * (viewModel.PlatenSize.Height + (int)commandBar.Height) / 96));
-            this.AppWindow.SetIcon("Assets/app-icon.ico");
-            this.AppWindow.Closing += CloseApp;
+            AppWindow.ResizeClient(new Windows.Graphics.SizeInt32(dpi * viewModel.PlatenSize.Width / 96, dpi * (viewModel.PlatenSize.Height + (int)commandBar.Height) / 96));
+            AppWindow.SetIcon("Assets/app-icon.ico");
+            AppWindow.Closing += CloseApp;
 
             logAppVersion(viewModel.BuildVersion);
 
@@ -88,7 +88,7 @@ public sealed partial class MainWindow : Window
         // Reload last-used definition
         try
         {
-            await this.viewModel.ReloadDefinitionAsync();
+            await viewModel.ReloadDefinitionAsync();
 
             logOkMoment("Reload");
         }
@@ -104,13 +104,13 @@ public sealed partial class MainWindow : Window
 
     private void ViewModel_DefinitionLoaded(object? sender, EventArgs e)
     {
-        var enqueued = this.DispatcherQueue.TryEnqueue(() =>
+        var enqueued = DispatcherQueue.TryEnqueue(() =>
         {
             // Set up bitmap cache
             bitmapCache.BaseDirectory = Path.GetDirectoryName(viewModel.LastOpenedFilePath);
 
             // TODO: https://microsoft.github.io/Win2D/WinUI2/html/LoadingResourcesOutsideCreateResources.htm
-            this.CreateResources(this.canvas);
+            CreateResources(canvas);
         });
 
         if (!enqueued)
@@ -142,7 +142,7 @@ public sealed partial class MainWindow : Window
 
     private void DisplayViewModelError(object? sender, ViewModels.UserErrorEventArgs e)
     {
-        var enqueued = this.DispatcherQueue.TryEnqueue(() =>
+        var enqueued = DispatcherQueue.TryEnqueue(() =>
         {
             ShowErrorAsync(e.Title, e.Details).ContinueWith(t =>
             {
@@ -166,7 +166,7 @@ public sealed partial class MainWindow : Window
             Title = title,
             Content = details,
             CloseButtonText = "OK",
-            XamlRoot = this.Root.XamlRoot
+            XamlRoot = Root.XamlRoot
         };
 
         var _ = await dialog.ShowAsync();
@@ -314,7 +314,7 @@ public sealed partial class MainWindow : Window
                             if (ex is UserErrorException uex)
                             {
                                 // Ok, we need to get BACK on the ui thread to show this error!!
-                                this.DispatcherQueue.TryEnqueue(async () =>
+                                DispatcherQueue.TryEnqueue(async () =>
                                 {
                                     await ShowErrorAsync(uex);
                                 });
@@ -378,7 +378,8 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "UI system requires calling with instance")]
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Windows requires a member method here")]
+    [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "It really is required!")]
     private void OpenLogsFolder(ContentDialog _, ContentDialogButtonClickEventArgs __)
     {
         Process.Start("explorer.exe", MainViewModel.LogsFolder);
@@ -560,55 +561,55 @@ public sealed partial class MainWindow : Window
     #region Logging
 
     [LoggerMessage(Level = LogLevel.Information, EventId = 2000, Message = "{Location}: OK")]
-    public partial void logOk([CallerMemberName] string? location = null);
+    public partial void logOk([CallerMemberName] string? location = "");
 
     [LoggerMessage(Level = LogLevel.Information, EventId = 2010, Message = "{Location}: OK {Path}")]
-    public partial void logOkPath(string path, [CallerMemberName] string? location = null);
+    public partial void logOkPath(string path, [CallerMemberName] string? location = "");
 
     [LoggerMessage(Level = LogLevel.Information, EventId = 2020, Message = "{Location}: {Moment} OK")]
-    public partial void logOkMoment(string moment, [CallerMemberName] string? location = null);
+    public partial void logOkMoment(string moment, [CallerMemberName] string? location = "");
 
     [LoggerMessage(Level = LogLevel.Information, EventId = 2030, Message = "{Location}: {Moment} OK {Path}")]
-    public partial void logOkMomentPath(string moment, string path, [CallerMemberName] string? location = null);
+    public partial void logOkMomentPath(string moment, string path, [CallerMemberName] string? location = "");
 
     [LoggerMessage(Level = LogLevel.Information, EventId = 2040, Message = "{Location}: OK {Title} {Details}")]
-    public partial void logOkTitleDetails(string title, string details, [CallerMemberName] string? location = null);
+    public partial void logOkTitleDetails(string title, string details, [CallerMemberName]string? location = "");
 
     [LoggerMessage(Level = LogLevel.Information, EventId = 2001, Message = "{Location}: Version {AppVersion}")]
-    public partial void logAppVersion(string appversion, [CallerMemberName] string? location = null);
+    public partial void logAppVersion(string appversion, [CallerMemberName] string? location = "");
 
     [LoggerMessage(Level = LogLevel.Error, EventId = 2008, Message = "{Location}: Failed")]
-    public partial void logFail(Exception ex, [CallerMemberName] string? location = null);
+    public partial void logFail(Exception ex, [CallerMemberName]string? location = "");
 
     [LoggerMessage(Level = LogLevel.Error, EventId = 2018, Message = "{Location}: Failed")]
-    public partial void logFail([CallerMemberName] string? location = null);
+    public partial void logFail([CallerMemberName] string? location = "");
 
     [LoggerMessage(Level = LogLevel.Error, EventId = 2028, Message = "{Location}: {Moment} Failed")]
-    public partial void logFailMoment(Exception ex, string moment, [CallerMemberName] string? location = null);
+    public partial void logFailMoment(Exception ex, string moment, [CallerMemberName] string? location = "");
 
     [LoggerMessage(Level = LogLevel.Error, EventId = 2038, Message = "{Location}: {Moment} Failed")]
-    public partial void logFailMoment(string moment, [CallerMemberName] string? location = null);
+    public partial void logFailMoment(string moment, [CallerMemberName]string? location = "");
 
     [LoggerMessage(Level = LogLevel.Critical, EventId = 2009, Message = "{Location}: Critical failure")]
-    public partial void logCritical(Exception ex, [CallerMemberName] string? location = null);
+    public partial void logCritical(Exception ex, [CallerMemberName] string? location = "");
 
     [LoggerMessage(Level = LogLevel.Debug, EventId = 2011, Message = "{Location}: Loading...")]
-    public partial void logDebugLoading([CallerMemberName] string? location = null);
+    public partial void logDebugLoading([CallerMemberName] string? location = "");
 
     [LoggerMessage(Level = LogLevel.Debug, EventId = 2012, Message = "{Location}: Skipping, no render config")]
-    public partial void logDebugNoRenderConfig([CallerMemberName] string? location = null);
+    public partial void logDebugNoRenderConfig([CallerMemberName] string? location = "");
 
     [LoggerMessage(Level = LogLevel.Debug, EventId = 2013, Message = "{Location}: Skipping, canvas not loaded")]
-    public partial void logDebugNotLoaded([CallerMemberName] string? location = null);
+    public partial void logDebugNotLoaded([CallerMemberName] string? location = "");
 
     [LoggerMessage(Level = LogLevel.Debug, EventId = 2014, Message = "{Location}: No file chosen")]
-    public partial void logDebugNoFile([CallerMemberName] string? location = null);
+    public partial void logDebugNoFile([CallerMemberName] string? location = "");
 
     [LoggerMessage(Level = LogLevel.Debug, EventId = 2015, Message = "{Location}: No resource load needed at this time")]
-    public partial void logDebugNoLoadNeeded([CallerMemberName] string? location = null);
+    public partial void logDebugNoLoadNeeded([CallerMemberName] string? location = "");
 
     [LoggerMessage(Level = LogLevel.Debug, EventId = 2016, Message = "{Location}: No action taken, because busy")]
-    public partial void logDebugBusy([CallerMemberName] string? location = null);
+    public partial void logDebugBusy([CallerMemberName] string? location = "");
 
     #endregion
 }
