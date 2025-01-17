@@ -18,6 +18,7 @@ dpi = 96
 
 [logos.wine]
 title = "Glass of Wine"
+path = "wine.png"
 
 [logos.wine-svg]
 title = "Glass of Wine (SVG)"
