@@ -5,6 +5,12 @@ using System.Collections.Immutable;
 
 namespace LogoSlideMaker.Public;
 
+/// <summary>
+/// Implements the public IDefinition interface.
+/// </summary>
+/// <remarks>
+/// Marshalls the internal data into the expected public form
+/// </remarks>
 internal class PublicDefinition : IDefinition
 {
     private readonly Definition definition;

@@ -5,6 +5,12 @@ using LogoSlideMaker.Primitives;
 
 namespace LogoSlideMaker.Public;
 
+/// <summary>
+/// Implements the public IVariant interface.
+/// </summary>
+/// <remarks>
+/// Marshalls the internal data into the expected public form
+/// </remarks>
 internal class PublicVariant(PublicDefinition definition, Variant variant, int index) : IVariant
 {
     public string Name => variant.Name;
