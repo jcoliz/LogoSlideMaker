@@ -1,0 +1,9 @@
+﻿[text_styles.Logo]
+size = 10
+name = "Logo Font"
+color = "111111"
+
+[text_styles.BoxTitle]
+size = 24
+name = "Segoe UI"
+color = "222222"

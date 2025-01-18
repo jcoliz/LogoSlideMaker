@@ -167,6 +167,23 @@ namespace LogoSlideMaker.Tests
         }
 
         [Test]
+        [Explicit("Failing test for new feature.")]
+        public void TextStylesNew()
+        {
+            // Given: A definition which defines text styles
+            var definition = Loader.Load(GetStream("text-styles-new.toml"));
+
+            // When: Getting the styles through the default variant
+            var styles = definition.Variants[0].TextStyles;
+
+            // Then: The values are as expected
+            Assert.That(styles[Models.TextSyle.Logo].FontName,Is.EqualTo("Logo Font"));
+            Assert.That(styles[Models.TextSyle.Logo].FontColor,Is.EqualTo("111111"));
+            Assert.That(styles[Models.TextSyle.BoxTitle].FontSize,Is.EqualTo(24));
+            Assert.That(styles[Models.TextSyle.BoxTitle].FontName,Is.EqualTo("Segoe UI"));
+        }
+
+        [Test]
         public void RemapLocations()
         {
             // Given: Loading A definition with locations and boxes that reference them

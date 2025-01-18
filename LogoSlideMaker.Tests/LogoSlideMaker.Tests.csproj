@@ -55,6 +55,8 @@
     <EmbeddedResource Include="data/simple.toml" />
     <Content Remove="data/text-styles.toml" />
     <EmbeddedResource Include="data/text-styles.toml" />
+    <Content Remove="data/text-styles-new.toml" />
+    <EmbeddedResource Include="data/text-styles-new.toml" />
     <Content Remove="data/locations.toml" />
     <EmbeddedResource Include="data/locations.toml" />
 	  <Content Remove="data/lang.toml" />
