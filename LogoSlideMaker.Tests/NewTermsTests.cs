@@ -1,8 +1,6 @@
 using LogoSlideMaker.Primitives;
 using LogoSlideMaker.Public;
 using LogoSlideMaker.Tests.Helpers;
-using System.Reflection;
-using System.Xml.Serialization;
 
 namespace LogoSlideMaker.Tests
 {
@@ -49,6 +47,23 @@ namespace LogoSlideMaker.Tests
                 .Single(x=>x?.Purpose == PrimitivePurpose.Background)!
                 .Path
                 ,Is.EqualTo("1.png"));
+        }
+        
+        [Test]
+        public void VariantsGetNamedLayout()
+        {
+            // Given: Loaded a definition with a mapped background
+            var definition = Loader.Load(GetStream("new-terms.toml"));
+
+            // When: Generating primitives for the second slide
+            var primitives = definition.Variants[1].GeneratePrimitives(new TestImageSource());
+
+            // Then: Seven base rectangle primitives (image placeholders)
+            Assert.That(primitives
+                .Where(x=>x is RectanglePrimitive)
+                .Where(x=>x.Purpose == PrimitivePurpose.Base)
+                .Count()
+                ,Is.EqualTo(7));
         }
     }
 }

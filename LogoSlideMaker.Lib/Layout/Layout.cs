@@ -343,10 +343,18 @@ internal class LayoutEngine(Definition definition, Variant variant)
 
     private bool BoxIncludedInVariant(Box box)
     {
-        if (variant.Pages.Count == 0 && box.Page == 0)
-            return true;
+        if (!string.IsNullOrEmpty(variant.Layout))
+        {
+            // Variant has a layout, ergo ONLY matching boxes are 'in'
+            return box.Layout == variant.Layout;
+        }
+        else
+        {
+            if (variant.Pages.Count == 0 && box.Page == 0)
+                return true;
 
-        return variant.Pages.Contains(box.Page);
+            return variant.Pages.Contains(box.Page);
+        }
     }
 
     /// <summary>
