@@ -21,7 +21,9 @@ internal class PublicDefinition : IDefinition
 
         Variants = definition.Variants.Select((x,i) => new PublicVariant(this,x,i)).Cast<IVariant>().ToImmutableList();
 
-        TextStyles = new Dictionary<TextSyle, ITextStyle>()
+        // Note that we still use built-in default styles by default.
+        // These can be overridden by specifying explicit styles
+        var textStyles = new Dictionary<TextSyle, ITextStyle>()
         {
             { TextSyle.Invisible, new PublicTextStyle() },
             { TextSyle.Logo, new PublicTextStyle(
@@ -35,6 +37,20 @@ internal class PublicDefinition : IDefinition
                 definition.Render.TitleFontColor
             ) },
         };
+
+        foreach(var definedStyle in definition.TextStyles)
+        {
+            if (Enum.TryParse<TextSyle>(definedStyle.Key, out var key))
+            {
+                textStyles[key] = new PublicTextStyle(
+                    definedStyle.Value.Size,
+                    definedStyle.Value.Name,
+                    definedStyle.Value.Color
+                );
+            }
+        }
+
+        TextStyles = textStyles;
     }
 
     public IList<IVariant> Variants {

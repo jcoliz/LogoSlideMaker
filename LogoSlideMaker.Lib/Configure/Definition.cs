@@ -54,6 +54,11 @@ internal record Definition
     /// Multi-line boxes of logo positions describing how the logos are laid out
     /// </summary>
     public List<Box> Boxes { get; set; } = new();
+
+    /// <summary>
+    /// Defined styles for text
+    /// </summary>
+    public Dictionary<string,TextStyle> TextStyles { get; set; } = new();
 }
 
 internal record Location: Rectangle
@@ -62,4 +67,25 @@ internal record Location: Rectangle
     /// Number of rows this location can handle
     /// </summary>
     public int? NumRows { get; set; }
+}
+
+/// <summary>
+/// Defines the appearance of a certain kind of text
+/// </summary>
+internal record TextStyle
+{
+    /// <summary>
+    /// Size in points
+    /// </summary>
+    public decimal Size { get; set; } = 12;
+
+    /// <summary>
+    /// Latin name of font (Should be known to PowerPoint)
+    /// </summary>
+    public string Name { get; set; } = "sans";
+
+    /// <summary>
+    /// Color of font. In 6-digit hex color
+    /// </summary>
+    public string Color { get; set; } = "FFFFFF";
 }
