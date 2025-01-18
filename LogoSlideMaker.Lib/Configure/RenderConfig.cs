@@ -37,12 +37,24 @@ internal record RenderConfig
 
     public string FontColor { get; set; } = "000000";
 
+    /// <remarks>
+    /// Unused. This was needed before we had transparency
+    /// </remarks>
     public string BackgroundColor { get; set; } = "FFFFFF";
 
+    /// <remarks>
+    /// Unused. Bring this back as part of rational styles
+    /// </remarks>
     public string FontColorDark { get; set; } = "FFFFFF";
 
+    /// <remarks>
+    /// Unused. Dark mode never happened.
+    /// </remarks>
     public string BackgroundColorDark { get; set; } = "000000";
 
+    /// <remarks>
+    /// Unused. Dark mode never happened.
+    /// </remarks>
     public string PaddingColorDark { get; set; } = "FFFFFF";
 
     /// <summary>
@@ -60,11 +72,17 @@ internal record RenderConfig
     /// <summary>
     /// In dark mode, how much padding to add around all sides
     /// </summary>
+    /// <remarks>
+    /// Unused
+    /// </remarks>
     public double PaddingDark { get; set; }
 
     /// <summary>
     /// Whether to render in dark mode, else is in light mode
     /// </summary>
+    /// <remarks>
+    /// Unused. And this is totally the wrong way to go about this
+    /// </remarks>
     public bool Dark { get; set; }
 
     /// <summary>
