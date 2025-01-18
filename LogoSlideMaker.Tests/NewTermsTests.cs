@@ -33,5 +33,22 @@ namespace LogoSlideMaker.Tests
             var boxes = definition!.Definition.Boxes.Select(x=>x.Outer!.X);
             Assert.That(boxes,Has.All.GreaterThan(0));
         }
+
+        [Test]
+        public void RendersBackgroundCorrectly()
+        {
+            // Given: Loaded a definition with a mapped background
+            var definition = Loader.Load(GetStream("new-terms.toml"));
+
+            // When: Generating primitives for the first slide
+            var primitives = definition.Variants[0].GeneratePrimitives(new TestImageSource());
+
+            // Then: Contains a correct background image
+            Assert.That(primitives
+                .Select(x=>x as ImagePrimitive)
+                .Single(x=>x?.Purpose == PrimitivePurpose.Background)!
+                .Path
+                ,Is.EqualTo("1.png"));
+        }
     }
 }
