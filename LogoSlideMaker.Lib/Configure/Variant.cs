@@ -43,22 +43,33 @@ internal record Variant
     /// Which slide # to use as the basis, starting from 0
     /// </summary>
     /// <remarks>
+    /// Obsolete. Use `Background`
+    /// 
     /// In practice, this has become confusing with 'page'. 'Page' tells where to get boxes, 
     /// 'Source' tells us what to put them on. Not super clear. 
     /// 
     /// This came about for the light/dark slides. light/dark need the same boxes, but have
     /// a different background.
     /// </remarks>
-    public int Source { get; set; }
+    public int Source 
+    { 
+        get => Background - 1;
+        set => Background = value + 1;
+    }
+
+    /// <summary>
+    /// Which background slide # to use as the background, starting from 1, or 0 for no background
+    /// </summary>
+    public int Background { get; set; } = 1;
 
     /// <summary>
     /// Which pages of boxes to include
     /// </summary>
-    /// <remarks>W
+    /// <remarks>
     /// If not specificed, will only includes 'loose' boxes, not assigned to any
     /// particular page.
     /// 
-    /// I think page is specified backware. The idea behind having multiple 'pages' here is that we could
+    /// I think page is specified backwards. The idea behind having multiple 'pages' here is that we could
     /// duplicate boxes on multiple different slides. We really haven't been using that, although
     /// it might be a good idea to start.
     /// 
@@ -66,6 +77,15 @@ internal record Variant
     /// box with the same name. This is a more flexible approach anyway.
     /// </remarks>
     public List<int> Pages { get; set; } = new();
+
+    /// <summary>
+    /// What named layout to use on this slide 
+    /// </summary>
+    /// <remarks>
+    /// This replaces the use of numbered pages. If there are no pages and no layout specified,
+    /// then we will just get 'loose' boxes
+    /// </remarks>
+    public string? Layout { get; set; } = null;
 
     /// <summary>
     /// Specification for logo masking

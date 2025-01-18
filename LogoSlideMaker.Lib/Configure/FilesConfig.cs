@@ -14,7 +14,16 @@ internal record FilesConfig
     /// Configuration for what the slides should look like before
     /// logos are added
     /// </summary>
-    public TemplateConfig Template { get; set; } = new();
+    /// <remarks>
+    /// Obsolete. Use Background
+    /// </remarks>
+    public TemplateConfig Template 
+    { 
+        get => Background;
+        set => Background = value;
+    }
+
+    public TemplateConfig Background { get; set;} = new();
 
     /// <summary>
     /// Configuration for what files should be included into this definition
@@ -29,7 +38,13 @@ internal record TemplateConfig
     /// </summary>
     public string? Slides { get; set; }
 
-    public List<string> Bitmaps { get; set; } = new();
+    public List<string> Bitmaps 
+    { 
+        get => Images;
+        set => Images = value;
+    }
+
+    public List<string> Images { get; set; } = new();
 }
 
 internal record IncludeConfig

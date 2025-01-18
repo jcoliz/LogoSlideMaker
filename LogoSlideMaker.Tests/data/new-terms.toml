@@ -1,0 +1,65 @@
+[files]
+background.images = [
+    "1.png",
+    "2.png"
+]
+background.slides = "template.pptx"
+
+[render]
+title_height = 0.5
+title_font_size = 24
+title_font_name = "Segoe UI"
+title_font_color = "222222"
+dpi = 100
+
+[[slides]]
+background = 1
+layout = "first"
+
+[[slides]]
+background = 2
+layout = "second"
+
+[layouts.first]
+"Upper" = { x=1, y=1, width=10, height=2, num_rows=2 }
+"Lower" = { x=1, y=4, width=10, height=4, num_rows=4 }
+
+[layouts.second]
+"Left" = { x=1, y=1, width=6, height=6, num_rows=6 }
+"Right" = { x=8, y=1, width=4, height=6, num_rows=6 }
+
+[[boxes]]
+title = "box 1"
+layout = "first"
+location = "Upper"
+logos.1 = [ "one" ]
+
+[[boxes]]
+title = "box 2"
+layout = "first"
+location = "Lower"
+logos.1 = [ "two", "two" ]
+
+[[boxes]]
+title = "box 3"
+layout = "second"
+location = "Left"
+logos.1 = [ "three", "three", "three" ]
+
+[[boxes]]
+title = "box 4"
+layout = "second"
+location = "Right"
+logos.1 = [ "four", "four", "four", "four" ]
+
+[logos.four]
+title = "four"
+
+[logos.one]
+title = "one"
+
+[logos.two]
+title = "two"
+
+[logos.three]
+title = "three"

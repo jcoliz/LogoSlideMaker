@@ -19,9 +19,23 @@ internal record Definition
     /// <summary>
     /// Variations of the logos which each get their own slide
     /// </summary>
-    public List<Variant> Variants { get; set; } = new();
+    /// <remarks>
+    /// Obsolete. Use `Slides`
+    /// </remarks>
+    public List<Variant> Variants 
+    { 
+        get => Slides;
+        set => Slides = value;
+    }
+
+    /// <summary>
+    /// Variations of the logos which each get their own slide
+    /// </summary>
+    public List<Variant> Slides { get; set; } = new();
 
     public Dictionary<int,Dictionary<string,Location>> Locations { get; set; } = new();
+
+    public Dictionary<string,Dictionary<string,Location>> Layouts { get; set; } = new();
 
     /// <summary>
     /// The actual logos to be displayed, indexed by id

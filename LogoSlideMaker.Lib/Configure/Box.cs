@@ -32,6 +32,8 @@ internal record Box
     /// Which page is this on?
     /// </summary>
     /// <remarks>
+    /// Obsolete. Prefer using `Layout`
+    /// 
     /// Think of a 'page' as a logical grouping of boxes. 
     /// 
     /// This box will be included in the layout if the variants include this page, or
@@ -45,7 +47,15 @@ internal record Box
     public int Page { get; set; }
 
     /// <summary>
-    /// Name of location on this page
+    /// Logical grouping of boxes
+    /// </summary>
+    /// <remarks>
+    /// Replaces `Page`
+    /// </remarks>
+    public string? Layout { get; set; }
+
+    /// <summary>
+    /// Name of location on this page or layout
     /// </summary>
     /// <remarks>
     /// If set, will pull box size/position from central list of locations. 
