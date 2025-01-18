@@ -30,6 +30,9 @@ internal record Logo
     /// <summary>
     /// Where to find the image data when displaying on a dark background
     /// </summary>
+    /// <remarks>
+    /// Unused
+    /// </remarks>
     public string? PathDark { get; set; }
 
     /// <summary>
@@ -52,6 +55,8 @@ internal record Logo
     /// True if this logo only looks good against a light background
     /// </summary>
     /// <remarks>
+    /// Unused
+    ///
     /// Ideally it would be replaces, or at least filled with white when
     /// presented on a dark background.
     /// </remarks>
@@ -61,7 +66,8 @@ internal record Logo
     /// Alt-text to use for the logo
     /// </summary>
     /// <remarks>
-    /// Only used if text in the logo is required for understanding
+    /// Only used if text in the logo is required for understanding, and is not
+    /// repeated in the logo tite
     /// </remarks>
     public string? AltText { get; set; }
 }
