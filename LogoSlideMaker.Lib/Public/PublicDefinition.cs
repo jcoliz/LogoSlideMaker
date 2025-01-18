@@ -87,6 +87,15 @@ internal class PublicDefinition : IDefinition
                 }
             }
 
+            if (definition.Layouts.Count > 0)
+            {
+                if (!string.IsNullOrEmpty(box.Layout) && !string.IsNullOrEmpty(box.Location))
+                {
+                    box.Outer = definition.Layouts[box.Layout][box.Location];
+                    box.NumRows = definition.Layouts[box.Layout][box.Location].NumRows;
+                }
+            }
+
             // If a box has no logos, grab them from first box with same title
             if (box.Logos.Keys.Count == 0)
             {
