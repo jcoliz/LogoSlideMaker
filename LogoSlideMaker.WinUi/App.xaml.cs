@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
 using System.Management;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using LogoSlideMaker.Primitives;
 using LogoSlideMaker.WinUi.Services;
@@ -11,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.UI.Xaml;
 using Serilog;
+using Serilog.Sinks.AzureLogAnalytics;
 using Serilog.Templates;
 using Windows.Storage;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
@@ -27,7 +31,29 @@ public partial class App : Application
     /// </summary>
     public App()
     {
-        Log.Logger = new LoggerConfiguration()
+        Exception? exception = null;
+        LoadedConfig? loadedConfig = null;
+        try
+        {
+            var fileName = ".config.toml";
+            var resourceName = Assembly.GetExecutingAssembly().GetManifestResourceNames().Where(x=>x.EndsWith(fileName)).SingleOrDefault();
+            if (resourceName is not null)
+            {
+                var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
+                if (stream is not null)
+                {
+                    var sr = new StreamReader(stream);
+                    var toml = sr.ReadToEnd();
+                    loadedConfig = Tomlyn.Toml.ToModel<LoadedConfig>(toml);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            exception = ex;
+        }
+
+        var logConfig = new LoggerConfiguration()
             .MinimumLevel.Debug()
             .Enrich.WithProperty("Session", Guid.NewGuid())
             .WriteTo.Debug()
@@ -42,7 +68,21 @@ public partial class App : Application
                 rollingInterval: RollingInterval.Day
             )
 #endif
-            .CreateLogger();
+            ;
+
+            if (loadedConfig?.LogAnalytics?.ConfigSettings is not null && loadedConfig?.LogAnalytics?.Credentials is not null)
+            {
+                logConfig = logConfig
+                    .WriteTo.AzureLogAnalytics(
+                        new ExpressionTemplate(
+                            "{ { SE: Session, SC: SourceContext, LO: Location, ID: EventId, LV: if @l = 'Information' then undefined() else @l, MT: @mt, EX: @x, PR: rest()} }\n"
+                        ),
+                        loadedConfig.LogAnalytics.Credentials,
+                        loadedConfig.LogAnalytics.ConfigSettings
+                    );
+            }
+
+            Log.Logger = logConfig.CreateLogger();
 
         try
         {
@@ -52,6 +92,11 @@ public partial class App : Application
             logHello();
 
             logOsVersion(Environment.OSVersion.Version.ToString());
+
+            if (exception is not null)
+            {
+                _logger.LogError(exception,"Log Setup Failed");
+            }
 
             try
             {
@@ -191,4 +236,15 @@ public partial class App : Application
 
     [LoggerMessage(Level = LogLevel.Critical, EventId = 199, Message = "{Location}: Unhandled XamlParseException Stack: {Stack} Source: {Source}")]
     public partial void logXamlParseException(Exception ex, string? stack, string? source, [CallerMemberName] string? location = null);
+}
+
+internal class LoadedConfig
+{
+    public AzureLogAnalyticsOptions? LogAnalytics { get; set; }
+}
+
+internal class AzureLogAnalyticsOptions
+{
+    public LoggerCredential? Credentials { get; set; }
+    public ConfigurationSettings? ConfigSettings { get; set; }
 }

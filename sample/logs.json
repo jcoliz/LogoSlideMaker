@@ -1,0 +1,7 @@
+[
+    {
+        "TimeGenerated": "2025-01-24T20:18:58.0495323Z",
+        "Message": "---------------------------------- {Location}",
+        "Event": {"TM":"2025-01-24T20:18:58.0495323Z","SE":"4b5d48f6-8969-4fed-b193-19cbad4caea0","SC":"LogoSlideMaker.WinUi.App","LO":".ctor","ID":{"Id":100,"Name":"logHello"},"MT":"---------------------------------- {Location}","PR":{}}
+    }
+]
