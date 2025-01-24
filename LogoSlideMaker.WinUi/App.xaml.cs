@@ -35,7 +35,7 @@ public partial class App : Application
 #if DEBUG
             .WriteTo.File(
                 new ExpressionTemplate(
-                    "{ { TM: @t, SE: Session, SC: SourceContext, LO: Location, ID: EventId, LV: if @l = 'Information' then undefined() else @l, MT: @mt, EX: @x, PR: rest()} }\n"
+                    "{ { TM: UtcDateTime(@t), SE: Session, SC: SourceContext, LO: Location, ID: EventId, LV: if @l = 'Information' then undefined() else @l, MT: @mt, EX: @x, PR: rest()} }\n"
                 ),
                 MainViewModel.LogsFolder+"/log-.json",
                 restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information,
