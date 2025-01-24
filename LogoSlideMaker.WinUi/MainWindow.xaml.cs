@@ -437,7 +437,7 @@ public sealed partial class MainWindow : Window
             // generate the drawing primitives so we can render them.
             viewModel.GeneratePrimitives();
 
-            logOk();
+            logDebugOk();
         }
         catch (Exception ex)
         {
@@ -576,7 +576,7 @@ public sealed partial class MainWindow : Window
     [LoggerMessage(Level = LogLevel.Information, EventId = 2040, Message = "{Location}: OK {Title} {Details}")]
     public partial void logOkTitleDetails(string title, string details, [CallerMemberName]string? location = "");
 
-    [LoggerMessage(Level = LogLevel.Information, EventId = 2001, Message = "{Location}: Version {AppVersion}")]
+    [LoggerMessage(Level = LogLevel.Information, EventId = 2002, Message = "{Location}: Version {AppVersion}")]
     public partial void logAppVersion(string appversion, [CallerMemberName] string? location = "");
 
     [LoggerMessage(Level = LogLevel.Error, EventId = 2008, Message = "{Location}: Failed")]
@@ -593,6 +593,9 @@ public sealed partial class MainWindow : Window
 
     [LoggerMessage(Level = LogLevel.Critical, EventId = 2009, Message = "{Location}: Critical failure")]
     public partial void logCritical(Exception ex, [CallerMemberName] string? location = "");
+
+    [LoggerMessage(Level = LogLevel.Debug, EventId = 2001, Message = "{Location}: OK")]
+    public partial void logDebugOk([CallerMemberName] string? location = "");
 
     [LoggerMessage(Level = LogLevel.Debug, EventId = 2011, Message = "{Location}: Loading...")]
     public partial void logDebugLoading([CallerMemberName] string? location = "");
