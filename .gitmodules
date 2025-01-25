@@ -2,3 +2,6 @@
 	path = submodules/ShapeCrawler
 	url = https://github.com/jcoliz/ShapeCrawler.git
 	branch = issue/671-addpicture-height
+[submodule ".azure/deploy/AzDeploy.Bicep"]
+	path = .azure/deploy/AzDeploy.Bicep
+	url = https://github.com/jcoliz/AzDeploy.Bicep
