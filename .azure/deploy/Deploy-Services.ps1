@@ -14,7 +14,7 @@ Write-Output "Creating Resource Group $ResourceGroup in $Location"
 az group create --name $ResourceGroup --location $Location
 
 Write-Output "Deploying to Resource Group $ResourceGroup"
-$result = az deployment group create --name "Deploy-$(Get-Random)" --resource-group $ResourceGroup --template-file .azure\deploy\azlogs-ingestion.bicep --parameters .azure\deploy\azlogs-ingestion.parameters.json --parameters principalId=$ServicePrincipal | ConvertFrom-Json
+$result = az deployment group create --name "Deploy-$(Get-Random)" --resource-group $ResourceGroup --template-file .azure\deploy\azlogs-serilog.bicep --parameters .azure\deploy\azlogs-serilog.parameters.json --parameters principalId=$ServicePrincipal | ConvertFrom-Json
 
 Write-Output "OK"
 Write-Output ""
