@@ -1,10 +1,10 @@
 ﻿
 using System.Reflection;
+using Azure.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Serilog;
-using Serilog.Templates;
 
 try
 {
@@ -13,7 +13,7 @@ try
         (
             new EmbeddedFileProvider(Assembly.GetExecutingAssembly()), 
             "config.toml", 
-            optional: false, 
+            optional: true,
             reloadOnChange: false
         )
         .Build();
@@ -24,10 +24,19 @@ try
     var idOptions = new IdentityOptions();
     configuration.Bind(IdentityOptions.Section, idOptions);
 
-    var endpoint = logsOptions.EndpointUri!.ToString();
-    var appid = idOptions.AppId.ToString();
+    var credential = new ClientSecretCredential
+    (
+        tenantId: idOptions.TenantId.ToString(),
+        clientId: idOptions.AppId.ToString(),
+        clientSecret: idOptions.AppSecret
+    );
 
     Serilog.Debugging.SelfLog.Enable(Console.Error);
+
+    if (logsOptions.EndpointUri is null)
+    {
+        throw new Exception("Must specify logs endpoint URI");
+    }
 
     var logConfig = new LoggerConfiguration()
         .MinimumLevel.Debug()
@@ -37,24 +46,18 @@ try
             new Serilog.Formatting.Json.JsonFormatter()
         )
         .WriteTo.AzureLogAnalytics(
-//            new ExpressionTemplate(
-//                "{ { SE: Session, SC: SourceContext, LO: Location, ID: EventId, LV: if @l = 'Information' then undefined() else @l, MT: @mt, EX: @x, PR: rest()} }\n"
-//            ),
-//            new Serilog.Formatting.Json.JsonFormatter(),
             new()
             {
-                ClientId = appid,
-                ClientSecret = idOptions.AppSecret,
-                TenantId = idOptions.TenantId.ToString(),
                 ImmutableId = logsOptions.DcrImmutableId,
-                Endpoint = endpoint,
-                StreamName = logsOptions.Stream
+                Endpoint = logsOptions.EndpointUri.GetComponents(UriComponents.SchemeAndServer, UriFormat.UriEscaped),
+                StreamName = logsOptions.Stream,
+                TokenCredential = credential
             },
             new()
             {
                 BufferSize = 5000,
                 BatchSize = 10,
-//                MinLogLevel = Serilog.Events.LogEventLevel.Information,
+                MinLogLevel = Serilog.Events.LogEventLevel.Information,
             }
         );
 
@@ -73,14 +76,12 @@ try
     _logger.LogInformation(1006,"Continue");
     _logger.LogInformation(1006,"Continue");
 
-    Log.CloseAndFlush();
+    await Log.CloseAndFlushAsync();
+
+    // Needs time to settle before process is terminated
+    await Task.Delay(TimeSpan.FromSeconds(2));
 }
 catch (Exception ex)
 {
     Console.Error.WriteLine("ERROR: {0}",ex.Message);
-}
-
-internal class LoadedConfig
-{
-    public IdentityOptions? LogAnalytics { get; set; }
 }
