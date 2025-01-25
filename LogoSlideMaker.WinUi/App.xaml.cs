@@ -30,10 +30,9 @@ public partial class App : Application
     {
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
-            .Enrich.WithProperty("Session", Guid.NewGuid())
             .WriteTo.Debug()
             .WriteTo.File(MainViewModel.LogsFolder+"/log-.txt", rollingInterval: RollingInterval.Day)
-            .WriteToLogAnalyticsIfConfigured()
+            .WriteToLogAnalyticsIfConfigured(out var sessionId)
 #if DEBUG
             .WriteTo.File(
                 new ExpressionTemplate(
@@ -51,7 +50,7 @@ public partial class App : Application
             var factory = new LoggerFactory().AddSerilog(Log.Logger);
             _logger = factory.CreateLogger<App>();
 
-            logHello();
+            logHello(sessionId);
 
             logOsVersion(Environment.OSVersion.Version.ToString());
 
@@ -158,8 +157,8 @@ public partial class App : Application
     [SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "This is to quiet logger message warnings")]
     private ILogger _logger = NullLogger.Instance;
 
-    [LoggerMessage(Level = LogLevel.Information, EventId = 100, Message = "---------------------------------- {Location}")]
-    public partial void logHello([CallerMemberName] string? location = null);
+    [LoggerMessage(Level = LogLevel.Information, EventId = 100, Message = "---------------------------------- {Location}: Starting session {SessionId}")]
+    public partial void logHello(Guid sessionId,[CallerMemberName] string? location = null);
 
     [LoggerMessage(Level = LogLevel.Information, EventId = 110, Message = "{Location}: OK")]
     public partial void logOk([CallerMemberName] string? location = null);

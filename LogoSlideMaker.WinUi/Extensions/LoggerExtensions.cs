@@ -7,7 +7,7 @@ using System.Reflection;
 
 public static class LoggerExtensions
 {
-    public static LoggerConfiguration WriteToLogAnalyticsIfConfigured(this LoggerConfiguration loggerConfiguration)
+    public static LoggerConfiguration WriteToLogAnalyticsIfConfigured(this LoggerConfiguration loggerConfiguration, out Guid sessionId)
     {
         var configuration = new ConfigurationBuilder()
             .AddTomlFile
@@ -27,6 +27,7 @@ public static class LoggerExtensions
 
         if (string.IsNullOrWhiteSpace(idOptions.AppSecret) || logsOptions.EndpointUri is null)
         {
+            sessionId = Guid.Empty;
             return loggerConfiguration;
         }
 
@@ -37,7 +38,9 @@ public static class LoggerExtensions
             clientSecret: idOptions.AppSecret
         );
 
+        sessionId = Guid.NewGuid();
         return loggerConfiguration
+            .Enrich.WithProperty("Session", sessionId)
             .WriteTo.AzureLogAnalytics
             (
                 new()
