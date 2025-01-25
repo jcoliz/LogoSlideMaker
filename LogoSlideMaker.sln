@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogoSlideMaker.WinUi", "Log
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogoSlideMaker.Tests", "LogoSlideMaker.Tests\LogoSlideMaker.Tests.csproj", "{30B438C9-4C66-4F39-A6EF-84C24FAF96EF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzLogs.Serilog", "AzLogs.Serilog\AzLogs.Serilog.csproj", "{E9C1A09C-BCEE-4021-BB46-0CA509A7FC7F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +76,18 @@ Global
 		{30B438C9-4C66-4F39-A6EF-84C24FAF96EF}.Release|ARM64.Build.0 = Release|ARM64
 		{30B438C9-4C66-4F39-A6EF-84C24FAF96EF}.Release|x64.ActiveCfg = Release|x64
 		{30B438C9-4C66-4F39-A6EF-84C24FAF96EF}.Release|x64.Build.0 = Release|x64
+		{E9C1A09C-BCEE-4021-BB46-0CA509A7FC7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9C1A09C-BCEE-4021-BB46-0CA509A7FC7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9C1A09C-BCEE-4021-BB46-0CA509A7FC7F}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{E9C1A09C-BCEE-4021-BB46-0CA509A7FC7F}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{E9C1A09C-BCEE-4021-BB46-0CA509A7FC7F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E9C1A09C-BCEE-4021-BB46-0CA509A7FC7F}.Debug|x64.Build.0 = Debug|Any CPU
+		{E9C1A09C-BCEE-4021-BB46-0CA509A7FC7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9C1A09C-BCEE-4021-BB46-0CA509A7FC7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9C1A09C-BCEE-4021-BB46-0CA509A7FC7F}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{E9C1A09C-BCEE-4021-BB46-0CA509A7FC7F}.Release|ARM64.Build.0 = Release|Any CPU
+		{E9C1A09C-BCEE-4021-BB46-0CA509A7FC7F}.Release|x64.ActiveCfg = Release|Any CPU
+		{E9C1A09C-BCEE-4021-BB46-0CA509A7FC7F}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
