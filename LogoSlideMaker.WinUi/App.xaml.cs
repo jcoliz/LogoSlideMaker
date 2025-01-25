@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
 using System.Management;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using LogoSlideMaker.Primitives;
 using LogoSlideMaker.WinUi.Services;
@@ -31,33 +28,12 @@ public partial class App : Application
     /// </summary>
     public App()
     {
-        Exception? exception = null;
-        LoadedConfig? loadedConfig = null;
-        try
-        {
-            var fileName = ".config.toml";
-            var resourceName = Assembly.GetExecutingAssembly().GetManifestResourceNames().Where(x=>x.EndsWith(fileName)).SingleOrDefault();
-            if (resourceName is not null)
-            {
-                var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
-                if (stream is not null)
-                {
-                    var sr = new StreamReader(stream);
-                    var toml = sr.ReadToEnd();
-                    loadedConfig = Tomlyn.Toml.ToModel<LoadedConfig>(toml);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            exception = ex;
-        }
-
-        var logConfig = new LoggerConfiguration()
+        Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
             .Enrich.WithProperty("Session", Guid.NewGuid())
             .WriteTo.Debug()
             .WriteTo.File(MainViewModel.LogsFolder+"/log-.txt", rollingInterval: RollingInterval.Day)
+            .WriteToLogAnalyticsIfConfigured()
 #if DEBUG
             .WriteTo.File(
                 new ExpressionTemplate(
@@ -68,21 +44,7 @@ public partial class App : Application
                 rollingInterval: RollingInterval.Day
             )
 #endif
-            ;
-
-            if (loadedConfig?.LogAnalytics?.ConfigSettings is not null && loadedConfig?.LogAnalytics?.Credentials is not null)
-            {
-                logConfig = logConfig
-                    .WriteTo.AzureLogAnalytics(
-                        new ExpressionTemplate(
-                            "{ { SE: Session, SC: SourceContext, LO: Location, ID: EventId, LV: if @l = 'Information' then undefined() else @l, MT: @mt, EX: @x, PR: rest()} }\n"
-                        ),
-                        loadedConfig.LogAnalytics.Credentials,
-                        loadedConfig.LogAnalytics.ConfigSettings
-                    );
-            }
-
-            Log.Logger = logConfig.CreateLogger();
+            .CreateLogger();
 
         try
         {
@@ -92,11 +54,6 @@ public partial class App : Application
             logHello();
 
             logOsVersion(Environment.OSVersion.Version.ToString());
-
-            if (exception is not null)
-            {
-                _logger.LogError(exception,"Log Setup Failed");
-            }
 
             try
             {
