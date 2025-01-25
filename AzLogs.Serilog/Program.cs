@@ -24,8 +24,10 @@ try
     var idOptions = new IdentityOptions();
     configuration.Bind(IdentityOptions.Section, idOptions);
 
-    var endpoint = logsOptions.EndpointUri!.ToString()[..^1];
+    var endpoint = logsOptions.EndpointUri!.ToString();
     var appid = idOptions.AppId.ToString();
+
+    Serilog.Debugging.SelfLog.Enable(Console.Error);
 
     var logConfig = new LoggerConfiguration()
         .MinimumLevel.Debug()
@@ -35,9 +37,9 @@ try
             new Serilog.Formatting.Json.JsonFormatter()
         )
         .WriteTo.AzureLogAnalytics(
-            new ExpressionTemplate(
-                "{ { SE: Session, SC: SourceContext, LO: Location, ID: EventId, LV: if @l = 'Information' then undefined() else @l, MT: @mt, EX: @x, PR: rest()} }\n"
-            ),
+//            new ExpressionTemplate(
+//                "{ { SE: Session, SC: SourceContext, LO: Location, ID: EventId, LV: if @l = 'Information' then undefined() else @l, MT: @mt, EX: @x, PR: rest()} }\n"
+//            ),
 //            new Serilog.Formatting.Json.JsonFormatter(),
             new()
             {
@@ -51,7 +53,7 @@ try
             new()
             {
                 BufferSize = 5000,
-                BatchSize = 1,
+                BatchSize = 10,
 //                MinLogLevel = Serilog.Events.LogEventLevel.Information,
             }
         );
