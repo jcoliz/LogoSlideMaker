@@ -383,6 +383,7 @@ public sealed partial class MainWindow : Window
     private void OpenLogsFolder(ContentDialog _, ContentDialogButtonClickEventArgs __)
     {
         Process.Start("explorer.exe", MainViewModel.LogsFolder);
+        logOk();
     }
 
     #endregion
