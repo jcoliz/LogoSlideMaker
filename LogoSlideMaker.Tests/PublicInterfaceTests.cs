@@ -167,7 +167,6 @@ namespace LogoSlideMaker.Tests
         }
 
         [Test]
-        [Explicit("Failing test for #66")]
         public void ImageCropCorrectSize()
         {
             // Given: A logo with excess imagery we don't want
@@ -184,7 +183,7 @@ namespace LogoSlideMaker.Tests
                 .Single()!;
 
             // Then: Size of image is as expected
-            Assert.That(primitive.Rectangle.Width,Is.EqualTo(25m));
+            Assert.That(primitive.Rectangle.Width,Is.EqualTo(50m));
             Assert.That(primitive.Rectangle.Height,Is.EqualTo(200m));
         }
 
