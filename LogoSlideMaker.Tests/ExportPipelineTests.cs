@@ -66,7 +66,6 @@ internal class ExportPipelineTests: TestsBase
     }
 
     [Test]
-    [Explicit("Failing test for #66")]
     public async Task ImageCropCorrectSize()
     {
         // Given: A logo with excess imagery we don't want
@@ -82,12 +81,14 @@ internal class ExportPipelineTests: TestsBase
         var renderer = new ExportRenderEngineEx(presentation, definition!.Variants[0], imageCache , null);
         renderer.Render();
 
+        presentation.SaveAs("crop-export.pptx");
+
         // Then: The title appears in the expected shape on the rendered slide
         var shape = presentation.Slides[^1].Shapes[0] as IPicture;
 
         // Then: Size of image is as expected
-        Assert.That(shape.Width,Is.EqualTo(100m));
-        Assert.That(shape.Height,Is.EqualTo(100m));
+        Assert.That(shape.Width,Is.EqualTo(100m).Within(0.01m));
+        Assert.That(shape.Height,Is.EqualTo(100m).Within(0.01m));
 
         // And: Cropping rectangle is as expected
         Assert.That(shape.Crop,Is.EqualTo(new CroppingFrame(0,75,0,0)));

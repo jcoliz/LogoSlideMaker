@@ -3,6 +3,7 @@ using LogoSlideMaker.Models;
 using LogoSlideMaker.Primitives;
 using LogoSlideMaker.Public;
 using ShapeCrawler;
+using ShapeCrawler.Drawing;
 
 namespace LogoSlideMaker.Export;
 
@@ -206,6 +207,11 @@ internal class ExportRenderEngineEx(Presentation pres, IVariant variant, ImageCa
         pic.Y = primitive.Rectangle.Y ?? 0;
         pic.Width = primitive.Rectangle.Width;
         pic.Height = primitive.Rectangle.Height ?? primitive.Rectangle.Width;
+
+        if (primitive.Crop?.Right > 0)
+        {
+            pic.Crop = new CroppingFrame(0,primitive.Crop.Right * 100m,0,0);
+        }
     }
 
     private static void Draw(RectanglePrimitive primitive, ISlideShapes target)
