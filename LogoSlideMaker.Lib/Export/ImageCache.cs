@@ -32,6 +32,8 @@ public class ImageCache : IGetImageAspectRatio
     }
     private string? _BaseDirectory;
 
+    public Assembly ImagesAssembly { get; set; }
+
     /// <summary>
     /// Load and retain bitmap for each paths if not already present
     /// </summary>
@@ -116,9 +118,10 @@ public class ImageCache : IGetImageAspectRatio
         Stream? stream = null;
         if (BaseDirectory is null)
         {
-            var names = Assembly.GetEntryAssembly()!.GetManifestResourceNames();
+            var assembly = ImagesAssembly ?? Assembly.GetEntryAssembly()!;
+            var names = assembly!.GetManifestResourceNames();
             var resource = names.Where(x => x.Contains($".{filename}")).Single();
-            stream = Assembly.GetEntryAssembly()!.GetManifestResourceStream(resource);
+            stream = assembly.GetManifestResourceStream(resource);
         }
         else
         {

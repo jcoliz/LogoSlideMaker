@@ -65,7 +65,12 @@
     <EmbeddedResource Include="data/new-terms.toml" />
 	  <Content Remove="data/crop.toml" />
     <EmbeddedResource Include="data/crop.toml" />
-
+	  <Content Remove="data/crop-export.toml" />
+    <EmbeddedResource Include="data/crop-export.toml" />
+	  <Content Remove="data/one.svg" />
+    <EmbeddedResource Include="data/one.svg" />
+	  <Content Remove="data/four.svg" />
+    <EmbeddedResource Include="data/four.svg" />
   <Content Remove="data/include-logos.toml" />
   <None Remove="data\image-paths-empty.toml" />
 	<None Remove="data\image-paths.toml" />
