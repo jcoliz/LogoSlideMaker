@@ -1,0 +1,15 @@
+[layout]
+default_width = 10
+
+[logos.one]
+title = "one"
+path = "./one.png"
+crop = { right = 0.8 }
+
+[logos.two]
+title = "two"
+path = "./two.png"
+
+[[boxes]]
+logos.1 = [ "one", "two" ]
+yposition = 0

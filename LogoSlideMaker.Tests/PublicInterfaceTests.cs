@@ -1,6 +1,8 @@
-﻿using LogoSlideMaker.Primitives;
+﻿using LogoSlideMaker.Configure;
+using LogoSlideMaker.Primitives;
 using LogoSlideMaker.Public;
 using LogoSlideMaker.Tests.Helpers;
+using ShapeCrawler.Drawing;
 using System.Reflection;
 using System.Xml.Serialization;
 
@@ -132,6 +134,35 @@ namespace LogoSlideMaker.Tests
 
             // Then: Has 4 image paths
             Assert.That(paths, Has.Count.EqualTo(4));
+        }
+
+        [Test]
+        public void ImageCropLoads()
+        {
+            // Given: A logo with excess imagery we don't want
+            // And: Specifying 'crop` dimensions in the definition
+            var definition = Loader.Load(GetStream("crop.toml")) as PublicDefinition;
+
+            // When: Checking loaded logo
+            var logo = definition!.Definition.Logos["one"];
+
+            // Then: Crop rectangle loaded as expected
+            Assert.That(logo.Crop,Is.EqualTo(new Frame() { Right = 0.8m }));
+        }
+
+        [Test]
+        public void ImageNoCropLoads()
+        {
+            // Given: A logo with excess imagery we don't want
+            // And: Specifying 'crop` dimensions in the definition
+            // When: Loading the definition
+            var definition = Loader.Load(GetStream("crop.toml")) as PublicDefinition;
+
+            // When: Checking a different  logo
+            var logo = definition!.Definition.Logos["two"];
+
+            // Then: Crop rectangle loaded as expected
+            Assert.That(logo.Crop,Is.Null);
         }
 
         /// <summary>
