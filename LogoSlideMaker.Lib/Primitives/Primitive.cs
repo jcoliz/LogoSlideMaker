@@ -64,6 +64,11 @@ public record ImagePrimitive: Primitive
     /// Path to on-disk location of image file
     /// </summary>
     public string Path { get; init; } = string.Empty;
+
+    /// <summary>
+    /// How to crop this image
+    /// </summary>
+    public Frame? Crop { get; init; }
 }
 
 /// <summary>
@@ -78,4 +83,18 @@ public record RectanglePrimitive : Primitive
     /// TODO: Is this even used??
     /// </remarks>
     public bool Fill { get; init; } = false;
+}
+
+/// <summary>
+/// A frame of insets around edges of a rectangle
+/// </summary>
+/// <remarks>
+/// For starters, just supporting right side
+/// </remarks>
+public record Frame
+{
+    /// <summary>
+    /// What amount (0.0-1.0) of the image to remove from the right edge
+    /// </summary>
+    public decimal Right { get; set; }
 }

@@ -1,10 +1,14 @@
 [layout]
 default_width = 10
 
+[render]
+icon_size = 1
+dpi = 100
+
 [logos.one]
 title = "one"
 path = "./one.png"
-crop = { right = 0.8 }
+crop = { right = 0.75 }
 
 [logos.two]
 title = "two"

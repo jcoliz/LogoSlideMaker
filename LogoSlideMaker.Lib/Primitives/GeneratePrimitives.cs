@@ -33,6 +33,13 @@ internal class PrimitivesEngine(RenderConfig config, IGetImageAspectRatio getLog
 
         var exists = logo.Path is not null && getLogoAspect.Contains(logo.Path);
         var aspect = exists ? getLogoAspect.GetAspectRatio(logo.Path!) : 1m;
+
+        // Currently only right-side cropping supported
+        if (logo.Crop?.Right > 0)
+        {
+            aspect *= 1 - logo.Crop.Right;
+        }
+
         var width_factor = (decimal)Math.Sqrt((double)aspect);
         var height_factor = 1.0m / width_factor;
         var icon_width = config.IconSize * width_factor * logo.Scale;
@@ -48,7 +55,7 @@ internal class PrimitivesEngine(RenderConfig config, IGetImageAspectRatio getLog
         if (exists)
         {
             result.Add(
-                new ImagePrimitive() { Rectangle = imageRect, Path = logo.Path! }
+                new ImagePrimitive() { Rectangle = imageRect, Path = logo.Path!, Crop = logo.Crop }
             );
         }
         else

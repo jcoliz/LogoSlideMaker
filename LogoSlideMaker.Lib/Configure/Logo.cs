@@ -78,16 +78,5 @@ internal record Logo
     /// Specifyins what amount of the image should be removed (0.0-1.0) on each
     /// edge
     /// </remarks>
-    public Frame? Crop { get; set; }
-}
-
-/// <summary>
-/// A frame of insets around edges of a rectangle
-/// </summary>
-/// <remarks>
-/// For starters, just supporting right side
-/// </remarks>
-internal record Frame
-{
-    public decimal Right { get; set; }
+    public Primitives.Frame? Crop { get; set; }
 }

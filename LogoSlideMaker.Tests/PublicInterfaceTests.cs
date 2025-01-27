@@ -1,4 +1,5 @@
-﻿using LogoSlideMaker.Configure;
+﻿using DocumentFormat.OpenXml.Linq;
+using LogoSlideMaker.Configure;
 using LogoSlideMaker.Primitives;
 using LogoSlideMaker.Public;
 using LogoSlideMaker.Tests.Helpers;
@@ -147,7 +148,7 @@ namespace LogoSlideMaker.Tests
             var logo = definition!.Definition.Logos["one"];
 
             // Then: Crop rectangle loaded as expected
-            Assert.That(logo.Crop,Is.EqualTo(new Frame() { Right = 0.8m }));
+            Assert.That(logo.Crop,Is.EqualTo(new Frame() { Right = 0.75m }));
         }
 
         [Test]
@@ -163,6 +164,28 @@ namespace LogoSlideMaker.Tests
 
             // Then: Crop rectangle loaded as expected
             Assert.That(logo.Crop,Is.Null);
+        }
+
+        [Test]
+        [Explicit("Failing test for #66")]
+        public void ImageCropCorrectSize()
+        {
+            // Given: A logo with excess imagery we don't want
+            // And: Specifying 'crop` dimensions in the definition
+            var definition = Loader.Load(GetStream("crop.toml")) as PublicDefinition;
+
+            // When: Generating primitives
+            var primitives = definition.Variants[0].GeneratePrimitives(new TestImageSource());
+
+            // And: Examining the primitive for the cropped logo
+            var primitive = primitives
+                .Where(x => x is ImagePrimitive)
+                .Cast<ImagePrimitive>().Where(x => x.Path == "./one.png")
+                .Single()!;
+
+            // Then: Size of image is as expected
+            Assert.That(primitive.Rectangle.Width,Is.EqualTo(25m));
+            Assert.That(primitive.Rectangle.Height,Is.EqualTo(200m));
         }
 
         /// <summary>
