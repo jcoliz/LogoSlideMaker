@@ -187,6 +187,19 @@ namespace LogoSlideMaker.Tests
             Assert.That(primitive.Rectangle.Height,Is.EqualTo(200m));
         }
 
+        [Test]
+        public void LogoCornerLoads()
+        {
+            // Given: A definition with a logo having specified corner radius
+            var definition = Loader.Load(GetStream("corner-radius.toml")) as PublicDefinition;
+
+            // When: Checking loaded logo
+            var logo = definition!.Definition.Logos["zero"];
+
+            // Then: Crop rectangle loaded as expected
+            Assert.That(logo.CornerRadius,Is.EqualTo(0.1m));
+        }
+
         /// <summary>
         /// Scenario: Image Paths should not contain empty paths
         /// </summary>

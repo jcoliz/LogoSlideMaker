@@ -71,6 +71,9 @@
     <EmbeddedResource Include="data/one.svg" />
 	  <Content Remove="data/four.svg" />
     <EmbeddedResource Include="data/four.svg" />
+	  <Content Remove="data/corner-radius.toml" />
+    <EmbeddedResource Include="data/corner-radius.toml" />
+
   <Content Remove="data/include-logos.toml" />
   <None Remove="data\image-paths-empty.toml" />
 	<None Remove="data\image-paths.toml" />

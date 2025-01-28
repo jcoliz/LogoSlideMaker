@@ -79,4 +79,16 @@ internal record Logo
     /// edge
     /// </remarks>
     public Primitives.Frame? Crop { get; set; }
+
+    /// <summary>
+    /// Corner radius for logo image
+    /// </summary>
+    /// <remarks>
+    /// Specified in portion of the standard logo width. This allows corner to
+    /// scale with larger logos.
+    /// 
+    /// e.g. if IconSize is 0.5 inches, and CornerRadius is 0.1, then the corners
+    /// will be 0.05 inches in radius.
+    /// </remarks>
+    public decimal? CornerRadius { get; set; }
 }
