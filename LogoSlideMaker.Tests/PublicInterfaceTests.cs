@@ -174,7 +174,7 @@ namespace LogoSlideMaker.Tests
             var definition = Loader.Load(GetStream("crop.toml")) as PublicDefinition;
 
             // When: Generating primitives
-            var primitives = definition.Variants[0].GeneratePrimitives(new TestImageSource());
+            var primitives = definition!.Variants[0].GeneratePrimitives(new TestImageSource());
 
             // And: Examining the primitive for the cropped logo
             var primitive = primitives

@@ -77,7 +77,7 @@ internal class ExportPipelineTests: TestsBase
 
         // When: Rendering the variant to the presentation
         var imageCache = new ImageCache() { ImagesAssembly = Assembly.GetExecutingAssembly() };
-        await imageCache.LoadAsync(definition.ImagePaths);
+        await imageCache.LoadAsync(definition!.ImagePaths);
         var renderer = new ExportRenderEngineEx(presentation, definition!.Variants[0], imageCache , null);
         renderer.Render();
 
@@ -87,7 +87,7 @@ internal class ExportPipelineTests: TestsBase
         var shape = presentation.Slides[^1].Shapes[0] as IPicture;
 
         // Then: Size of image is as expected
-        Assert.That(shape.Width,Is.EqualTo(100m).Within(0.01m));
+        Assert.That(shape!.Width,Is.EqualTo(100m).Within(0.01m));
         Assert.That(shape.Height,Is.EqualTo(100m).Within(0.01m));
 
         // And: Cropping rectangle is as expected
