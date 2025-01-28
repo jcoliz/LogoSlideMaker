@@ -93,7 +93,6 @@ internal class ExportPipelineTests: TestsBase
     }
 
     [Test]
-    [Explicit("Failing test for #69")]
     public async Task LogoCornerCorrectSize()
     {
         // Given: A definition with a logo having specified corner radius
@@ -114,6 +113,6 @@ internal class ExportPipelineTests: TestsBase
         // Expected corner size to be ...
         // Shape is 200x50 (4:1), corner radius is 10, corner size is 10/(50/2)
         var shape = presentation.Slides[^1].Shapes[0] as IPicture;
-        Assert.That(shape!.CornerSize,Is.EqualTo(10m/25));
+        Assert.That(shape!.CornerSize,Is.EqualTo(40));
     }
 }

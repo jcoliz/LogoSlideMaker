@@ -212,6 +212,12 @@ internal class ExportRenderEngineEx(Presentation pres, IVariant variant, ImageCa
         {
             pic.Crop = new CroppingFrame(0,primitive.Crop.Right * 100m,0,0);
         }
+
+        if (primitive.CornerRadius.HasValue)
+        {
+            pic.GeometryType = Geometry.RoundedRectangle;
+            pic.CornerSize = 100m * primitive.CornerRadius.Value / (Math.Min(pic.Width,pic.Height)/2m);
+        }
     }
 
     private static void Draw(RectanglePrimitive primitive, ISlideShapes target)
