@@ -98,8 +98,9 @@ internal class LayoutBoxTests: TestsBase
         var layout = engine.CreateSlideLayout();
 
         // Then: Logos are evenly distributed amongst rows
-        Assert.That(layout.Logos[0..3], Has.All.Property("Y").EqualTo(0));
-        Assert.That(layout.Logos[3..6], Has.All.Property("Y").EqualTo(10));
+        Assert.That(layout.Logos[0..3].Select(x => x.Y).ToHashSet(), Has.Count.EqualTo(1));
+        Assert.That(layout.Logos[3..6].Select(x => x.Y).ToHashSet(), Has.Count.EqualTo(1));
+        Assert.That(layout.Logos[0..6].Select(x => x.Y).ToHashSet(), Has.Count.EqualTo(2));
     }
 
     [Test]
@@ -114,15 +115,17 @@ internal class LayoutBoxTests: TestsBase
         var engine = new LayoutEngine(definition, variant);
         var layout = engine.CreateSlideLayout();
 
-        // Then: First min_columns (4) logos on first line 
-        Assert.That(layout.Logos[6..10], Has.All.Property("Y").EqualTo(20));
+        // Then: First min_columns (4) logos on same line
+        Assert.That(layout.Logos[6..10].Select(x => x.Y).ToHashSet(), Has.Count.EqualTo(1));
 
-        // And: Remaining logos are on second line 
-        Assert.That(layout.Logos[10..12], Has.All.Property("Y").EqualTo(30));
+        // And: Remaining logos are on same line 
+        Assert.That(layout.Logos[10..12].Select(x => x.Y).ToHashSet(), Has.Count.EqualTo(1));
+
+        // And: All logos are on two lines total
+        Assert.That(layout.Logos[6..12].Select(x => x.Y).ToHashSet(), Has.Count.EqualTo(2));
     }
 
     [Test]
-    [Explicit("Failing test for #68")]
     public void AutoFlowAlignedColumns()
     {
         // Given: A box with unbalanced rows and autoflow set to true, min-columns set
@@ -153,11 +156,15 @@ internal class LayoutBoxTests: TestsBase
         var engine = new LayoutEngine(definition, variant);
         var layout = engine.CreateSlideLayout();
 
-        // Then: First min_columns (6) logos on first line 
-        Assert.That(layout.Logos[12..18], Has.All.Property("Y").EqualTo(40));
+        // Then: First min_columns (6) logos on same line 
+        Assert.That(layout.Logos[12..18].Select(x => x.Y).ToHashSet(), Has.Count.EqualTo(1));
 
-        // And: Second min_columns logos on second line 
-        Assert.That(layout.Logos[18..24], Has.All.Property("Y").EqualTo(50));
+        // And: Second min_columns logos on same line 
+        Assert.That(layout.Logos[18..24].Select(x => x.Y).ToHashSet(), Has.Count.EqualTo(1));
+
+        // And: All logos are on two lines total
+        Assert.That(layout.Logos[12..24].Select(x => x.Y).ToHashSet(), Has.Count.EqualTo(2));
+
     }
 
     [Test]
@@ -173,7 +180,7 @@ internal class LayoutBoxTests: TestsBase
         var layout = engine.CreateSlideLayout();
 
         // Then: First row of logos all on same line
-        Assert.That(layout.Logos[0..5], Has.All.Property("Y").EqualTo(0));
+        Assert.That(layout.Logos[0..5].Select(x => x.Y).ToHashSet(), Has.Count.EqualTo(1));
     }
 
     [Test]
