@@ -52,10 +52,20 @@ internal class PrimitivesEngine(RenderConfig config, IGetImageAspectRatio getLog
             Height = icon_height * config.Dpi
         };
 
+        var corner = logo.CornerRadius.HasValue 
+            ? (decimal?)(logo.CornerRadius.Value * config.Dpi * config.IconSize) 
+            : null;
+
         if (exists)
         {
             result.Add(
-                new ImagePrimitive() { Rectangle = imageRect, Path = logo.Path!, Crop = logo.Crop }
+                new ImagePrimitive() 
+                { 
+                    Rectangle = imageRect, 
+                    Path = logo.Path!, 
+                    Crop = logo.Crop,
+                    CornerRadius = corner
+                }
             );
         }
         else

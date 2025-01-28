@@ -69,6 +69,14 @@ public record ImagePrimitive: Primitive
     /// How to crop this image
     /// </summary>
     public Frame? Crop { get; init; }
+
+    /// <summary>
+    /// Corner radius of image
+    /// </summary>
+    /// <remarks>
+    /// In pixels
+    /// </remarks>
+    public decimal? CornerRadius { get; init; }
 }
 
 /// <summary>

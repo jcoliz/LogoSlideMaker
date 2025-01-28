@@ -200,6 +200,26 @@ namespace LogoSlideMaker.Tests
             Assert.That(logo.CornerRadius,Is.EqualTo(0.1m));
         }
 
+        [Test]
+        public void LogoCornerInPrimitives()
+        {
+            // Given: A definition with a logo having specified corner radius
+            var definition = Loader.Load(GetStream("corner-radius.toml"));
+
+            // When: Generating primitives
+            var primitives = definition.Variants[0].GeneratePrimitives(new TestImageSource());
+
+            // And: Examining the primitive for the logo
+            var primitive = primitives
+                .Where(x => x is ImagePrimitive)
+                .Cast<ImagePrimitive>().Where(x => x.Path == "zero.svg")
+                .First()!;
+
+            // Then: Primitive has expected corner radius value
+            // Expected 5m, 100 dpi * 1 inches * 0.1 radius ratio
+            Assert.That(primitive.CornerRadius,Is.EqualTo(10m));
+        }
+
         /// <summary>
         /// Scenario: Image Paths should not contain empty paths
         /// </summary>
