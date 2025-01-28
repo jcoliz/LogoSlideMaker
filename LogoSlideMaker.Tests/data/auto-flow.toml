@@ -1,6 +1,10 @@
 [layout]
 default_width = 10
-line_spacing = 10
+line_spacing = 0.75
+
+[render]
+icon_size = 0.33
+text_distace = 0.3
 
 [logos.one]
 title = "one"
@@ -12,12 +16,14 @@ tags = [ "exclude" ]
 [[boxes]]
 logos.1 = [ "one", "one", "one", "one", "one" ]
 logos.2 = [ "one" ]
-yposition = 0
+yposition = 0.5
+xposition = 0.5
 auto_flow = true
 
 [[boxes]]
 logos.1 = [ "one", "one", "one", "one", "one" ]
 logos.2 = [ "one" ]
+xposition = 0.5
 min_columns = 4
 auto_flow = true
 
@@ -26,5 +32,6 @@ logos.1 = [ "one", "two", "two", "one", "one", "one", "one", "two", "two", "one"
 logos.2 = [ "one", "one", "two" , "one", "one", "one", "two" ]
 logos.3 = [ "one", "one", "one", "one", "one" ]
 logos.4 = [ "two", "one", "one"  ]
+xposition = 0.5
 min_columns = 6
 auto_flow = true

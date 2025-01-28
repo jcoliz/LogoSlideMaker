@@ -175,6 +175,11 @@ internal class LayoutEngine(Definition definition, Variant variant)
         {
             num_cols = box.MinColumns;
         }
+        else
+        {
+            // If it's MORE than min-columns, update the box
+            box.MinColumns = num_cols;
+        }
 
         var result = new List<List<string>>();
         var current = new List<string>();
