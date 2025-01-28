@@ -32,7 +32,13 @@ public class ImageCache : IGetImageAspectRatio
     }
     private string? _BaseDirectory;
 
-    public Assembly ImagesAssembly { get; set; }
+    /// <summary>
+    /// Assembly where to get embedded storage values from
+    /// </summary>
+    /// <remarks>
+    /// Optional, else will use entry assembly
+    /// </remarks>
+    public Assembly? ImagesAssembly { get; set; }
 
     /// <summary>
     /// Load and retain bitmap for each paths if not already present
