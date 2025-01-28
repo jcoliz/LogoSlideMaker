@@ -122,6 +122,25 @@ internal class LayoutBoxTests: TestsBase
     }
 
     [Test]
+    [Explicit("Failing test for #68")]
+    public void AutoFlowAlignedColumns()
+    {
+        // Given: A box with unbalanced rows and autoflow set to true, min-columns set
+        // to something which will still cause imbalance (here, 4), and run_rows so
+        // low that the actual cols must be more than min-cols
+        var definition = Load("auto-flow-aligned.toml");
+
+        // When: Creating and populating these into a layout
+        var variant = new Variant();
+        var engine = new LayoutEngine(definition, variant);
+        var layout = engine.CreateSlideLayout();
+
+        // Then: X locations are the same on both rows
+        Assert.That(layout.Logos[10].X, Is.EqualTo(layout.Logos[4].X));
+        Assert.That(layout.Logos[7].X, Is.EqualTo(layout.Logos[1].X));
+    }
+
+    [Test]
     public void AutoFlowMinColumnsTags()
     {
         // Given: A box with unbalanced rows and autoflow set to true, and min-columns set

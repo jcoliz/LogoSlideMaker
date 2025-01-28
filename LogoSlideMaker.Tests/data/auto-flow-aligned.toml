@@ -1,0 +1,15 @@
+[layout]
+line_spacing = 1
+
+[logos.one]
+title = "one"
+
+[[boxes]]
+outer = { x=1, y=1, width=9, height=5 }
+logos.1 = [ 
+    "one", "one", "one", "one", "one", "one", "one", "one", "one", "one",
+    "one",
+     ]
+min_columns = 4
+num_rows = 2
+auto_flow = true

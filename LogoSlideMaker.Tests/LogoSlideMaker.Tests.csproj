@@ -51,6 +51,8 @@
     <EmbeddedResource Include="data/end-tag.toml" />
     <Content Remove="data/auto-flow.toml" />
     <EmbeddedResource Include="data/auto-flow.toml" />
+    <Content Remove="data/auto-flow-aligned.toml" />
+    <EmbeddedResource Include="data/auto-flow-aligned.toml" />
     <Content Remove="data/simple.toml" />
     <EmbeddedResource Include="data/simple.toml" />
     <Content Remove="data/text-styles.toml" />
