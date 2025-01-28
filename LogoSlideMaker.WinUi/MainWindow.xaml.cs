@@ -523,7 +523,12 @@ public sealed partial class MainWindow : Window
         var bitmap = bitmapCache.GetOrDefault(primitive.Path);
         if (bitmap is not null)
         {
-            session.DrawImage(bitmap, primitive.Rectangle.AsWindowsRect(), bitmap.Bounds, 1.0f, CanvasImageInterpolation.HighQualityCubic);
+            var sourceRect = bitmap.Bounds;
+            if (primitive.Crop?.Right > 0)
+            {
+                sourceRect.Width *= 1 - (double)primitive.Crop.Right;
+            }
+            session.DrawImage(bitmap, primitive.Rectangle.AsWindowsRect(), sourceRect, 1.0f, CanvasImageInterpolation.HighQualityCubic);
         }
 
         // Draw a logo bounding box
