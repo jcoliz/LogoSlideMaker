@@ -83,14 +83,37 @@ internal class ExportPipelineTests: TestsBase
 
         presentation.SaveAs("crop-export.pptx");
 
-        // Then: The title appears in the expected shape on the rendered slide
-        var shape = presentation.Slides[^1].Shapes[0] as IPicture;
-
         // Then: Size of image is as expected
+        var shape = presentation.Slides[^1].Shapes[0] as IPicture;
         Assert.That(shape!.Width,Is.EqualTo(100m).Within(0.01m));
         Assert.That(shape.Height,Is.EqualTo(100m).Within(0.01m));
 
         // And: Cropping rectangle is as expected
         Assert.That(shape.Crop,Is.EqualTo(new CroppingFrame(0,75,0,0)));
+    }
+
+    [Test]
+    [Explicit("Failing test for #69")]
+    public async Task LogoCornerCorrectSize()
+    {
+        // Given: A definition with a logo having specified corner radius
+        var definition = Loader.Load(GetStream("corner-radius.toml")) as PublicDefinition;
+
+        // And: A presentation
+        var presentation = new Presentation();
+
+        // When: Rendering the variant to the presentation
+        var imageCache = new ImageCache() { ImagesAssembly = Assembly.GetExecutingAssembly() };
+        await imageCache.LoadAsync(definition!.ImagePaths);
+        var renderer = new ExportRenderEngineEx(presentation, definition!.Variants[0], imageCache , null);
+        renderer.Render();
+
+        presentation.SaveAs("corner-radius.pptx");
+
+        // Then: Cropping rectangle is as expected
+        // Expected corner size to be ...
+        // Shape is 200x50 (4:1), corner radius is 10, corner size is 10/(50/2)
+        var shape = presentation.Slides[^1].Shapes[0] as IPicture;
+        Assert.That(shape!.CornerSize,Is.EqualTo(10m/25));
     }
 }

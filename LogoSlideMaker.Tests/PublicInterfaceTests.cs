@@ -212,12 +212,12 @@ namespace LogoSlideMaker.Tests
             // And: Examining the primitive for the logo
             var primitive = primitives
                 .Where(x => x is ImagePrimitive)
-                .Cast<ImagePrimitive>().Where(x => x.Path == "zero.svg")
+                .Cast<ImagePrimitive>().Where(x => x.Path == "rect-4x1.svg")
                 .First()!;
 
             // Then: Primitive has expected corner radius value
-            // Expected 5m, 100 dpi * 1 inches * 0.1 radius ratio
-            Assert.That(primitive.CornerRadius,Is.EqualTo(10m));
+            // Expected 96 dpi * 1 inches * 0.1 radius ratio
+            Assert.That(primitive.CornerRadius,Is.EqualTo(9.6m));
         }
 
         /// <summary>

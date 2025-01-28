@@ -3,11 +3,11 @@ default_width = 10
 
 [render]
 icon_size = 1
-dpi = 100
+dpi = 96
 
 [logos.zero]
 title = "zero"
-path = "zero.svg"
+path = "rect-4x1.svg"
 corner_radius = 0.1
 
 [[boxes]]
