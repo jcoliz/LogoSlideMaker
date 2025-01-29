@@ -16,7 +16,22 @@ title = "left"
 path = "./left.png"
 crop = { left = 0.75 }
 
+[logos.left-right]
+title = "left-right"
+path = "./left-right.png"
+crop = { left = 0.25, right = 0.25 }
+
+[logos.top-bottom]
+title = "top-bottom"
+path = "./top-bottom.png"
+crop = { top = 0.25, bottom = 0.25 }
+
+[logos.all]
+title = "all"
+path = "./all.png"
+crop = { top = 0.25, bottom = 0.25, left = 0.25, right = 0.25 }
+
 [[boxes]]
 outer = { x = 1, y = 1, width = 10, height = 5 }
-logos.1 = [ "one", "two" ]
+logos.1 = [ "one", "two", "left", "left-right", "top-bottom", "all" ]
 yposition = 0

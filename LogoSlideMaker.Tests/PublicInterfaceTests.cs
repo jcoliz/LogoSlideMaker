@@ -168,6 +168,10 @@ namespace LogoSlideMaker.Tests
         }
 
         [TestCase("./one.png", "[50, 200]")]
+        [TestCase("./left.png", "[50, 200]")]
+        [TestCase("./left-right.png", "[70.71, 141.42]")]
+        [TestCase("./top-bottom.png", "[141.42, 70.71]")]
+        [TestCase("./all.png", "[100, 100]")]
         public void ImageCropCorrectSize(string filename, string dimensionsjson)
         {
             // Given: A logo with excess imagery we don't want
@@ -185,8 +189,8 @@ namespace LogoSlideMaker.Tests
 
             // Then: Size of image is as expected
             var dimensions = JsonSerializer.Deserialize<decimal[]>(dimensionsjson)!;
-            Assert.That(primitive.Rectangle.Width, Is.EqualTo(dimensions[0]));
-            Assert.That(primitive.Rectangle.Height,Is.EqualTo(dimensions[1]));
+            Assert.That(primitive.Rectangle.Width, Is.EqualTo(dimensions[0]).Within(0.01m));
+            Assert.That(primitive.Rectangle.Height,Is.EqualTo(dimensions[1]).Within(0.01m));
         }
 
         [Test]
