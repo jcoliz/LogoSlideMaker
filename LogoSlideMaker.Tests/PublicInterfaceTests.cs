@@ -5,6 +5,7 @@ using LogoSlideMaker.Public;
 using LogoSlideMaker.Tests.Helpers;
 using ShapeCrawler.Drawing;
 using System.Reflection;
+using System.Text.Json;
 using System.Xml.Serialization;
 
 namespace LogoSlideMaker.Tests
@@ -166,8 +167,8 @@ namespace LogoSlideMaker.Tests
             Assert.That(logo.Crop,Is.Null);
         }
 
-        [Test]
-        public void ImageCropCorrectSize()
+        [TestCase("./one.png", "[50, 200]")]
+        public void ImageCropCorrectSize(string filename, string dimensionsjson)
         {
             // Given: A logo with excess imagery we don't want
             // And: Specifying 'crop` dimensions in the definition
@@ -179,12 +180,13 @@ namespace LogoSlideMaker.Tests
             // And: Examining the primitive for the cropped logo
             var primitive = primitives
                 .Where(x => x is ImagePrimitive)
-                .Cast<ImagePrimitive>().Where(x => x.Path == "./one.png")
+                .Cast<ImagePrimitive>().Where(x => x.Path == filename)
                 .Single()!;
 
             // Then: Size of image is as expected
-            Assert.That(primitive.Rectangle.Width,Is.EqualTo(50m));
-            Assert.That(primitive.Rectangle.Height,Is.EqualTo(200m));
+            var dimensions = JsonSerializer.Deserialize<decimal[]>(dimensionsjson)!;
+            Assert.That(primitive.Rectangle.Width, Is.EqualTo(dimensions[0]));
+            Assert.That(primitive.Rectangle.Height,Is.EqualTo(dimensions[1]));
         }
 
         [Test]

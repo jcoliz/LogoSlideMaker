@@ -11,6 +11,11 @@ crop = { right = 0.75 }
 title = "two"
 path = "./two.png"
 
+[logos.left]
+title = "left"
+path = "./left.png"
+crop = { left = 0.75 }
+
 [[boxes]]
 outer = { x = 1, y = 1, width = 10, height = 5 }
 logos.1 = [ "one", "two" ]
