@@ -79,6 +79,8 @@
     <EmbeddedResource Include="data/corner-radius.toml" />
 
   <Content Remove="data/include-logos.toml" />
+
+  <None Remove="data\four.webp" />
   <None Remove="data\image-paths-empty.toml" />
 	<None Remove="data\image-paths.toml" />
 	<None Remove="data\include-logos-duplicate.toml" />
@@ -86,6 +88,8 @@
 	<None Remove="data\title.toml" />
 	<None Remove="data\variant.toml" />
 	<EmbeddedResource Include="data/include-logos.toml" />
+	<EmbeddedResource Include="data\four.webp" />
+	<EmbeddedResource Include="data\webp.toml" />
 	<EmbeddedResource Include="data\image-paths-empty.toml" />
 	<EmbeddedResource Include="data\include-logos-duplicate.toml" />
 	<EmbeddedResource Include="data\render-title.toml" />
