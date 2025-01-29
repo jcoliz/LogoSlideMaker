@@ -524,9 +524,12 @@ public sealed partial class MainWindow : Window
         if (bitmap is not null)
         {
             var sourceRect = bitmap.Bounds;
-            if (primitive.Crop?.Right > 0)
+            if (primitive.Crop?.IsValid == true)
             {
-                sourceRect.Width *= 1 - (double)primitive.Crop.Right;
+                sourceRect.X += sourceRect.Width * (double)primitive.Crop.Left;
+                sourceRect.Y += sourceRect.Height * (double)primitive.Crop.Top;
+                sourceRect.Width *= 1 - (double)primitive.Crop.Right - (double)primitive.Crop.Left;
+                sourceRect.Height *= 1 - (double)primitive.Crop.Top - (double)primitive.Crop.Bottom;
             }
             session.DrawImage(bitmap, primitive.Rectangle.AsWindowsRect(), sourceRect, 1.0f, CanvasImageInterpolation.HighQualityCubic);
         }
