@@ -90,6 +90,8 @@ internal class ExportPipelineTests: TestsBase
 
         // And: Cropping rectangle is as expected
         Assert.That(shape.Crop,Is.EqualTo(new CroppingFrame(0,75,0,0)));
+
+        // TODO: Tests for other cropping edges
     }
 
     [Test]

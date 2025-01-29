@@ -208,9 +208,15 @@ internal class ExportRenderEngineEx(Presentation pres, IVariant variant, ImageCa
         pic.Width = primitive.Rectangle.Width;
         pic.Height = primitive.Rectangle.Height ?? primitive.Rectangle.Width;
 
-        if (primitive.Crop?.Right > 0)
+        if (primitive.Crop?.IsValid == true)
         {
-            pic.Crop = new CroppingFrame(0,primitive.Crop.Right * 100m,0,0);
+            pic.Crop = new CroppingFrame
+            (
+                primitive.Crop.Left * 100m, 
+                primitive.Crop.Right * 100m,
+                primitive.Crop.Top * 100m,
+                primitive.Crop.Bottom * 100m
+            );
         }
 
         if (primitive.CornerRadius.HasValue)
