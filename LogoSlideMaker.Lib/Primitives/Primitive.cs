@@ -96,13 +96,36 @@ public record RectanglePrimitive : Primitive
 /// <summary>
 /// A frame of insets around edges of a rectangle
 /// </summary>
-/// <remarks>
-/// For starters, just supporting right side
-/// </remarks>
 public record Frame
 {
     /// <summary>
-    /// What amount (0.0-1.0) of the image to remove from the right edge
+    /// What amount (0.0-1.0) of the reectangle to inset from the right edge
     /// </summary>
     public decimal Right { get; set; }
+
+    /// <summary>
+    /// What amount (0.0-1.0) of the reectangle to inset from the left edge
+    /// </summary>
+    public decimal Left { get; set; }
+
+    /// <summary>
+    /// What amount (0.0-1.0) of the reectangle to inset from the top edge
+    /// </summary>
+    public decimal Top { get; set; }
+
+    /// <summary>
+    /// What amount (0.0-1.0) of the reectangle to inset from the bottom edge
+    /// </summary>
+    public decimal Bottom { get; set; }
+
+    /// <summary>
+    /// Whether this frame contains valid values
+    /// </summary>
+    public bool IsValid =>
+        Right >= 0m && Right <= 1m &&
+        Left >= 0m && Left <= 1m &&
+        Top >= 0m && Top <= 1m &&
+        Bottom >= 0m && Bottom <= 1m &&
+        (Left + Right) < 1m &&
+        (Top + Bottom) < 1m;
 }

@@ -7,11 +7,26 @@ title = "four"
 path = "four.svg"
 crop = { right = 0.75 }
 
+[logos.four-left]
+title = "four-left"
+path = "four.svg"
+crop = { left = 0.75 }
+
+[logos.four-left-right]
+title = "four-left-right"
+path = "four.svg"
+crop = { left = 0.25, right = 0.25 }
+
+[logos.four-lrtb]
+title = "four-lrtb"
+path = "four.svg"
+crop = { left = 0.25, right = 0.25, top = 0.25, bottom = 0.25 }
+
 [logos.one]
 title = "one"
 path = "one.svg"
 
 [[boxes]]
 outer = { x = 1, y = 1, width = 10, height = 5 }
-logos.1 = [ "four", "one" ]
+logos.1 = [ "four", "four-left", "four-left-right", "four-lrtb", "one" ]
 yposition = 0
