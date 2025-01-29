@@ -91,7 +91,23 @@ internal class ExportPipelineTests: TestsBase
         // And: Cropping rectangle is as expected
         Assert.That(shape.Crop,Is.EqualTo(new CroppingFrame(0,75,0,0)));
 
-        // TODO: Tests for other cropping edges
+        // And: Size/cropping of image with left-edge cropping is as expected 
+        shape = presentation.Slides[^1].Shapes[2] as IPicture;
+        Assert.That(shape!.Width, Is.EqualTo(100m).Within(0.01m));
+        Assert.That(shape.Height, Is.EqualTo(100m).Within(0.01m));
+        Assert.That(shape.Crop, Is.EqualTo(new CroppingFrame(75, 0, 0, 0)));
+
+        // And: Size/cropping of image with left-right-edge cropping is as expected 
+        shape = presentation.Slides[^1].Shapes[4] as IPicture;
+        Assert.That(shape!.Width, Is.EqualTo(141.42m).Within(0.01m));
+        Assert.That(shape.Height, Is.EqualTo(70.71m).Within(0.01m));
+        Assert.That(shape.Crop, Is.EqualTo(new CroppingFrame(25, 25, 0, 0)));
+
+        // And: Size/cropping of image with all-edge cropping is as expected 
+        shape = presentation.Slides[^1].Shapes[6] as IPicture;
+        Assert.That(shape!.Width, Is.EqualTo(200m).Within(0.01m));
+        Assert.That(shape.Height, Is.EqualTo(50m).Within(0.01m));
+        Assert.That(shape.Crop, Is.EqualTo(new CroppingFrame(25, 25, 25, 25)));
     }
 
     [Test]
