@@ -2,9 +2,6 @@ using LogoSlideMaker.Primitives;
 using LogoSlideMaker.WinUi.Services;
 using LogoSlideMaker.WinUi.ViewModels;
 using Microsoft.Extensions.Logging;
-using Microsoft.Graphics.Canvas;
-using Microsoft.Graphics.Canvas.Brushes;
-using Microsoft.Graphics.Canvas.Text;
 using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI.Xaml;
@@ -36,10 +33,8 @@ public sealed partial class MainWindow : Window
     private readonly BitmapCache bitmapCache;
     private readonly ILogger<MainWindow> logger;
 
-    // Cached canvas resources
-    private CanvasTextFormat? defaultTextFormat;
-    private CanvasTextFormat? titleTextFormat;
-    private ICanvasBrush? solidBlack;
+    // Canvas manager
+    private readonly DisplayRenderer renderer;
 
     // Internal state
     private bool needResourceLoad = false;
@@ -58,9 +53,10 @@ public sealed partial class MainWindow : Window
         {
             InitializeComponent();
 
+            renderer = new(canvas, bitmapCache, logger);
+
             // Set up view model
             viewModel.PropertyChanged += ViewModel_PropertyChanged;
-            viewModel.DefinitionLoaded += ViewModel_DefinitionLoaded;
             viewModel.ErrorFound += DisplayViewModelError;
             Root.DataContext = viewModel;
             Title = MainViewModel.AppDisplayName;
@@ -101,7 +97,7 @@ public sealed partial class MainWindow : Window
 
     #region Event handlers
 
-    private void ViewModel_DefinitionLoaded(object? sender, EventArgs e)
+    private void ViewModel_DefinitionLoaded()
     {
         var enqueued = DispatcherQueue.TryEnqueue(() =>
         {
@@ -135,6 +131,14 @@ public sealed partial class MainWindow : Window
         if (e.PropertyName == nameof(MainViewModel.ShowBoundingBoxes))
         {
             // New slide, redraw
+            canvas.Invalidate();
+        }
+
+        if (e.PropertyName == nameof(MainViewModel.Definition))
+        {
+            ViewModel_DefinitionLoaded();
+
+            // During and after loading, canvas needs to redraw to blank
             canvas.Invalidate();
         }
     }
@@ -403,34 +407,7 @@ public sealed partial class MainWindow : Window
             }
             needResourceLoad = false;
 
-            // NOTE: This is only called once per LOAD, so we don't currently support changing
-            // text styles per variant. Ergo, there is a subtle bug here right now.
-            var logoStyle = viewModel.TextStyles[Models.TextSyle.Logo];
-            defaultTextFormat = new() 
-            { 
-                FontSize = (float)logoStyle.FontSize * 96.0f / 72.0f, 
-                FontFamily = logoStyle.FontName, 
-                VerticalAlignment = CanvasVerticalAlignment.Center, 
-                HorizontalAlignment = CanvasHorizontalAlignment.Center 
-            };
-
-            var tytleStyle = viewModel.TextStyles[Models.TextSyle.BoxTitle];
-            titleTextFormat = new() 
-            { 
-                FontSize = (float)tytleStyle.FontSize * 96.0f / 72.0f, 
-                FontFamily = tytleStyle.FontName, 
-                VerticalAlignment = CanvasVerticalAlignment.Center, 
-                HorizontalAlignment = CanvasHorizontalAlignment.Center 
-            };
-            solidBlack = new CanvasSolidColorBrush(sender, Microsoft.UI.Colors.Black);
-            logDebugLoading();
-
-            // Load (and measure) all the bitmaps
-            // NOTE: If multiple TOML files share the same path, we will re-use the previously
-            // created canvas bitmap. This could be a problem if two different TOMLs are in 
-            // different directories, and use the same relative path to refer to two different
-            // images.
-            await bitmapCache.LoadAsync(sender, viewModel.ImagePaths);
+            await renderer.CreateResourcesAsync(viewModel.Definition);
 
             // Now that all the bitmaps are loaded, we now have enough information to
             // generate the drawing primitives so we can render them.
@@ -463,92 +440,11 @@ public sealed partial class MainWindow : Window
                 return;
             }
 
-            foreach (var p in primitives)
-            {
-                Draw(p, args.DrawingSession);
-            }
+            renderer.Render(primitives, args.DrawingSession);
         }
         catch (Exception ex)
         {
             logFail(ex);
-        }
-    }
-
-    private void Draw(Primitive primitive, CanvasDrawingSession session)
-    {
-        switch (primitive)
-        {
-            case TextPrimitive text:
-                Draw(text, session);
-                break;
-
-            case ImagePrimitive image:
-                Draw(image, session);
-                break;
-
-            case RectanglePrimitive rect:
-                Draw(rect, session);
-                break;
-
-            default:
-                throw new NotImplementedException();
-        }
-    }
-    private void Draw(TextPrimitive primitive, CanvasDrawingSession session)
-    {
-        // Draw the actual text
-        session.DrawText(
-            primitive.Text, 
-            primitive.Rectangle.AsWindowsRect(), 
-            solidBlack, 
-            primitive.Style switch
-            {
-                Models.TextSyle.Logo => defaultTextFormat,
-                Models.TextSyle.BoxTitle => titleTextFormat,
-                _ => throw new Exception($"Unexpected text style {primitive.Style}")
-            }
-        );
-
-        // Draw a text bounding box
-        if (viewModel.ShowBoundingBoxes)
-        {
-            session.DrawRectangle(primitive.Rectangle.AsWindowsRect(), Microsoft.UI.Colors.Blue, 1);
-        }
-    }
-
-    private void Draw(ImagePrimitive primitive, CanvasDrawingSession session)
-    {
-        // Draw the actual logo
-        var bitmap = bitmapCache.GetOrDefault(primitive.Path);
-        if (bitmap is not null)
-        {
-            var sourceRect = bitmap.Bounds;
-            if (primitive.Crop?.IsValid == true)
-            {
-                sourceRect.X += sourceRect.Width * (double)primitive.Crop.Left;
-                sourceRect.Y += sourceRect.Height * (double)primitive.Crop.Top;
-                sourceRect.Width *= 1 - (double)primitive.Crop.Right - (double)primitive.Crop.Left;
-                sourceRect.Height *= 1 - (double)primitive.Crop.Top - (double)primitive.Crop.Bottom;
-            }
-            session.DrawImage(bitmap, primitive.Rectangle.AsWindowsRect(), sourceRect, 1.0f, CanvasImageInterpolation.HighQualityCubic);
-        }
-
-        // Draw a logo bounding box
-        if (viewModel.ShowBoundingBoxes)
-        {
-            session.DrawRectangle(primitive.Rectangle.AsWindowsRect(), Microsoft.UI.Colors.Red, 1);
-        }
-    }
-
-    private static void Draw(RectanglePrimitive primitive, CanvasDrawingSession session)
-    {
-        if (primitive.Fill)
-        {
-            session.FillRectangle(primitive.Rectangle.AsWindowsRect(), Microsoft.UI.Colors.White);
-        }
-        else
-        {
-            session.DrawRectangle(primitive.Rectangle.AsWindowsRect(), Microsoft.UI.Colors.Purple, 1);
         }
     }
 

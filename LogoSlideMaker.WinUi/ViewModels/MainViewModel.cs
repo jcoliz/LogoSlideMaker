@@ -29,11 +29,6 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, IDispatcher dis
     public event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
     /// <summary>
-    /// A new definition has been loaded
-    /// </summary>
-    public event EventHandler<EventArgs>? DefinitionLoaded = delegate { };
-
-    /// <summary>
     /// User action has resulted in an error
     /// </summary>
     public event EventHandler<UserErrorEventArgs>? ErrorFound = delegate { };
@@ -324,7 +319,6 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, IDispatcher dis
 
                     logOkDetails(DocumentTitle);
 
-                    DefinitionLoaded?.Invoke(this, new EventArgs());
                     OnPropertyChanged(nameof(Definition));
 
                     // TODO: Could I change to Defintion.Title, to just have one property to manage here?
