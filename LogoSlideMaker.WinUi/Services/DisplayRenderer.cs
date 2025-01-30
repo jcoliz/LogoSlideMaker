@@ -1,4 +1,6 @@
-﻿using LogoSlideMaker.Primitives;
+﻿using LogoSlideMaker.Models;
+using LogoSlideMaker.Primitives;
+using LogoSlideMaker.Public;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
@@ -6,6 +8,7 @@ using Microsoft.Graphics.Canvas.Text;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace LogoSlideMaker.WinUi.Services;
 
@@ -15,28 +18,34 @@ namespace LogoSlideMaker.WinUi.Services;
 internal class DisplayRenderer(CanvasControl canvas, BitmapCache bitmapCache, ILogger _logger)
 {
     // Cached canvas resources
-    private CanvasTextFormat? defaultTextFormat;
-    private CanvasTextFormat? titleTextFormat;
     private ICanvasBrush? solidBlack;
 
-    public void CreateResources()
-    {
-        defaultTextFormat = new()
-        {
-            FontSize = (float)10 /*logoStyle.FontSize*/ * 96.0f / 72.0f,
-            FontFamily = "Segoe UI", //logoStyle.FontName,
-            VerticalAlignment = CanvasVerticalAlignment.Center,
-            HorizontalAlignment = CanvasHorizontalAlignment.Center
-        };
+    private readonly Dictionary<TextSyle, CanvasTextFormat> textFormats = new();
 
-        titleTextFormat = new()
+    public async Task CreateResourcesAsync(IDefinition definition)
+    {
+        if (definition.Variants.Count > 0)
         {
-            FontSize = (float)24 /*tytleStyle.FontSize*/ * 96.0f / 72.0f,
-            FontFamily = "Segoe UI", //tytleStyle.FontName
-            VerticalAlignment = CanvasVerticalAlignment.Center,
-            HorizontalAlignment = CanvasHorizontalAlignment.Center
-        };
+            foreach (var format in definition.Variants[0].TextStyles)
+            {
+                textFormats[format.Key] = new CanvasTextFormat
+                {
+                    FontSize = (float)format.Value.FontSize * 96.0f / 72.0f,
+                    FontFamily = format.Value.FontName,
+                    VerticalAlignment = CanvasVerticalAlignment.Center,
+                    HorizontalAlignment = CanvasHorizontalAlignment.Center
+                };
+            }
+
+        }
         solidBlack = new CanvasSolidColorBrush(canvas, Microsoft.UI.Colors.Black);
+
+        // Load (and measure) all the bitmaps
+        // NOTE: If multiple TOML files share the same path, we will re-use the previously
+        // created canvas bitmap. This could be a problem if two different TOMLs are in 
+        // different directories, and use the same relative path to refer to two different
+        // images.
+        await bitmapCache.LoadAsync(canvas, definition.ImagePaths);
     }
 
     public void Render(IEnumerable<Primitive> primitives, CanvasDrawingSession session)
@@ -70,17 +79,14 @@ internal class DisplayRenderer(CanvasControl canvas, BitmapCache bitmapCache, IL
 
     private void Draw(TextPrimitive primitive, CanvasDrawingSession session)
     {
-        // Draw the actual text
+        if (!textFormats.TryGetValue(primitive.Style, out var format))
+            throw new Exception($"Unexpected text style {primitive.Style}");
+
         session.DrawText(
             primitive.Text,
             primitive.Rectangle.AsWindowsRect(),
             solidBlack,
-            primitive.Style switch
-            {
-                Models.TextSyle.Logo => defaultTextFormat,
-                Models.TextSyle.BoxTitle => titleTextFormat,
-                _ => throw new Exception($"Unexpected text style {primitive.Style}")
-            }
+            format
         );
 
 #if false

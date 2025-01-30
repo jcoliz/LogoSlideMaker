@@ -1,4 +1,5 @@
-﻿using LogoSlideMaker.Configure;
+﻿using DocumentFormat.OpenXml.InkML;
+using LogoSlideMaker.Configure;
 using LogoSlideMaker.Export;
 using LogoSlideMaker.Layout;
 using LogoSlideMaker.Models;
@@ -41,6 +42,11 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
     #endregion
 
     #region Properties
+
+    /// <summary>
+    /// The definition we are currently showing
+    /// </summary>
+    public IDefinition Definition => _definition;
 
     /// <summary>
     /// Size of the drawing area
@@ -326,6 +332,9 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
                     logOkDetails(DocumentTitle);
 
                     DefinitionLoaded?.Invoke(this, new EventArgs());
+                    OnPropertyChanged(nameof(Definition));
+
+                    // TODO: Could I change to Defintion.Title, to just have one property to manage here?
                     OnPropertyChanged(nameof(DocumentTitle));
                     OnPropertyChanged(nameof(DocumentSubtitle));
                 }
