@@ -133,4 +133,16 @@ internal class ExportPipelineTests: TestsBase
         var shape = presentation.Slides[^1].Shapes[0] as IPicture;
         Assert.That(shape!.CornerSize,Is.EqualTo(40));
     }
+
+    [Test]
+    public async Task LoadWebP()
+    {
+        // When: Loading image paths containing WebP image
+        var imageCache = new ImageCache() { ImagesAssembly = Assembly.GetExecutingAssembly() };
+        await imageCache.LoadAsync(["four.webp"]);
+
+        // Then: Aspect ratio is returned as expected
+        var actual = imageCache.GetAspectRatio("four.webp");
+        Assert.That(actual,Is.EqualTo(4));
+    }
 }
