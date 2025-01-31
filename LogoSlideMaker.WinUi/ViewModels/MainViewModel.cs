@@ -20,7 +20,7 @@ using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace LogoSlideMaker.WinUi.ViewModels;
 
-public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> logger) : INotifyPropertyChanged
+public partial class MainViewModel(IDispatcher dispatcher, ILogger<MainViewModel> logger) : INotifyPropertyChanged
 {
     #region Events
     /// <summary>
