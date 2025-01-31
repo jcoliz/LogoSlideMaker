@@ -16,13 +16,18 @@ namespace LogoSlideMaker.WinUi.Services;
 /// <summary>
 /// Renders LogoSlideMaker primitives to a Win2D CanvasControl
 /// </summary>
-internal class DisplayRenderer(CanvasControl canvas, ILoggerFactory logFactory)
+public class DisplayRenderer(BitmapCache bitmapCache, ILogger<DisplayRenderer> logger)
 {
     // Cached canvas resources
     private ICanvasBrush? solidBlack;
-
-    private readonly BitmapCache bitmapCache = new(logFactory);
     private readonly Dictionary<TextSyle, CanvasTextFormat> textFormats = [];
+
+    public CanvasControl Canvas
+    {
+        private get => _canvas ?? throw new Exception("Canvas not initialized");
+        set => _canvas = value;
+    }
+    CanvasControl? _canvas;
 
     public IVariant Variant 
     {
@@ -35,16 +40,6 @@ internal class DisplayRenderer(CanvasControl canvas, ILoggerFactory logFactory)
     } 
     private IVariant _variant = Loader.Empty().Variants[0];
     private IEnumerable<Primitive> _primitives = [];
-
-
-    /// <summary>
-    /// Base directory where files are located, or null for embedded storage
-    /// </summary>
-    public string? BaseDirectory 
-    { 
-        get => bitmapCache.BaseDirectory;
-        set => bitmapCache.BaseDirectory = value;
-    }
 
     public async Task CreateResourcesAsync(IDefinition definition)
     {
@@ -62,14 +57,14 @@ internal class DisplayRenderer(CanvasControl canvas, ILoggerFactory logFactory)
             }
 
         }
-        solidBlack = new CanvasSolidColorBrush(canvas, Microsoft.UI.Colors.Black);
+        solidBlack = new CanvasSolidColorBrush(Canvas, Microsoft.UI.Colors.Black);
 
         // Load (and measure) all the bitmaps
         // NOTE: If multiple TOML files share the same path, we will re-use the previously
         // created canvas bitmap. This could be a problem if two different TOMLs are in 
         // different directories, and use the same relative path to refer to two different
         // images.
-        await bitmapCache.LoadAsync(canvas, definition.ImagePaths);
+        await bitmapCache.LoadAsync(Canvas, definition.ImagePaths);
     }
 
     public void Render(bool showExtents, CanvasDrawingSession session)

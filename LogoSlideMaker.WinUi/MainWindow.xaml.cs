@@ -1,5 +1,3 @@
-using DocumentFormat.OpenXml.VariantTypes;
-using LogoSlideMaker.Primitives;
 using LogoSlideMaker.WinUi.Services;
 using LogoSlideMaker.WinUi.ViewModels;
 using Microsoft.Extensions.Logging;
@@ -12,7 +10,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -31,10 +28,9 @@ public sealed partial class MainWindow : Window
 
     // Injected dependencies
     private readonly MainViewModel viewModel;
-    private readonly ILogger<MainWindow> logger;
-
-    // Canvas manager
+    private readonly BitmapCache bitmapCache;
     private readonly DisplayRenderer renderer;
+    private readonly ILogger<MainWindow> logger;
 
     // Internal state
     private bool needResourceLoad = false;
@@ -43,16 +39,19 @@ public sealed partial class MainWindow : Window
 
     #region Constructor
 
-    public MainWindow(MainViewModel _viewModel, ILoggerFactory logFactory)
+    public MainWindow(MainViewModel _viewModel, BitmapCache _bitmapCache, DisplayRenderer _renderer, ILogger<MainWindow> _logger)
     {
         viewModel = _viewModel;
-        logger = logFactory.CreateLogger<MainWindow>();
+        bitmapCache = _bitmapCache;
+        renderer = _renderer;
+        logger = _logger;
 
         try
         {
             InitializeComponent();
 
-            renderer = new(canvas, logFactory);
+            // Set up renderer
+            renderer.Canvas = canvas;
 
             // Set up view model
             viewModel.PropertyChanged += ViewModel_PropertyChanged;
@@ -101,7 +100,7 @@ public sealed partial class MainWindow : Window
         var enqueued = DispatcherQueue.TryEnqueue(async () =>
         {
             // Set up bitmap cache
-            renderer.BaseDirectory = Path.GetDirectoryName(viewModel.LastOpenedFilePath);
+            bitmapCache.BaseDirectory = Path.GetDirectoryName(viewModel.LastOpenedFilePath);
 
             // TODO: https://microsoft.github.io/Win2D/WinUI2/html/LoadingResourcesOutsideCreateResources.htm
             await CreateResourcesAsync(canvas);
@@ -284,7 +283,7 @@ public sealed partial class MainWindow : Window
                 var path = file.Path;
                 logOkMomentPath("Selected", path);
 
-                renderer.BaseDirectory = Path.GetDirectoryName(path);
+                bitmapCache.BaseDirectory = Path.GetDirectoryName(path);
                 await viewModel.LoadDefinitionAsync(path);
             }
             else

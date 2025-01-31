@@ -2,7 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Management;
 using System.Runtime.CompilerServices;
-using LogoSlideMaker.Primitives;
 using LogoSlideMaker.WinUi.Services;
 using LogoSlideMaker.WinUi.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
@@ -86,6 +85,8 @@ public partial class App : Application
                 {
                     services.AddSerilog();
 
+                    services.AddSingleton<BitmapCache>();
+                    services.AddSingleton<DisplayRenderer>();
                     services.AddSingleton<MainWindow>();
                     services.AddSingleton<MainViewModel>();
 
