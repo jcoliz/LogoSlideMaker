@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 namespace LogoSlideMaker.WinUi.Services;
 
 /// <summary>
-/// Renders LogoSlideMaker variant to a Win2D CanvasControl
+/// Renders IRenderViewModel to a Win2D CanvasControl
 /// </summary>
 public partial class DisplayRenderer
 {
@@ -44,8 +44,10 @@ public partial class DisplayRenderer
     {
         try
         {
-            if (e.PropertyName == nameof(MainViewModel.Variant))
+            if (e.PropertyName == nameof(MainViewModel.Variant) && !_viewModel.IsLoading)
             {
+                // Don't need to generate primitivs while we're loading. Bitmaps might not be
+                // all loaded yet, and we'll catch the change in IsLoading
                 _primitives = _viewModel.Variant.GeneratePrimitives(_bitmapCache);
 
                 // New slide, redraw
@@ -109,7 +111,7 @@ public partial class DisplayRenderer
 
     #region Canvas event handlers
 
-    private void Canvas_DrawCanvas(CanvasControl _, CanvasDrawEventArgs args)
+    internal void Canvas_DrawCanvas(CanvasControl _, CanvasDrawEventArgs args)
     {
         try
         {
@@ -124,7 +126,7 @@ public partial class DisplayRenderer
         }
     }
 
-    private async void Canvas_CreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs args)
+    internal async void Canvas_CreateResources(CanvasControl sender, CanvasCreateResourcesEventArgs args)
     {
         // This is called by the canvas when it's ready for resources. Typically, this shouldn't be needed,
         // as the canvas should be ready for resources before we have them loaded. However, there
@@ -144,7 +146,7 @@ public partial class DisplayRenderer
 
     #endregion
 
-    public async Task CreateResourcesAsync()
+    private async Task CreateResourcesAsync()
     {
         try
         {
@@ -190,7 +192,7 @@ public partial class DisplayRenderer
         }
     }
 
-    public void Render(CanvasDrawingSession session)
+    private void Render(CanvasDrawingSession session)
     {
         var primitives = _viewModel.ShowBoundingBoxes ?
             _primitives :
