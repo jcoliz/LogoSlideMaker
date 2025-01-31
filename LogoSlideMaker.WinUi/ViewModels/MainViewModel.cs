@@ -263,6 +263,21 @@ public partial class MainViewModel(BitmapCache bitmapCache, IDispatcher dispatch
             return result;
         }
     }
+    #endregion
+
+    #region Pickers
+
+    public FileSavePickerViewModel FileSavePickerViewModel => new()
+    {
+        SuggestedFileName = Path.GetFileName(OutputPath ?? LastOpenedFilePath ?? "logo-slides.pptx"),
+        SettingsIdentifier = "Common",
+        FileTypeChoices = new Dictionary<string, IList<string>>() { { "PowerPoint Files", [".pptx"] } },
+        Continue = path => { _ = ExportToAsync(path); }
+    };
+
+    #endregion
+
+    #region Commands
 
     /// <summary>
     /// [User Can] Reload changes made in TOML file since last (re)load
@@ -453,19 +468,41 @@ public partial class MainViewModel(BitmapCache bitmapCache, IDispatcher dispatch
             //
 
             ExportPipelineEx.Export(_definition, imageCache, templateStream, outPath, _gitVersion);
+
+            logOkPath(outPath);
         }
         catch (DirectoryNotFoundException ex)
         {
-            throw new UserErrorException("Export failed", ex.Message);
+            ErrorFound?.Invoke(this, new() 
+            { 
+                Title = "Export failed", 
+                Details = ex.Message 
+            });
         }
         catch (FileNotFoundException ex)
         {
-            throw new UserErrorException("Export failed", ex.Message);
+            ErrorFound?.Invoke(this, new()
+            {
+                Title = "Export failed",
+                Details = ex.Message
+            });
         }
-        catch
+        catch (UserErrorException ex)
         {
-            // Code errors can get logged by the parent
-            throw;
+            ErrorFound?.Invoke(this, new()
+            {
+                Title = ex.Title,
+                Details = ex.Details
+            });
+        }
+        catch (Exception ex)
+        {
+            logFail(ex);
+            ErrorFound?.Invoke(this, new()
+            {
+                Title = "Export failed",
+                Details = "Internal system failure"
+            });
         }
         finally
         {
@@ -544,6 +581,9 @@ public partial class MainViewModel(BitmapCache bitmapCache, IDispatcher dispatch
 
     [LoggerMessage(Level = LogLevel.Information, EventId = 1010, Message = "{Location}: {Moment} OK")]
     public partial void logOkMoment(string moment, [CallerMemberName] string? location = "");
+
+    [LoggerMessage(Level = LogLevel.Information, EventId = 1050, Message = "{Location}: OK {Path}")]
+    public partial void logOkPath(string path, [CallerMemberName] string? location = "");
 
     [LoggerMessage(Level = LogLevel.Information, EventId = 1020, Message = "{Location}: OK {Details}")]
     public partial void logOkDetails(string details, [CallerMemberName] string? location = "");

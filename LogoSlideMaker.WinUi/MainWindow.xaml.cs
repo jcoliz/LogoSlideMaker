@@ -204,13 +204,17 @@ public sealed partial class MainWindow : Window
     {
         try
         {
-            // Bring up a save picker to let user have ultimate decision on file
+            var pickerViewModel = viewModel.FileSavePickerViewModel;
             var picker = new FileSavePicker()
             {
-                SuggestedFileName = Path.GetFileName(viewModel.OutputPath ?? viewModel.LastOpenedFilePath ?? "logo-slides.pptx"),
-                SettingsIdentifier = "Common"
+                SuggestedFileName = pickerViewModel.SuggestedFileName,
+                SettingsIdentifier = pickerViewModel.SettingsIdentifier
             };
-            picker.FileTypeChoices.Add("PowerPoint Files", [".pptx"]);
+
+            foreach(var kvp in pickerViewModel.FileTypeChoices)
+            {
+                picker.FileTypeChoices.Add(kvp);
+            }
 
             // Associate the HWND with the file picker
             InitializeWithWindow.Initialize(picker, hWnd);
@@ -221,41 +225,8 @@ public sealed partial class MainWindow : Window
                 var outPath = file.Path;
 
                 // Get off of the UI thread
-                var ___ = Task.Run(async () =>
-                {
-                    await viewModel.ExportToAsync(outPath);
-                })
-                .ContinueWith(t => 
-                {
-                    if (t.Exception is AggregateException aex)
-                    {
-                        foreach(var ex in aex.InnerExceptions)
-                        {
-                            if (ex is UserErrorException uex)
-                            {
-                                // Ok, we need to get BACK on the ui thread to show this error!!
-                                DispatcherQueue.TryEnqueue(async () =>
-                                {
-                                    await ShowErrorAsync(uex);
-                                });
-                            }
-                            else
-                            {
-                                logFailMoment(ex,"Export aggregate");
-                            }
-                        }
-                    }
-                    if (t.Exception is not null)
-                    {
-                        logFailMoment(t.Exception,"Export single exception");
-                    }
-                    else
-                    {
-                        // TODO: This would be the time to emit an event that we have successfully
-                        // exported
-                        logOkPath(outPath);
-                    }
-                });
+                _ = Task.Run(() => { pickerViewModel.Continue.Invoke(file.Path); });
+                logDebugOk();
             }
             else
             {
@@ -263,12 +234,8 @@ public sealed partial class MainWindow : Window
             }
 
             // TODO: Give user option to launch the ppt (would be nice)
-        }
-        catch (UserErrorException ex)
-        {
-            // Return user-caused errors to the user
-            // Note that this will also log the details
-            await ShowErrorAsync(ex);
+            // Note that this wouldn't happen here. VM would neeed to raise an
+            // Exported event, and then we've get that and show something
         }
         catch (Exception ex)
         {
