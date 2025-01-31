@@ -353,6 +353,24 @@ public partial class MainViewModel(IDispatcher dispatcher, ILogger<MainViewModel
     }
 
     /// <summary>
+    /// Called by the view to indicate that the application is ready for us to start
+    /// </summary>
+    public async Task Start()
+    {
+        // Reload last-used definition
+        try
+        {
+            await ReloadDefinitionAsync();
+
+            logOk();
+        }
+        catch (Exception ex)
+        {
+            logFail(ex);
+        }
+    }
+
+    /// <summary>
     /// Reload the last opened definition
     /// </summary>
     /// <returns></returns>

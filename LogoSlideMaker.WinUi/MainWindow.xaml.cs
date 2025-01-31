@@ -71,19 +71,9 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private async void Root_Loaded(object sender, RoutedEventArgs e)
+    private void Root_Loaded(object sender, RoutedEventArgs e)
     {
-        // Reload last-used definition
-        try
-        {
-            await viewModel.ReloadDefinitionAsync();
-
-            logOkMoment("Reload");
-        }
-        catch (Exception ex)
-        {
-            logFail(ex);
-        }        
+        _ = viewModel.Start();     
     }
 
     #endregion
