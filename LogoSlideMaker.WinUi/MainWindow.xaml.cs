@@ -59,7 +59,6 @@ public sealed partial class MainWindow : Window
             InitializeComponent();
 
             // Set up view model
-            viewModel.UIAction = x => DispatcherQueue.TryEnqueue(() => x());
             viewModel.PropertyChanged += ViewModel_PropertyChanged;
             viewModel.DefinitionLoaded += ViewModel_DefinitionLoaded;
             viewModel.ErrorFound += DisplayViewModelError;

@@ -1,10 +1,8 @@
-﻿using DocumentFormat.OpenXml.InkML;
-using LogoSlideMaker.Configure;
-using LogoSlideMaker.Export;
-using LogoSlideMaker.Layout;
+﻿using LogoSlideMaker.Export;
 using LogoSlideMaker.Models;
 using LogoSlideMaker.Primitives;
 using LogoSlideMaker.Public;
+using LogoSlideMaker.WinUi.Services;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -22,7 +20,7 @@ using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace LogoSlideMaker.WinUi.ViewModels;
 
-public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> logger) : INotifyPropertyChanged
+public partial class MainViewModel(IGetImageAspectRatio bitmaps, IDispatcher dispatcher, ILogger<MainViewModel> logger) : INotifyPropertyChanged
 {
     #region Events
     /// <summary>
@@ -52,11 +50,6 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
     /// Size of the drawing area
     /// </summary>
     public System.Drawing.Size PlatenSize { get; } = new(1280, 720);
-
-    /// <summary>
-    /// View needs to give us a way to dispatch onto the UI Thread
-    /// </summary>
-    public Action<Action> UIAction { get; set; } = (x => x());
 
     /// <summary>
     /// Drawing primitives needed to render the current slide
@@ -535,7 +528,7 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainVie
         // Raise the PropertyChanged event, passing the name of the property whose value has changed.
         // And be sure to do it on UI thread, because we may be running on a BG thread, and the
         // handler is often the framework, which runs on UI thread
-        UIAction(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)));
+        dispatcher.Dispatch(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)));
     }
     #endregion
 
