@@ -19,7 +19,7 @@ using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace LogoSlideMaker.WinUi.ViewModels;
 
-public partial class MainViewModel(IDispatcher dispatcher, ILogger<MainViewModel> logger) : IRenderViewModel, INotifyPropertyChanged
+public partial class MainViewModel(BitmapCache bitmapCache, IDispatcher dispatcher, ILogger<MainViewModel> logger) : IRenderViewModel, INotifyPropertyChanged
 {
     #region Events
     /// <summary>
@@ -310,6 +310,7 @@ public partial class MainViewModel(IDispatcher dispatcher, ILogger<MainViewModel
 
                     var loaded = Loader.Load(stream, path is not null ? Path.GetDirectoryName(path) : null);
                     LastOpenedFilePath = path;
+                    bitmapCache.BaseDirectory = Path.GetDirectoryName(path);
 
                     _gitVersion = null;
                     Definition = loaded;

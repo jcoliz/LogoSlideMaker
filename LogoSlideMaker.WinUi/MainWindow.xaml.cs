@@ -25,7 +25,6 @@ public sealed partial class MainWindow : Window
 
     // Injected dependencies
     private readonly MainViewModel viewModel;
-    private readonly BitmapCache bitmapCache;
     private readonly DisplayRenderer renderer;
     private readonly ILogger<MainWindow> logger;
 
@@ -35,10 +34,9 @@ public sealed partial class MainWindow : Window
 
     #region Constructor
 
-    public MainWindow(MainViewModel _viewModel, BitmapCache _bitmapCache, DisplayRenderer _renderer, ILogger<MainWindow> _logger)
+    public MainWindow(MainViewModel _viewModel, DisplayRenderer _renderer, ILogger<MainWindow> _logger)
     {
         viewModel = _viewModel;
-        bitmapCache = _bitmapCache;
         renderer = _renderer;
         logger = _logger;
 
@@ -189,7 +187,6 @@ public sealed partial class MainWindow : Window
                 var path = file.Path;
                 logOkMomentPath("Selected", path);
 
-                bitmapCache.BaseDirectory = Path.GetDirectoryName(path);
                 await viewModel.LoadDefinitionAsync(path);
             }
             else
