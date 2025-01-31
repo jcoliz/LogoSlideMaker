@@ -60,7 +60,7 @@
                       PointerReleased="ScrollViewer_ResetPanning"
                       >
             <controls:CursorGrid Width="{x:Bind viewModel.PlatenSize.Width}" Height="{x:Bind viewModel.PlatenSize.Height}">
-                <win2dcanvas:CanvasControl Width="{x:Bind viewModel.PlatenSize.Width}" Height="{x:Bind viewModel.PlatenSize.Height}" x:Name="canvas" Draw="DrawCanvas" ClearColor="#333333" CreateResources="CreateResourcesEvent"/>
+                <win2dcanvas:CanvasControl Width="{x:Bind viewModel.PlatenSize.Width}" Height="{x:Bind viewModel.PlatenSize.Height}" x:Name="canvas" ClearColor="#333333" />
             </controls:CursorGrid>
         </ScrollViewer>
         <ProgressRing Grid.Row="1" Grid.ColumnSpan="2" IsActive="{x:Bind viewModel.IsLoading, Mode=OneWay}" Foreground="White"/>

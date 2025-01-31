@@ -1,6 +1,5 @@
 ﻿using LogoSlideMaker.Export;
 using LogoSlideMaker.Models;
-using LogoSlideMaker.Primitives;
 using LogoSlideMaker.Public;
 using LogoSlideMaker.WinUi.Services;
 using Microsoft.Extensions.Logging;
@@ -20,7 +19,7 @@ using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace LogoSlideMaker.WinUi.ViewModels;
 
-public partial class MainViewModel(IDispatcher dispatcher, ILogger<MainViewModel> logger) : INotifyPropertyChanged
+public partial class MainViewModel(IDispatcher dispatcher, ILogger<MainViewModel> logger) : IRenderViewModel, INotifyPropertyChanged
 {
     #region Events
     /// <summary>
@@ -309,11 +308,13 @@ public partial class MainViewModel(IDispatcher dispatcher, ILogger<MainViewModel
 
                     var currentSlideIndex = _currentVariant?.Index ?? 0;
 
-                    Definition = Loader.Load(stream, path is not null ? Path.GetDirectoryName(path) : null);
-                    _gitVersion = null;
-                    Variant = _definition.Variants[currentSlideIndex < _definition.Variants.Count ? currentSlideIndex : 0];
-
+                    var loaded = Loader.Load(stream, path is not null ? Path.GetDirectoryName(path) : null);
                     LastOpenedFilePath = path;
+
+                    _gitVersion = null;
+                    Definition = loaded;
+                    Variant = Definition.Variants[currentSlideIndex < _definition.Variants.Count ? currentSlideIndex : 0];
+
                     _gitVersion = path is not null ? Utilities.GitVersion.GetForDirectory(path) : null;
 
                     logOkDetails(DocumentTitle);

@@ -86,9 +86,10 @@ public partial class App : Application
                     services.AddSerilog();
 
                     services.AddSingleton<BitmapCache>();
+                    services.AddSingleton<MainViewModel>();
+                    services.AddSingleton<IRenderViewModel>(sp => sp.GetRequiredService<MainViewModel>());
                     services.AddSingleton<DisplayRenderer>();
                     services.AddSingleton<MainWindow>();
-                    services.AddSingleton<MainViewModel>();
 
                     services.AddSingleton(x => new Lazy<Window>(() => x.GetRequiredService<MainWindow>()));
                     services.AddSingleton<IDispatcher, Dispatcher>();

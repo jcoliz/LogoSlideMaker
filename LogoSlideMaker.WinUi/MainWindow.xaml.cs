@@ -1,12 +1,9 @@
 using LogoSlideMaker.WinUi.Services;
 using LogoSlideMaker.WinUi.ViewModels;
 using Microsoft.Extensions.Logging;
-using Microsoft.Graphics.Canvas.UI;
-using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -33,7 +30,6 @@ public sealed partial class MainWindow : Window
     private readonly ILogger<MainWindow> logger;
 
     // Internal state
-    private bool needResourceLoad = false;
     private Point? lastPanningPoint;
     #endregion
 
@@ -54,7 +50,6 @@ public sealed partial class MainWindow : Window
             renderer.Canvas = canvas;
 
             // Set up view model
-            viewModel.PropertyChanged += ViewModel_PropertyChanged;
             viewModel.ErrorFound += DisplayViewModelError;
             Root.DataContext = viewModel;
             Title = MainViewModel.AppDisplayName;
@@ -95,66 +90,6 @@ public sealed partial class MainWindow : Window
 
     #region Event handlers
 
-    private void LoadImagesForDefinition()
-    {
-        var enqueued = DispatcherQueue.TryEnqueue(async () =>
-        {
-            // Set up bitmap cache
-            bitmapCache.BaseDirectory = Path.GetDirectoryName(viewModel.LastOpenedFilePath);
-
-            // TODO: https://microsoft.github.io/Win2D/WinUI2/html/LoadingResourcesOutsideCreateResources.htm
-            await CreateResourcesAsync(canvas);
-
-            logDebugOk();
-        });
-
-        if (!enqueued)
-        {
-            logFailMoment("Enqueue Create Resources");
-        }
-    }
-
-    private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(MainViewModel.IsLoading))
-        {
-            // During and after loading, canvas needs to redraw to blank
-            canvas.Invalidate();
-        }
-
-        if (e.PropertyName == nameof(MainViewModel.Variant))
-        {
-            // ??? Should we be brokering this here, or let the display renderer
-            // get this directly from the view model??
-            renderer.Variant = viewModel.Variant;
-
-            // New slide, redraw
-            canvas.Invalidate();
-        }
-
-        if (e.PropertyName == nameof(MainViewModel.ShowBoundingBoxes))
-        {
-            // New slide, redraw
-            canvas.Invalidate();
-        }
-
-        if (e.PropertyName == nameof(MainViewModel.IsLoading))
-        {
-            renderer.Variant = viewModel.Variant;
-
-            // New slide, redraw
-            canvas.Invalidate();
-        }
-
-        if (e.PropertyName == nameof(MainViewModel.Definition))
-        {
-            LoadImagesForDefinition();
-
-            // During and after loading, canvas needs to redraw to blank
-            canvas.Invalidate();
-        }
-    }
-
     private void DisplayViewModelError(object? sender, ViewModels.UserErrorEventArgs e)
     {
         var enqueued = DispatcherQueue.TryEnqueue(() =>
@@ -191,25 +126,6 @@ public sealed partial class MainWindow : Window
 
     private Task ShowErrorAsync(ViewModels.UserErrorEventArgs eventargs) => ShowErrorAsync(eventargs.Title, eventargs.Details);
     private Task ShowErrorAsync(UserErrorException ex) => ShowErrorAsync(ex.Title, ex.Details);
-
-    private async void CreateResourcesEvent(CanvasControl sender, CanvasCreateResourcesEventArgs args)
-    {
-        // This is called by the canvas when it's ready for resources. Typically, this shouldn't be needed,
-        // as the canvas should be ready for resources before we have them loaded. However, there
-        // seem to be cases where the definition is loaded BEFORE the canvas is ready, so this event
-        // handler should ensure the resources are loaded anyway.
-
-        if (!needResourceLoad)
-        {
-            // When viewmodel is DONE loading, it will call us
-            logDebugNoLoadNeeded();
-            return;
-        }
-
-        await CreateResourcesAsync(sender);
-        canvas.Invalidate();
-        logDebugOk();
-    }
 
     private void ScrollViewer_ResetPanning(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
@@ -405,56 +321,6 @@ public sealed partial class MainWindow : Window
 
     #endregion
 
-    #region Canvas management & drawing
-
-    private async Task CreateResourcesAsync(CanvasControl sender)
-    {
-        try
-        {
-            // Create some static resource we'll use as part of drawing
-            // Not in view model because we don't want any UI namespaces in there
-            if (!canvas.IsLoaded)
-            {
-                needResourceLoad = true;
-                logDebugNotLoaded();
-                return;
-            }
-            needResourceLoad = false;
-
-            // TODO: Push everything here into the renderer
-            await renderer.CreateResourcesAsync(viewModel.Definition);
-
-            logDebugOk();
-        }
-        catch (Exception ex)
-        {
-            logFail(ex);
-        }
-        finally
-        {
-            // Now we are really done loading
-            viewModel.IsLoading = false;
-        }
-    }
-
-    private void DrawCanvas(CanvasControl _, CanvasDrawEventArgs args)
-    {
-        try
-        {
-            if (!viewModel.IsLoading)
-            {
-                // TODO: Push this logging into the renderer
-                renderer.Render(viewModel.ShowBoundingBoxes, args.DrawingSession);
-            }
-        }
-        catch (Exception ex)
-        {
-            logFail(ex);
-        }
-    }
-
-#endregion
-
     #region Windows Internals
 
     [LibraryImport("User32.dll", SetLastError = true)]
@@ -511,14 +377,9 @@ public sealed partial class MainWindow : Window
     [LoggerMessage(Level = LogLevel.Debug, EventId = 2012, Message = "{Location}: Skipping, no render config")]
     public partial void logDebugNoRenderConfig([CallerMemberName] string? location = "");
 
-    [LoggerMessage(Level = LogLevel.Debug, EventId = 2013, Message = "{Location}: Skipping, canvas not loaded")]
-    public partial void logDebugNotLoaded([CallerMemberName] string? location = "");
-
     [LoggerMessage(Level = LogLevel.Debug, EventId = 2014, Message = "{Location}: No file chosen")]
     public partial void logDebugNoFile([CallerMemberName] string? location = "");
 
-    [LoggerMessage(Level = LogLevel.Debug, EventId = 2015, Message = "{Location}: No resource load needed at this time")]
-    public partial void logDebugNoLoadNeeded([CallerMemberName] string? location = "");
 
     [LoggerMessage(Level = LogLevel.Debug, EventId = 2016, Message = "{Location}: No action taken, because busy")]
     public partial void logDebugBusy([CallerMemberName] string? location = "");
