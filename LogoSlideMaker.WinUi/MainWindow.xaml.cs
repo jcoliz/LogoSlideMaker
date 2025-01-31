@@ -169,13 +169,17 @@ public sealed partial class MainWindow : Window
     {
         try
         {
+            var pickerViewModel = viewModel.FileOpenPickerViewModel;
             var picker = new FileOpenPicker()
             {
                 ViewMode = PickerViewMode.List,
                 SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
-                SettingsIdentifier = "Common"
+                SettingsIdentifier = pickerViewModel.SettingsIdentifier,
             };
-            picker.FileTypeFilter.Add(".toml");
+            foreach (var fileTppe in pickerViewModel.FileTypeFilter)
+            {
+                picker.FileTypeFilter.Add(fileTppe);
+            }
 
             // https://github.com/microsoft/WindowsAppSDK/issues/1188
             // Associate the HWND with the file picker
@@ -185,9 +189,9 @@ public sealed partial class MainWindow : Window
             if (file != null)
             {
                 var path = file.Path;
-                logOkMomentPath("Selected", path);
 
-                await viewModel.LoadDefinitionAsync(path);
+                _ = Task.Run(() => { pickerViewModel.Continue.Invoke(file.Path); });
+                logDebugMoment("Selected");
             }
             else
             {
@@ -226,7 +230,7 @@ public sealed partial class MainWindow : Window
 
                 // Get off of the UI thread
                 _ = Task.Run(() => { pickerViewModel.Continue.Invoke(file.Path); });
-                logDebugOk();
+                logDebugMoment("Selected");
             }
             else
             {
@@ -334,9 +338,11 @@ public sealed partial class MainWindow : Window
     [LoggerMessage(Level = LogLevel.Debug, EventId = 2014, Message = "{Location}: No file chosen")]
     public partial void logDebugNoFile([CallerMemberName] string? location = "");
 
-
     [LoggerMessage(Level = LogLevel.Debug, EventId = 2016, Message = "{Location}: No action taken, because busy")]
     public partial void logDebugBusy([CallerMemberName] string? location = "");
+
+    [LoggerMessage(Level = LogLevel.Debug, EventId = 2013, Message = "{Location}: {Moment}")]
+    public partial void logDebugMoment(string moment, [CallerMemberName] string? location = "");
 
     #endregion
 }

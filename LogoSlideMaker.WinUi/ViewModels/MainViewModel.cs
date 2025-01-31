@@ -275,6 +275,13 @@ public partial class MainViewModel(BitmapCache bitmapCache, IDispatcher dispatch
         Continue = path => { _ = ExportToAsync(path); }
     };
 
+    public FileOpenPickerViewModel FileOpenPickerViewModel => new()
+    {
+        SettingsIdentifier = "Common",
+        FileTypeFilter = [".toml"],
+        Continue = path => { _ = LoadDefinitionAsync(path); }
+    };
+
     #endregion
 
     #region Commands
@@ -333,7 +340,7 @@ public partial class MainViewModel(BitmapCache bitmapCache, IDispatcher dispatch
 
                     _gitVersion = path is not null ? Utilities.GitVersion.GetForDirectory(path) : null;
 
-                    logOkDetails(DocumentTitle);
+                    logOkPath(path ?? "(null)");
                 }
                 catch (TomlException ex)
                 {
