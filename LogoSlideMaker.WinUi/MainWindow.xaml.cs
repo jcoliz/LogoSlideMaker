@@ -109,11 +109,8 @@ public sealed partial class MainWindow : Window
 
         var _ = await dialog.ShowAsync();
 
-        logOkTitleDetails(title, details);
+        LogUserError(title, details);
     }
-
-    private Task ShowErrorAsync(ViewModels.UserErrorEventArgs eventargs) => ShowErrorAsync(eventargs.Title, eventargs.Details);
-    private Task ShowErrorAsync(UserErrorException ex) => ShowErrorAsync(ex.Title, ex.Details);
 
     private void ScrollViewer_ResetPanning(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
@@ -165,7 +162,7 @@ public sealed partial class MainWindow : Window
 
     #region Command handlers
 
-    private async void OpenDocument(object _, RoutedEventArgs __)
+    private async void Command_Open(object _, RoutedEventArgs __)
     {
         try
         {
@@ -204,7 +201,7 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private async void ExportSlides(object _, RoutedEventArgs __)
+    private async void Command_Export(object _, RoutedEventArgs __)
     {
         try
         {
@@ -247,7 +244,7 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private async void ShowAboutDialog(object sender, RoutedEventArgs e)
+    private async void Command_About(object sender, RoutedEventArgs e)
     {
         try
         {
@@ -306,7 +303,7 @@ public sealed partial class MainWindow : Window
     public partial void logOkMomentPath(string moment, string path, [CallerMemberName] string? location = "");
 
     [LoggerMessage(Level = LogLevel.Information, EventId = 2040, Message = "{Location}: OK {Title} {Details}")]
-    public partial void logOkTitleDetails(string title, string details, [CallerMemberName]string? location = "");
+    public partial void LogUserError(string title, string details, [CallerMemberName]string? location = "");
 
     [LoggerMessage(Level = LogLevel.Information, EventId = 2002, Message = "{Location}: Version {AppVersion}")]
     public partial void logAppVersion(string appversion, [CallerMemberName] string? location = "");

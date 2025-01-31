@@ -27,17 +27,17 @@
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <StackPanel x:Name="commandBar" Orientation="Horizontal" Background="#333333" Height="64">
-            <AppBarButton Icon="OpenFile" Label="Open" Click="OpenDocument" IsEnabled="{Binding IsExporting, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"/>
+            <AppBarButton Icon="OpenFile" Label="Open" Click="Command_Open" IsEnabled="{Binding IsExporting, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"/>
             <AppBarButton Icon="Refresh" Label="Reload" Command="{x:Bind viewModel.Reload}" IsEnabled="{Binding IsExporting, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}" />
             <AppBarButton Icon="Back" Label="Previous" Command="{x:Bind viewModel.PreviousSlide}" />
             <AppBarButton Icon="Forward" Label="Next" Command="{x:Bind viewModel.NextSlide}" />
             <AppBarToggleButton Icon="ViewAll" Label="Boxes" IsChecked="{x:Bind viewModel.ShowBoundingBoxes, Mode=TwoWay}" />
-            <AppBarButton Label="About" Click="ShowAboutDialog" IsEnabled="{Binding IsExporting, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}">
+            <AppBarButton Label="About" Click="Command_About" IsEnabled="{Binding IsExporting, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}">
                 <AppBarButton.Icon>
                     <ImageIcon Source="ms-appx:///Assets/icon-info.svg"/>
                 </AppBarButton.Icon>
             </AppBarButton>
-            <AppBarButton Icon="Download" Label="Export" Click="ExportSlides" IsEnabled="{Binding IsExporting, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"/>
+            <AppBarButton Icon="Download" Label="Export" Click="Command_Export" IsEnabled="{Binding IsExporting, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"/>
         </StackPanel>
         <Border Grid.Column="1" Background="#333333" Height="{x:Bind commandBar.Height, Mode=OneWay}">
             <TextBlock Foreground="White" Height="{x:Bind commandBar.Height, Mode=OneWay}" FontFamily="Segoe UI" FontSize="14" HorizontalTextAlignment="Right" Margin="20,3,20,0">
