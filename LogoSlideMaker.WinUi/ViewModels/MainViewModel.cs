@@ -20,7 +20,7 @@ using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace LogoSlideMaker.WinUi.ViewModels;
 
-public partial class MainViewModel(IGetImageAspectRatio bitmaps, IDispatcher dispatcher, ILogger<MainViewModel> logger) : INotifyPropertyChanged
+public partial class MainViewModel(IGetImageAspectRatio bitmaps, ILogger<MainViewModel> logger) : INotifyPropertyChanged
 {
     #region Events
     /// <summary>
@@ -39,22 +39,38 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, IDispatcher dis
     /// <summary>
     /// The definition we are currently showing
     /// </summary>
-    public IDefinition Definition => _definition;
+    public IDefinition Definition
+    {
+        get => _definition;
+        set
+        {
+            _definition = value;
+            OnPropertyChanged();
+        }
+    }
+    private IDefinition _definition = Loader.Empty();
+
+    /// <summary>
+    /// The variant we are currently showing
+    /// </summary>
+    public IVariant Variant
+    {
+        get => _currentVariant;
+        set
+        {
+            _currentVariant = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(DocumentTitle));
+            OnPropertyChanged(nameof(DocumentSubtitle));
+            OnPropertyChanged(nameof(SlideNumber));
+        }
+    }
+    private IVariant _currentVariant = Loader.Empty().Variants[0];
 
     /// <summary>
     /// Size of the drawing area
     /// </summary>
     public System.Drawing.Size PlatenSize { get; } = new(1280, 720);
-
-    /// <summary>
-    /// Drawing primitives needed to render the current slide
-    /// </summary>
-    public IReadOnlyList<Primitive> Primitives => _primitives;
-
-    /// <summary>
-    /// All the image paths we would need to render
-    /// </summary>
-    public IEnumerable<string> ImagePaths => _definition.ImagePaths;
 
     /// <summary>
     /// The styles which should be used to render text on this slide
@@ -74,14 +90,7 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, IDispatcher dis
             {
                 if (value < _definition.Variants.Count && value != _currentVariant.Index && value >= 0)
                 {
-                    _currentVariant = _definition.Variants[value];
-
-                    // TODO: How do we know that the images have been loaded??
-                    GeneratePrimitives();
-
-                    OnPropertyChanged();                    
-                    OnPropertyChanged(nameof(DocumentTitle));
-                    OnPropertyChanged(nameof(DocumentSubtitle));
+                    Variant = _definition.Variants[value];
                 }
             }
             catch (Exception ex)
@@ -127,15 +136,6 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, IDispatcher dis
         }
     }
     private bool _IsExporting = false;
-
-    /// <summary>
-    /// Display names of the slides
-    /// </summary>
-    /// <remarks>
-    /// This is for a future slide picker
-    /// </remarks>
-    public IEnumerable<string> SlideNames =>
-        _definition.Variants.Select((x, i) => $"{i}. {x.Name}");
 
     /// <summary>
     /// Path to input file, last time we opened a file from file system
@@ -305,25 +305,18 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, IDispatcher dis
             {
                 try
                 {
-                    _primitives.Clear();
                     IsLoading = true;
 
                     var currentSlideIndex = _currentVariant?.Index ?? 0;
 
-                    _definition = Loader.Load(stream, path is not null ? Path.GetDirectoryName(path) : null);
+                    Definition = Loader.Load(stream, path is not null ? Path.GetDirectoryName(path) : null);
                     _gitVersion = null;
-                    _currentVariant = _definition.Variants[currentSlideIndex < _definition.Variants.Count ? currentSlideIndex : 0];
+                    Variant = _definition.Variants[currentSlideIndex < _definition.Variants.Count ? currentSlideIndex : 0];
 
                     LastOpenedFilePath = path;
                     _gitVersion = path is not null ? Utilities.GitVersion.GetForDirectory(path) : null;
 
                     logOkDetails(DocumentTitle);
-
-                    OnPropertyChanged(nameof(Definition));
-
-                    // TODO: Could I change to Defintion.Title, to just have one property to manage here?
-                    OnPropertyChanged(nameof(DocumentTitle));
-                    OnPropertyChanged(nameof(DocumentSubtitle));
                 }
                 catch (TomlException ex)
                 {
@@ -461,14 +454,6 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, IDispatcher dis
             IsExporting = false;
         }
     }
-
-    public void GeneratePrimitives()
-    {
-        var latest = _currentVariant.GeneratePrimitives(bitmaps);
-        _primitives.Clear();
-        _primitives.AddRange(latest);
-    }
-
     #endregion
 
     #region Internals
@@ -527,10 +512,7 @@ public partial class MainViewModel(IGetImageAspectRatio bitmaps, IDispatcher dis
     #endregion
 
     #region Fields
-    private IDefinition _definition = Loader.Empty();
-    private IVariant _currentVariant = Loader.Empty().Variants[0];
     private string? _gitVersion;
-    private readonly List<Primitive> _primitives = [];
     #endregion
 
     #region Logging

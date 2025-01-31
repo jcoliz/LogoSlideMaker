@@ -14,8 +14,10 @@ namespace LogoSlideMaker.WinUi.Services;
 /// <summary>
 /// Contains ready-to-draw canvas bitmaps for all images we may want to draw
 /// </summary>
-public class BitmapCache(ILogger<BitmapCache> logger) : IGetImageAspectRatio
+public class BitmapCache(ILoggerFactory logFactory) : IGetImageAspectRatio
 {
+    private readonly ILogger _logger = logFactory.CreateLogger<BitmapCache>();
+
     /// <summary>
     /// Base directory where files are located, or null for embedded storage
     /// </summary>
@@ -53,18 +55,18 @@ public class BitmapCache(ILogger<BitmapCache> logger) : IGetImageAspectRatio
         catch (DirectoryNotFoundException)
         {
             // This is a user error that will be handled by displaying a blank logo
-            logger.LogDebug("Cache LoadBitmap: Directory not found {Path}", path);
+            _logger.LogDebug("Cache LoadBitmap: Directory not found {Path}", path);
         }
         catch (FileNotFoundException)
         {
             // This is a user error that will be handled by displaying a blank logo
-            logger.LogDebug("Cache LoadBitmap: File not found {Path}", path);
+            _logger.LogDebug("Cache LoadBitmap: File not found {Path}", path);
         }
         catch (Exception ex)
         {
             // We should investigate any of these to see how we want to handle other
             // kinds of errors.
-            logger.LogError(ex, "Cache LoadBitmap: Failed to load {Path}", path);
+            _logger.LogError(ex, "Cache LoadBitmap: Failed to load {Path}", path);
         }
     }
 

@@ -89,8 +89,6 @@ public partial class App : Application
                     services.AddSingleton<MainWindow>();
                     services.AddSingleton<MainViewModel>();
 
-                    services.AddSingleton<BitmapCache>();
-                    services.AddSingleton<IGetImageAspectRatio>(x => x.GetRequiredService<BitmapCache>());
                     services.AddSingleton(x => new Lazy<Window>(() => x.GetRequiredService<MainWindow>()));
                     services.AddSingleton<IDispatcher, Dispatcher>();
 

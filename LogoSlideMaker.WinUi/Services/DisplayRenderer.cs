@@ -8,6 +8,7 @@ using Microsoft.Graphics.Canvas.Text;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace LogoSlideMaker.WinUi.Services;
@@ -15,12 +16,35 @@ namespace LogoSlideMaker.WinUi.Services;
 /// <summary>
 /// Renders LogoSlideMaker primitives to a Win2D CanvasControl
 /// </summary>
-internal class DisplayRenderer(CanvasControl canvas, BitmapCache bitmapCache, ILogger _logger)
+internal class DisplayRenderer(CanvasControl canvas, ILoggerFactory logFactory)
 {
     // Cached canvas resources
     private ICanvasBrush? solidBlack;
 
-    private readonly Dictionary<TextSyle, CanvasTextFormat> textFormats = new();
+    private readonly BitmapCache bitmapCache = new(logFactory);
+    private readonly Dictionary<TextSyle, CanvasTextFormat> textFormats = [];
+
+    public IVariant Variant 
+    {
+        private get => _variant; 
+        set
+        {
+            _variant = value;
+            _primitives = _variant.GeneratePrimitives(bitmapCache);
+        }
+    } 
+    private IVariant _variant = Loader.Empty().Variants[0];
+    private IEnumerable<Primitive> _primitives = [];
+
+
+    /// <summary>
+    /// Base directory where files are located, or null for embedded storage
+    /// </summary>
+    public string? BaseDirectory 
+    { 
+        get => bitmapCache.BaseDirectory;
+        set => bitmapCache.BaseDirectory = value;
+    }
 
     public async Task CreateResourcesAsync(IDefinition definition)
     {
@@ -48,8 +72,12 @@ internal class DisplayRenderer(CanvasControl canvas, BitmapCache bitmapCache, IL
         await bitmapCache.LoadAsync(canvas, definition.ImagePaths);
     }
 
-    public void Render(IEnumerable<Primitive> primitives, CanvasDrawingSession session)
+    public void Render(bool showExtents, CanvasDrawingSession session)
     {
+        var primitives = showExtents ?
+            _primitives :
+            _primitives.Where(x => x.Purpose != PrimitivePurpose.Extents);
+
         foreach (var p in primitives)
         {
             Draw(p, session);

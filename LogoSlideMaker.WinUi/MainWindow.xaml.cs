@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml.VariantTypes;
 using LogoSlideMaker.Primitives;
 using LogoSlideMaker.WinUi.Services;
 using LogoSlideMaker.WinUi.ViewModels;
@@ -30,7 +31,6 @@ public sealed partial class MainWindow : Window
 
     // Injected dependencies
     private readonly MainViewModel viewModel;
-    private readonly BitmapCache bitmapCache;
     private readonly ILogger<MainWindow> logger;
 
     // Canvas manager
@@ -43,17 +43,16 @@ public sealed partial class MainWindow : Window
 
     #region Constructor
 
-    public MainWindow(MainViewModel _viewModel, BitmapCache _bitmapCache, ILogger<MainWindow> _logger)
+    public MainWindow(MainViewModel _viewModel, ILoggerFactory logFactory)
     {
         viewModel = _viewModel;
-        bitmapCache = _bitmapCache;
-        logger = _logger;
+        logger = logFactory.CreateLogger<MainWindow>();
 
         try
         {
             InitializeComponent();
 
-            renderer = new(canvas, bitmapCache, logger);
+            renderer = new(canvas, logFactory);
 
             // Set up view model
             viewModel.PropertyChanged += ViewModel_PropertyChanged;
@@ -97,15 +96,17 @@ public sealed partial class MainWindow : Window
 
     #region Event handlers
 
-    private void ViewModel_DefinitionLoaded()
+    private void LoadImagesForDefinition()
     {
-        var enqueued = DispatcherQueue.TryEnqueue(() =>
+        var enqueued = DispatcherQueue.TryEnqueue(async () =>
         {
             // Set up bitmap cache
-            bitmapCache.BaseDirectory = Path.GetDirectoryName(viewModel.LastOpenedFilePath);
+            renderer.BaseDirectory = Path.GetDirectoryName(viewModel.LastOpenedFilePath);
 
             // TODO: https://microsoft.github.io/Win2D/WinUI2/html/LoadingResourcesOutsideCreateResources.htm
-            CreateResources(canvas);
+            await CreateResourcesAsync(canvas);
+
+            logDebugOk();
         });
 
         if (!enqueued)
@@ -122,8 +123,12 @@ public sealed partial class MainWindow : Window
             canvas.Invalidate();
         }
 
-        if (e.PropertyName == nameof(MainViewModel.SlideNumber))
+        if (e.PropertyName == nameof(MainViewModel.Variant))
         {
+            // ??? Should we be brokering this here, or let the display renderer
+            // get this directly from the view model??
+            renderer.Variant = viewModel.Variant;
+
             // New slide, redraw
             canvas.Invalidate();
         }
@@ -134,9 +139,17 @@ public sealed partial class MainWindow : Window
             canvas.Invalidate();
         }
 
+        if (e.PropertyName == nameof(MainViewModel.IsLoading))
+        {
+            renderer.Variant = viewModel.Variant;
+
+            // New slide, redraw
+            canvas.Invalidate();
+        }
+
         if (e.PropertyName == nameof(MainViewModel.Definition))
         {
-            ViewModel_DefinitionLoaded();
+            LoadImagesForDefinition();
 
             // During and after loading, canvas needs to redraw to blank
             canvas.Invalidate();
@@ -180,7 +193,7 @@ public sealed partial class MainWindow : Window
     private Task ShowErrorAsync(ViewModels.UserErrorEventArgs eventargs) => ShowErrorAsync(eventargs.Title, eventargs.Details);
     private Task ShowErrorAsync(UserErrorException ex) => ShowErrorAsync(ex.Title, ex.Details);
 
-    private void CreateResourcesEvent(CanvasControl sender, CanvasCreateResourcesEventArgs args)
+    private async void CreateResourcesEvent(CanvasControl sender, CanvasCreateResourcesEventArgs args)
     {
         // This is called by the canvas when it's ready for resources. Typically, this shouldn't be needed,
         // as the canvas should be ready for resources before we have them loaded. However, there
@@ -194,7 +207,9 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        CreateResources(sender);
+        await CreateResourcesAsync(sender);
+        canvas.Invalidate();
+        logDebugOk();
     }
 
     private void ScrollViewer_ResetPanning(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
@@ -269,7 +284,7 @@ public sealed partial class MainWindow : Window
                 var path = file.Path;
                 logOkMomentPath("Selected", path);
 
-                bitmapCache.BaseDirectory = Path.GetDirectoryName(path);
+                renderer.BaseDirectory = Path.GetDirectoryName(path);
                 await viewModel.LoadDefinitionAsync(path);
             }
             else
@@ -393,7 +408,7 @@ public sealed partial class MainWindow : Window
 
     #region Canvas management & drawing
 
-    private async void CreateResources(CanvasControl sender)
+    private async Task CreateResourcesAsync(CanvasControl sender)
     {
         try
         {
@@ -407,11 +422,8 @@ public sealed partial class MainWindow : Window
             }
             needResourceLoad = false;
 
+            // TODO: Push everything here into the renderer
             await renderer.CreateResourcesAsync(viewModel.Definition);
-
-            // Now that all the bitmaps are loaded, we now have enough information to
-            // generate the drawing primitives so we can render them.
-            viewModel.GeneratePrimitives();
 
             logDebugOk();
         }
@@ -430,17 +442,11 @@ public sealed partial class MainWindow : Window
     {
         try
         {
-            var primitives = viewModel.ShowBoundingBoxes ?
-                viewModel.Primitives :
-                viewModel.Primitives.Where(x => x.Purpose != PrimitivePurpose.Extents);
-
-            if (primitives is null)
+            if (!viewModel.IsLoading)
             {
-                logFail();
-                return;
+                // TODO: Push this logging into the renderer
+                renderer.Render(viewModel.ShowBoundingBoxes, args.DrawingSession);
             }
-
-            renderer.Render(primitives, args.DrawingSession);
         }
         catch (Exception ex)
         {
