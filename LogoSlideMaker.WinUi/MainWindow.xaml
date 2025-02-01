@@ -9,6 +9,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:win2dcanvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
     xmlns:converters="using:CommunityToolkit.WinUI.Converters"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:interactivitycore="using:Microsoft.Xaml.Interactions.Core"
+    xmlns:pickers="using:LogoSlideMaker.WinUi.Pickers" 
     mc:Ignorable="d"
     Closed="Window_Closed"
     SizeChanged="Window_SizeChanged"
@@ -37,7 +40,13 @@
                     <ImageIcon Source="ms-appx:///Assets/icon-info.svg"/>
                 </AppBarButton.Icon>
             </AppBarButton>
-            <AppBarButton Icon="Download" Label="Export" Click="Command_Export" IsEnabled="{Binding IsExporting, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"/>
+            <AppBarButton Icon="Download" Label="Export" IsEnabled="{Binding IsExporting, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}">
+                <interactivity:Interaction.Behaviors>
+                    <interactivitycore:EventTriggerBehavior EventName="Click">
+                        <pickers:ShowFileSavePickerAction Source="{x:Bind viewModel.FileSavePickerViewModel, Mode=OneWay}" />
+                    </interactivitycore:EventTriggerBehavior>
+                </interactivity:Interaction.Behaviors>
+            </AppBarButton>
         </StackPanel>
         <Border Grid.Column="1" Background="#333333" Height="{x:Bind commandBar.Height, Mode=OneWay}">
             <TextBlock Foreground="White" Height="{x:Bind commandBar.Height, Mode=OneWay}" FontFamily="Segoe UI" FontSize="14" HorizontalTextAlignment="Right" Margin="20,3,20,0">
