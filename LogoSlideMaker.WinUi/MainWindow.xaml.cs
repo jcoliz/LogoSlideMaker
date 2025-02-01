@@ -203,45 +203,8 @@ public sealed partial class MainWindow : Window
 
     private async void Command_Export(object _, RoutedEventArgs __)
     {
-        try
-        {
-            var pickerViewModel = viewModel.FileSavePickerViewModel;
-            var picker = new FileSavePicker()
-            {
-                SuggestedFileName = pickerViewModel.SuggestedFileName,
-                SettingsIdentifier = pickerViewModel.SettingsIdentifier
-            };
-
-            foreach(var kvp in pickerViewModel.FileTypeChoices)
-            {
-                picker.FileTypeChoices.Add(kvp);
-            }
-
-            // Associate the HWND with the file picker
-            InitializeWithWindow.Initialize(picker, hWnd);
-
-            var file = await picker.PickSaveFileAsync();
-            if (file != null)
-            {
-                var outPath = file.Path;
-
-                // Get off of the UI thread
-                _ = Task.Run(() => { pickerViewModel.Continue.Invoke(file.Path); });
-                logDebugMoment("Selected");
-            }
-            else
-            {
-                logDebugNoFile();
-            }
-
-            // TODO: Give user option to launch the ppt (would be nice)
-            // Note that this wouldn't happen here. VM would neeed to raise an
-            // Exported event, and then we've get that and show something
-        }
-        catch (Exception ex)
-        {
-            logFail(ex);
-        }
+        var picker = new Pickers.FileSavePicker(viewModel.FileSavePickerViewModel, this, logger);
+        await picker.Execute();
     }
 
     private async void Command_About(object sender, RoutedEventArgs e)
