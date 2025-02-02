@@ -49,7 +49,7 @@ public sealed partial class MainWindow : Window
             viewModel.ErrorFound += DisplayViewModelError;
             Root.DataContext = viewModel;
             Title = MainViewModel.AppDisplayName;
-            Root.Loaded += Root_Loaded;
+            Root.Loaded += (s,e) => { _ = viewModel.Start(); };
 
             // Set up app window
             var dpi = GetDpiForWindow(hWnd);
@@ -65,11 +65,6 @@ public sealed partial class MainWindow : Window
         {
             logCritical(ex);
         }
-    }
-
-    private void Root_Loaded(object sender, RoutedEventArgs e)
-    {
-        _ = viewModel.Start();     
     }
 
     #endregion
