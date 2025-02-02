@@ -49,6 +49,9 @@ public sealed partial class ShowFilePickerAction : DependencyObject, IAction
         }
         else
         {
+            // Note that this is an unhandled exception, and will crash the app. It will be logged
+            // by the unhandled exception handler. This is probably correct, because only way this
+            // would be null is a developer error.
             throw new ArgumentNullException(nameof(Source));
         }
 

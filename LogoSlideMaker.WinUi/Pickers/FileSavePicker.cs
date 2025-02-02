@@ -8,6 +8,12 @@ using WinRT.Interop;
 
 namespace LogoSlideMaker.WinUi.Pickers;
 
+/// <summary>
+/// Manages a file save picker with connection back to the viewmodel
+/// </summary>
+/// <param name="viewModel">Details on what to display and what to do with chosen file</param>
+/// <param name="parent">Which window should this dialog be parented to</param>
+/// <param name="logger">Where to send logs</param>
 public partial class FileSavePicker(FileSavePickerViewModel viewModel, Window parent, ILogger logger) : IFilePicker
 {
     private readonly Windows.Storage.Pickers.FileSavePicker _picker = new ()

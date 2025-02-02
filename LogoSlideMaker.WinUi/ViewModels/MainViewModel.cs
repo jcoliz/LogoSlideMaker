@@ -326,6 +326,9 @@ public partial class MainViewModel(BitmapCache bitmapCache, IDispatcher dispatch
             {
                 try
                 {
+                    // NOTE: isLoading will be set to false by the renderer after it has loaded
+                    // all the images contained in the definition. THe renderer is listening for
+                    // changes to `Definition`.
                     IsLoading = true;
 
                     var currentSlideIndex = _currentVariant?.Index ?? 0;

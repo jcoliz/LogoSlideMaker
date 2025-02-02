@@ -14,6 +14,7 @@ public interface IRenderViewModel: INotifyPropertyChanged
 
     bool ShowBoundingBoxes { get; }
 
+    // Needed because the renderer will be loading images from this path
     public string? LastOpenedFilePath { get; }
 
     public bool IsLoading { get; set; }
