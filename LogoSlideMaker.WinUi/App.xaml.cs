@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Management;
 using System.Runtime.CompilerServices;
+using LogoSlideMaker.WinUi.Pickers;
 using LogoSlideMaker.WinUi.Services;
 using LogoSlideMaker.WinUi.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,7 +39,7 @@ public partial class App : Application
                     "{ { TM: UtcDateTime(@t), SE: Session, SC: SourceContext, LO: Location, ID: EventId, LV: if @l = 'Information' then undefined() else @l, MT: @mt, EX: @x, PR: rest()} }\n"
                 ),
                 MainViewModel.LogsFolder+"/log-.json",
-                restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information,
+                restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Debug,
                 rollingInterval: RollingInterval.Day
             )
 #endif
@@ -94,6 +95,8 @@ public partial class App : Application
                     services.AddSingleton(x => new Lazy<Window>(() => x.GetRequiredService<MainWindow>()));
                     services.AddSingleton<IDispatcher, Dispatcher>();
 
+                    services.AddTransient<PickerFactory>();
+
                     logOkMoment("ConfigureServices");
                 })
 
@@ -106,6 +109,8 @@ public partial class App : Application
             logCritical(ex);
         }
     }
+
+    public IServiceProvider Services => _host!.Services;
 
     private void Application_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {

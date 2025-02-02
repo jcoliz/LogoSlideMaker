@@ -4,10 +4,14 @@
 // Source: https://github.com/CommunityToolkit/Windows/blob/main/components/Behaviors/src/NavigateToUriAction.cs
 
 using System;
+using System.Threading.Tasks;
 using DocumentFormat.OpenXml.Bibliography;
+using LogoSlideMaker.WinUi.Services;
 using LogoSlideMaker.WinUi.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.Xaml.Interactivity;
+using Windows.Foundation;
 
 namespace LogoSlideMaker.WinUi.Pickers;
 
@@ -39,7 +43,17 @@ public sealed partial class ShowFileSavePickerAction : DependencyObject, IAction
     {
         if (Source != null)
         {
-            Console.WriteLine(Source.SuggestedFileName);
+            var app = (App)Application.Current;
+            var dispatcher = app.Services.GetRequiredService<IDispatcher>();
+
+            dispatcher.Dispatch(async () => 
+            {
+                var picker = app.Services.GetRequiredService<PickerFactory>().CreatePicker<FileSavePicker>(Source);
+                if (picker is not null)
+                {
+                    await picker.Execute();
+                }
+            });
         }
         else
         {
