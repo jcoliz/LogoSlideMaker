@@ -267,7 +267,7 @@ public partial class MainViewModel(BitmapCache bitmapCache, IDispatcher dispatch
 
     #region Pickers
 
-    public FileSavePickerViewModel FileSavePickerViewModel => new()
+    public IPickerViewModel FileSavePickerViewModel => new FileSavePickerViewModel()
     {
         SuggestedFileName = Path.GetFileName(OutputPath ?? LastOpenedFilePath ?? "logo-slides.pptx"),
         SettingsIdentifier = "Common",
@@ -275,7 +275,7 @@ public partial class MainViewModel(BitmapCache bitmapCache, IDispatcher dispatch
         Continue = path => { _ = ExportToAsync(path); }
     };
 
-    public FileOpenPickerViewModel FileOpenPickerViewModel => new()
+    public IPickerViewModel FileOpenPickerViewModel => new FileOpenPickerViewModel()
     {
         SettingsIdentifier = "Common",
         FileTypeFilter = [".toml"],

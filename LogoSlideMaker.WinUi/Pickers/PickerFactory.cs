@@ -7,14 +7,10 @@ namespace LogoSlideMaker.WinUi.Pickers;
 
 public class PickerFactory(Lazy<Window> window, ILoggerFactory loggerFactory)
 {
-    public T? CreatePicker<T>(IPickerViewModel viewModel) where T : class
+    public IFilePicker? CreatePicker(IPickerViewModel viewModel) => viewModel switch
     {
-        if (typeof(T) == typeof(FileSavePicker) && viewModel is FileSavePickerViewModel fileSavePickerViewModel)
-        {
-            var picker = new FileSavePicker(fileSavePickerViewModel, window.Value, loggerFactory.CreateLogger<FileSavePicker>());
-            return picker as T;
-        }
-
-        return null;
-    }
+        FileOpenPickerViewModel fileOpenPickerViewModel => new FileOpenPicker(fileOpenPickerViewModel, window.Value, loggerFactory.CreateLogger<FileOpenPicker>()),
+        FileSavePickerViewModel fileSavePickerViewModel => new FileSavePicker(fileSavePickerViewModel, window.Value, loggerFactory.CreateLogger<FileSavePicker>()),
+        _ => null
+    };
 }

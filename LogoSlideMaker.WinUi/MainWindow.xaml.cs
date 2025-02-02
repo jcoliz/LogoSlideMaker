@@ -6,12 +6,10 @@ using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Windows.Storage.Pickers;
 using WinRT.Interop;
 
 namespace LogoSlideMaker.WinUi;
@@ -162,51 +160,7 @@ public sealed partial class MainWindow : Window
 
     #region Command handlers
 
-    private async void Command_Open(object _, RoutedEventArgs __)
-    {
-        try
-        {
-            var pickerViewModel = viewModel.FileOpenPickerViewModel;
-            var picker = new FileOpenPicker()
-            {
-                ViewMode = PickerViewMode.List,
-                SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
-                SettingsIdentifier = pickerViewModel.SettingsIdentifier,
-            };
-            foreach (var fileTppe in pickerViewModel.FileTypeFilter)
-            {
-                picker.FileTypeFilter.Add(fileTppe);
-            }
-
-            // https://github.com/microsoft/WindowsAppSDK/issues/1188
-            // Associate the HWND with the file picker
-            InitializeWithWindow.Initialize(picker, hWnd);
-
-            var file = await picker.PickSingleFileAsync();
-            if (file != null)
-            {
-                var path = file.Path;
-
-                _ = Task.Run(() => { pickerViewModel.Continue.Invoke(file.Path); });
-                logDebugMoment("Selected");
-            }
-            else
-            {
-                logDebugNoFile();
-            }
-        }
-        catch (Exception ex)
-        {
-            logFail(ex);
-        }
-    }
-
-    private async void Command_Export(object _, RoutedEventArgs __)
-    {
-        var picker = new Pickers.FileSavePicker(viewModel.FileSavePickerViewModel, this, logger);
-        await picker.Execute();
-    }
-
+    // TODO: Think about how to replace this with an action.
     private async void Command_About(object sender, RoutedEventArgs e)
     {
         try
