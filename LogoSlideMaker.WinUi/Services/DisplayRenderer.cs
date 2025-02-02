@@ -38,6 +38,8 @@ public partial class DisplayRenderer
         _logger = logger;
 
         viewModel.PropertyChanged += ViewModel_PropertyChanged;
+
+        logDebugOk();
     }
 
     private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -70,6 +72,8 @@ public partial class DisplayRenderer
 
             if (e.PropertyName == nameof(MainViewModel.Definition))
             {
+                logDebugMoment(nameof(MainViewModel.Definition));
+
                 // Set up bitmap cache
                 _bitmapCache.BaseDirectory = Path.GetDirectoryName(_viewModel.LastOpenedFilePath);
 
@@ -150,6 +154,8 @@ public partial class DisplayRenderer
     {
         try
         {
+            logDebugMoment("Starting");
+
             // If cansas is not loaded, we can't do this!
             if (!Canvas.IsLoaded)
             {
@@ -288,6 +294,8 @@ public partial class DisplayRenderer
     [LoggerMessage(Level = LogLevel.Debug, EventId = 1113, Message = "{Location}: Skipping, canvas not loaded")]
     public partial void logDebugCanvasNotLoaded([CallerMemberName] string? location = "");
 
+    [LoggerMessage(Level = LogLevel.Debug, EventId = 1114, Message = "{Location}: {Moment}")]
+    public partial void logDebugMoment(string moment, [CallerMemberName] string? location = "");
 
     [LoggerMessage(Level = LogLevel.Debug, EventId = 1115, Message = "{Location}: No resource load needed at this time")]
     public partial void logDebugNoLoadNeeded([CallerMemberName] string? location = "");
