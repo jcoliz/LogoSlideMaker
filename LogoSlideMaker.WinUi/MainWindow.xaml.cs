@@ -112,18 +112,23 @@ public sealed partial class MainWindow : Window
 
     private void ScrollViewer_PointerMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
+        if (sender is not ScrollViewer viewer)
+        {
+            return;        
+        }
+
         if (e.Pointer.IsInContact && e.Pointer.PointerDeviceType is Microsoft.UI.Input.PointerDeviceType.Mouse or Microsoft.UI.Input.PointerDeviceType.Touchpad)
         {
-            var pt = e.GetCurrentPoint(canvasScrollViewer);
+            var pt = e.GetCurrentPoint(viewer);
             if (lastPanningPoint.HasValue)
             {
                 var deltaX = pt.Position.X - lastPanningPoint.Value.X;
                 var deltaY = pt.Position.Y - lastPanningPoint.Value.Y;
 
-                var newX = canvasScrollViewer.HorizontalOffset - deltaX;
-                var newY = canvasScrollViewer.VerticalOffset - deltaY;
-                canvasScrollViewer.ScrollToHorizontalOffset(newX);
-                canvasScrollViewer.ScrollToVerticalOffset(newY);
+                var newX = viewer.HorizontalOffset - deltaX;
+                var newY = viewer.VerticalOffset - deltaY;
+                viewer.ScrollToHorizontalOffset(newX);
+                viewer.ScrollToVerticalOffset(newY);
             }
             lastPanningPoint = pt.Position;
         }
