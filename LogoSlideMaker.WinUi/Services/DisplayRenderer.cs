@@ -62,7 +62,7 @@ public partial class DisplayRenderer
                 Canvas.Invalidate();
             }
 
-            if (e.PropertyName == nameof(MainViewModel.IsLoading))
+            if (e.PropertyName == nameof(MainViewModel.IsLoading) && _viewModel.IsLoading == false)
             {
                 _primitives = _viewModel.Variant.GeneratePrimitives(_bitmapCache);
 
@@ -77,12 +77,17 @@ public partial class DisplayRenderer
                 // Set up bitmap cache
                 _bitmapCache.BaseDirectory = Path.GetDirectoryName(_viewModel.LastOpenedFilePath);
 
-                _dispatcher.Dispatch(async () => {
-                    await CreateResourcesAsync();
-                    Canvas.Invalidate();
+                CreateResourcesAsync().ContinueWith(t => 
+                {
+                    if (t.IsCompleted)
+                    {
+                        Canvas.Invalidate();
+                    }
                 });
-            }
 
+                // NOTE: CreateResourcesAsync() will set IsLoading to false, which will generate a
+                // property changed notification, which will lead to primitives to be generated (above).
+            }
         }
         catch (Exception ex)
         {
