@@ -6,6 +6,11 @@ dpi = 100
 title = "webp"
 path = "four.webp"
 
+[logos.bmp]
+title = "bmp"
+path = "four.bmp"
+
+
 [[boxes]]
 outer = { x = 1, y = 1, width = 10, height = 5 }
-logos.1 = [ "webp" ]
+logos.1 = [ "webp", "bmp" ]

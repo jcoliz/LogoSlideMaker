@@ -157,4 +157,25 @@ internal class ExportPipelineTests: TestsBase
         var actual = imageCache.GetAspectRatio("four.bmp");
         Assert.That(actual,Is.EqualTo(4));
     }
+
+    [Test]
+    public async Task ImageFormats()
+    {
+        // Given: A definition with logo having various limage formats
+        var definition = Loader.Load(GetStream("webp.toml")) as PublicDefinition;
+
+        // And: A presentation
+        var presentation = new Presentation();
+
+        // When: Rendering the variant to the presentation
+        var imageCache = new ImageCache() { ImagesAssembly = Assembly.GetExecutingAssembly() };
+        await imageCache.LoadAsync(definition!.ImagePaths);
+        var renderer = new ExportRenderEngineEx(presentation, definition!.Variants[0], imageCache , null);
+        renderer.Render();
+
+        presentation.SaveAs("webp.pptx");
+
+        // Then: Images are added as expected (?)
+
+    }    
 }
