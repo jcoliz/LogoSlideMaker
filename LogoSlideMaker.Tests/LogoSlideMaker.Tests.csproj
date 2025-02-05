@@ -79,6 +79,8 @@
     <EmbeddedResource Include="data/corner-radius.toml" />
 	  <Content Remove="data/four.bmp" />
     <EmbeddedResource Include="data/four.bmp" />
+	  <Content Remove="data/four.gif" />
+    <EmbeddedResource Include="data/four.gif" />
 
   <Content Remove="data/include-logos.toml" />
 

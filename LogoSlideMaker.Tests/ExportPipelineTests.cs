@@ -134,32 +134,22 @@ internal class ExportPipelineTests: TestsBase
         Assert.That(shape!.CornerSize,Is.EqualTo(40));
     }
 
-    [Test]
-    public async Task LoadWebP()
+    [TestCase("four.webp")]
+    [TestCase("four.bmp")]
+    [TestCase("four.gif")]
+    public async Task LoadImageFormats(string filename)
     {
         // When: Loading image paths containing WebP image
         var imageCache = new ImageCache() { ImagesAssembly = Assembly.GetExecutingAssembly() };
-        await imageCache.LoadAsync(["four.webp"]);
+        await imageCache.LoadAsync([filename]);
 
         // Then: Aspect ratio is returned as expected
-        var actual = imageCache.GetAspectRatio("four.webp");
+        var actual = imageCache.GetAspectRatio(filename);
         Assert.That(actual,Is.EqualTo(4));
     }
 
     [Test]
-    public async Task LoadBmp()
-    {
-        // When: Loading image paths containing WebP image
-        var imageCache = new ImageCache() { ImagesAssembly = Assembly.GetExecutingAssembly() };
-        await imageCache.LoadAsync(["four.bmp"]);
-
-        // Then: Aspect ratio is returned as expected
-        var actual = imageCache.GetAspectRatio("four.bmp");
-        Assert.That(actual,Is.EqualTo(4));
-    }
-
-    [Test]
-    public async Task ImageFormats()
+    public async Task RenderImageFormats()
     {
         // Given: A definition with logo having various limage formats
         var definition = Loader.Load(GetStream("webp.toml")) as PublicDefinition;

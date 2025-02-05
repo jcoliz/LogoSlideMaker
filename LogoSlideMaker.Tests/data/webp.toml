@@ -10,7 +10,10 @@ path = "four.webp"
 title = "bmp"
 path = "four.bmp"
 
+[logos.gif]
+title = "gif"
+path = "four.gif"
 
 [[boxes]]
 outer = { x = 1, y = 1, width = 10, height = 5 }
-logos.1 = [ "webp", "bmp" ]
+logos.1 = [ "webp", "bmp", "gif" ]
