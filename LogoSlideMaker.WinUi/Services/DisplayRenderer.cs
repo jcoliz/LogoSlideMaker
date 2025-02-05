@@ -62,9 +62,12 @@ public partial class DisplayRenderer
                 Canvas.Invalidate();
             }
 
-            if (e.PropertyName == nameof(MainViewModel.IsLoading) && _viewModel.IsLoading == false)
+            if (e.PropertyName == nameof(MainViewModel.IsLoading))
             {
-                _primitives = _viewModel.Variant.GeneratePrimitives(_bitmapCache);
+                if (!_viewModel.IsLoading)
+                {
+                    _primitives = _viewModel.Variant.GeneratePrimitives(_bitmapCache);
+                }
 
                 // New slide, redraw
                 Canvas.Invalidate();
