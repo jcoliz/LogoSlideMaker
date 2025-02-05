@@ -145,4 +145,16 @@ internal class ExportPipelineTests: TestsBase
         var actual = imageCache.GetAspectRatio("four.webp");
         Assert.That(actual,Is.EqualTo(4));
     }
+
+    [Test]
+    public async Task LoadBmp()
+    {
+        // When: Loading image paths containing WebP image
+        var imageCache = new ImageCache() { ImagesAssembly = Assembly.GetExecutingAssembly() };
+        await imageCache.LoadAsync(["four.bmp"]);
+
+        // Then: Aspect ratio is returned as expected
+        var actual = imageCache.GetAspectRatio("four.bmp");
+        Assert.That(actual,Is.EqualTo(4));
+    }
 }
