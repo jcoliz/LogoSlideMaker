@@ -45,6 +45,7 @@ public partial class MainViewModel(BitmapCache bitmapCache, IDispatcher dispatch
         {
             _definition = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(FileSavePickerViewModel));
         }
     }
     private IDefinition _definition = Loader.Empty();
@@ -336,12 +337,10 @@ public partial class MainViewModel(BitmapCache bitmapCache, IDispatcher dispatch
                     var loaded = Loader.Load(stream, path is not null ? Path.GetDirectoryName(path) : null);
                     LastOpenedFilePath = path;
                     bitmapCache.BaseDirectory = Path.GetDirectoryName(path);
+                    _gitVersion = path is not null ? Utilities.GitVersion.GetForDirectory(path) : null;
 
-                    _gitVersion = null;
                     Definition = loaded;
                     Variant = Definition.Variants[currentSlideIndex < _definition.Variants.Count ? currentSlideIndex : 0];
-
-                    _gitVersion = path is not null ? Utilities.GitVersion.GetForDirectory(path) : null;
 
                     logOkPath(path ?? "(null)");
                 }
