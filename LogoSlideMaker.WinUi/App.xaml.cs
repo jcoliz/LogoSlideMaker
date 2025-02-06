@@ -143,8 +143,7 @@ public partial class App : Application
                 throw new Exception("Host not found");            
             }
 
-            var folder = ApplicationData.Current.LocalFolder;
-            logDebugFolder(folder.Path);
+            logLocalFolder(ApplicationData.Current.LocalFolder.Path);
 
             await _host.StartAsync();
 
@@ -155,7 +154,7 @@ public partial class App : Application
         catch (Exception ex)
         {
             logCritical(ex);
-            Log.CloseAndFlush();
+            await Log.CloseAndFlushAsync();
         }
     }
 
@@ -182,8 +181,8 @@ public partial class App : Application
     [LoggerMessage(Level = LogLevel.Debug, EventId = 120, Message = "{Location}: Starting")]
     public partial void logStarting([CallerMemberName] string? location = null);
 
-    [LoggerMessage(Level = LogLevel.Debug, EventId = 121, Message = "{Location}: Local Folder: {Path}")]
-    public partial void logDebugFolder(string path, [CallerMemberName] string? location = null);
+    [LoggerMessage(Level = LogLevel.Information, EventId = 121, Message = "{Location}: Local Folder: {Path}")]
+    public partial void logLocalFolder(string path, [CallerMemberName] string? location = null);
 
     [LoggerMessage(Level = LogLevel.Error, EventId = 108, Message = "{Location}: Failed")]
     public partial void logFail([CallerMemberName] string? location = null);
